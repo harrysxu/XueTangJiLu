@@ -17,10 +17,10 @@ enum GlucoseLevel {
     /// 对应的 Asset 颜色名称
     var colorName: String {
         switch self {
-        case .low:      return "GlucoseLow"       // 番茄红
-        case .normal:   return "GlucoseNormal"     // 薄荷绿
-        case .high:     return "GlucoseHigh"       // 向日葵黄
-        case .veryHigh: return "GlucoseLow"        // 番茄红（复用低血糖色）
+        case .low:      return "GlucoseLow"        // 天蓝
+        case .normal:   return "GlucoseNormal"      // 翠绿
+        case .high:     return "GlucoseHigh"        // 琥珀
+        case .veryHigh: return "GlucoseVeryHigh"    // 柔和红
         }
     }
 

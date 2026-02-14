@@ -43,11 +43,10 @@ final class GlucoseViewModel {
         Double(inputText)
     }
 
-    /// 当前输入值的血糖等级
-    var currentLevel: GlucoseLevel? {
-        guard let value = inputValue else { return nil }
-        // 如果是 mg/dL 需先转为 mmol/L
-        return GlucoseLevel.from(value: value)
+    /// 当前输入值的血糖等级（需传入单位以正确转换）
+    func currentLevel(unit: GlucoseUnit) -> GlucoseLevel? {
+        guard let mmolL = normalizedValue(unit: unit) else { return nil }
+        return GlucoseLevel.from(value: mmolL)
     }
 
     /// 保存按钮是否可用

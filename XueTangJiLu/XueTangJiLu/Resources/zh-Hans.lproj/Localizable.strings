@@ -1,0 +1,168 @@
+/* Tab Bar */
+"tab.dashboard" = "首页";
+"tab.log" = "记录";
+"tab.insights" = "洞察";
+"tab.profile" = "我的";
+
+/* Dashboard */
+"greeting.morning" = "早上好";
+"greeting.afternoon" = "下午好";
+"greeting.evening" = "晚上好";
+"latest.glucose" = "最新血糖";
+"today.summary" = "今日概要";
+"today.records" = "今日记录";
+"today.average" = "今日均值";
+"today.tir" = "达标率";
+"today.medication" = "今日用药";
+"quick.glucose" = "记录血糖";
+"quick.medication" = "记录用药";
+"quick.meal" = "拍照饮食";
+"today.insight" = "今日洞察";
+"recent.records" = "最近记录";
+
+/* Record Input */
+"save.record" = "保存记录";
+"cancel" = "取消";
+"note" = "备注";
+"hide.note" = "隐藏备注";
+"add.note.optional" = "添加备注（可选）";
+"select.datetime" = "选择日期和时间";
+"select.time" = "选择时间";
+"done" = "完成";
+
+/* Quick Notes */
+"note.exercise" = "运动后";
+"note.stress" = "压力大";
+"note.sick" = "生病";
+"note.travel" = "旅行";
+"note.snack" = "加餐";
+"note.alcohol" = "饮酒";
+
+/* Meal Context */
+"meal.before_breakfast" = "早餐前";
+"meal.after_breakfast" = "早餐后";
+"meal.before_lunch" = "午餐前";
+"meal.after_lunch" = "午餐后";
+"meal.before_dinner" = "晚餐前";
+"meal.after_dinner" = "晚餐后";
+"meal.fasting" = "空腹";
+"meal.bedtime" = "睡前";
+"meal.other" = "其他";
+
+/* Glucose Level */
+"level.low" = "偏低";
+"level.normal" = "正常";
+"level.high" = "偏高";
+"level.veryHigh" = "注意";
+
+/* Medication */
+"med.rapid_insulin" = "速效胰岛素";
+"med.long_insulin" = "长效胰岛素";
+"med.mixed_insulin" = "预混胰岛素";
+"med.oral_medicine" = "口服药物";
+"med.other" = "其他";
+"med.save" = "保存用药记录";
+"med.name.placeholder" = "药物名称（可选，如\"诺和锐\"）";
+
+/* Meal Record */
+"meal.carb_low" = "低碳水";
+"meal.carb_medium" = "中碳水";
+"meal.carb_high" = "高碳水";
+"meal.record" = "记录饮食";
+"meal.take_photo" = "拍照";
+"meal.album" = "相册";
+"meal.carb_level" = "碳水水平";
+"meal.description" = "饮食描述";
+"meal.description.placeholder" = "如\"米饭 + 青菜 + 鸡胸肉\"";
+
+/* Insights / Trends */
+"insights.title" = "洞察";
+"insights.average" = "平均血糖";
+"insights.a1c" = "预估 A1C";
+"insights.tir" = "达标率";
+"insights.records" = "记录次数";
+"insights.cv" = "波动系数 (CV%)";
+"insights.stable" = "稳定";
+"insights.volatile" = "波动较大";
+"insights.target.cv" = "目标 < 36%";
+"insights.target.tir" = "目标 > 70%";
+"insights.weekly" = "周对比";
+"insights.a1c_goal" = "A1C 目标追踪";
+"insights.smart" = "智能洞察";
+
+/* Profile */
+"profile.title" = "我的";
+"profile.nickname" = "控糖达人";
+"profile.total" = "总记录";
+"profile.days" = "天";
+"profile.streak" = "连续";
+"profile.achievements" = "成就徽章";
+"profile.preferences" = "偏好设置";
+"profile.data" = "数据管理";
+"profile.about" = "关于";
+"profile.unit" = "血糖单位";
+"profile.target" = "目标范围";
+"profile.reminders" = "提醒设置";
+"profile.smart_tag" = "智能标签";
+"profile.health" = "Apple Health";
+"profile.icloud" = "iCloud 同步";
+"profile.export_pdf" = "导出 PDF 报告";
+"profile.export_csv" = "导出 CSV 数据";
+"profile.share" = "分享血糖摘要";
+"profile.version" = "版本";
+"profile.privacy" = "隐私政策";
+"profile.disclaimer" = "免责声明";
+"profile.rate" = "给我们评分";
+"profile.connected" = "已连接";
+"profile.connect" = "连接";
+"profile.auto" = "自动";
+
+/* Achievements */
+"achievement.streak" = "连续记录";
+"achievement.first" = "初次记录";
+"achievement.hundred" = "百次记录";
+"achievement.tir" = "TIR达标";
+
+/* Reminders */
+"reminder.title" = "提醒设置";
+"reminder.permission" = "通知权限";
+"reminder.enabled" = "已开启";
+"reminder.enable" = "开启";
+"reminder.measurement" = "测量提醒";
+"reminder.inactivity" = "久未记录提醒";
+"reminder.interval" = "提醒间隔";
+"reminder.off" = "关闭";
+"reminder.save" = "保存提醒设置";
+
+/* Onboarding */
+"onboarding.welcome" = "学糖记录";
+"onboarding.slogan" = "让控糖回归简单";
+"onboarding.start" = "开始使用";
+"onboarding.next" = "下一步";
+"onboarding.unit.title" = "选择您的血糖单位";
+"onboarding.unit.subtitle" = "可随时在设置中更改";
+"onboarding.edu.title" = "了解关键指标";
+"onboarding.edu.subtitle" = "帮助您更好地理解血糖数据";
+"onboarding.goal.title" = "设定您的控糖目标";
+"onboarding.goal.subtitle" = "可随时在设置中调整";
+"onboarding.health.title" = "健康数据同步";
+"onboarding.health.connect" = "连接 Health";
+"onboarding.health.skip" = "稍后再说";
+
+/* Empty States */
+"empty.no_records" = "还没有任何记录";
+"empty.tap_add" = "点击下方快捷按钮开始记录";
+"empty.no_glucose" = "还没有血糖记录";
+"empty.no_medication" = "还没有用药记录";
+"empty.no_trends" = "暂无趋势数据";
+"empty.trends_hint" = "开始记录血糖后，这里将展示您的趋势图表和洞察";
+
+/* Share */
+"share.title" = "分享摘要";
+"share.button" = "分享卡片";
+"share.week" = "本周";
+"share.month" = "本月";
+
+/* Activity */
+"activity.steps" = "今日步数";
+"activity.exercise" = "运动时间";

@@ -17,11 +17,14 @@ struct XueTangJiLuApp: App {
         let schema = Schema([
             GlucoseRecord.self,
             UserSettings.self,
+            MedicationRecord.self,
+            MealRecord.self,
         ])
 
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
+            groupContainer: .identifier(AppConstants.appGroupID),
             cloudKitDatabase: .private(AppConstants.cloudKitContainerID)
         )
 

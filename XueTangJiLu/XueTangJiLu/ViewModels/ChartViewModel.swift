@@ -21,12 +21,14 @@ enum TimeRange: String, CaseIterable {
     case week = "7天"
     case twoWeeks = "14天"
     case month = "30天"
+    case threeMonths = "90天"
 
     var days: Int {
         switch self {
-        case .week:     return 7
-        case .twoWeeks: return 14
-        case .month:    return 30
+        case .week:        return 7
+        case .twoWeeks:    return 14
+        case .month:       return 30
+        case .threeMonths: return 90
         }
     }
 }
@@ -46,8 +48,8 @@ final class ChartViewModel {
         let startDate = Date.daysAgo(selectedRange.days)
         let filtered = records.filter { $0.timestamp >= startDate }
 
-        // 7 天使用原始数据点，30 天使用按天聚合
-        if selectedRange == .month {
+        // 7 / 14 天使用原始数据点，30 / 90 天使用按天聚合
+        if selectedRange == .month || selectedRange == .threeMonths {
             return aggregateByDay(records: filtered)
         }
 

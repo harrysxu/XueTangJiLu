@@ -6,36 +6,44 @@
 //
 
 import SwiftUI
+import SwiftData
 
 /// 底部 Tab 导航容器
 struct MainTabView: View {
-    @State private var selectedTab: Tab = .home
+    @State private var selectedTab: Tab = .dashboard
 
     enum Tab: String {
-        case home = "记录"
-        case trend = "趋势"
-        case settings = "设置"
+        case dashboard = "首页"
+        case log = "记录"
+        case insights = "洞察"
+        case profile = "我的"
     }
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView()
+            DashboardView()
                 .tabItem {
-                    Label(Tab.home.rawValue, systemImage: selectedTab == .home ? "list.bullet" : "list.bullet")
+                    Label(Tab.dashboard.rawValue, systemImage: selectedTab == .dashboard ? "house.fill" : "house")
                 }
-                .tag(Tab.home)
+                .tag(Tab.dashboard)
 
-            TrendView()
+            LogView()
                 .tabItem {
-                    Label(Tab.trend.rawValue, systemImage: "chart.line.uptrend.xyaxis")
+                    Label(Tab.log.rawValue, systemImage: selectedTab == .log ? "square.and.pencil.circle.fill" : "square.and.pencil")
                 }
-                .tag(Tab.trend)
+                .tag(Tab.log)
 
-            SettingsView()
+            InsightsView()
                 .tabItem {
-                    Label(Tab.settings.rawValue, systemImage: selectedTab == .settings ? "gearshape.fill" : "gearshape")
+                    Label(Tab.insights.rawValue, systemImage: selectedTab == .insights ? "chart.line.uptrend.xyaxis.circle.fill" : "chart.line.uptrend.xyaxis")
                 }
-                .tag(Tab.settings)
+                .tag(Tab.insights)
+
+            ProfileView()
+                .tabItem {
+                    Label(Tab.profile.rawValue, systemImage: selectedTab == .profile ? "person.fill" : "person")
+                }
+                .tag(Tab.profile)
         }
         .tint(Color.brandPrimary)
     }
@@ -43,6 +51,6 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
-        .modelContainer(for: [GlucoseRecord.self, UserSettings.self], inMemory: true)
+        .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self], inMemory: true)
         .environment(HealthKitManager())
 }

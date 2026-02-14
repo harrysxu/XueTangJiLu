@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FD4546642F40B98A00B276C3 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD4546632F40B98A00B276C3 /* WidgetKit.framework */; };
+		FD4546662F40B98A00B276C3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD4546652F40B98A00B276C3 /* SwiftUI.framework */; };
+		FD4546732F40B98B00B276C3 /* XueTangJiLuWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FD4546612F40B98A00B276C3 /* XueTangJiLuWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		AEC6FDF92F3E221E00E58FE8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,12 +27,37 @@
 			remoteGlobalIDString = AEC6FDE62F3E221D00E58FE8;
 			remoteInfo = XueTangJiLu;
 		};
+		FD4546712F40B98B00B276C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AEC6FDDF2F3E221D00E58FE8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FD4546602F40B98A00B276C3;
+			remoteInfo = XueTangJiLuWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FD4546742F40B98B00B276C3 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FD4546732F40B98B00B276C3 /* XueTangJiLuWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		AEC6FDE72F3E221D00E58FE8 /* XueTangJiLu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XueTangJiLu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AEC6FDF82F3E221E00E58FE8 /* XueTangJiLuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XueTangJiLuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AEC6FE022F3E221E00E58FE8 /* XueTangJiLuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XueTangJiLuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD4546612F40B98A00B276C3 /* XueTangJiLuWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = XueTangJiLuWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FD4546632F40B98A00B276C3 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		FD4546652F40B98A00B276C3 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		FD45468E2F40BBF700B276C3 /* XueTangJiLuWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XueTangJiLuWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -37,6 +68,29 @@
 			);
 			target = AEC6FDE62F3E221D00E58FE8 /* XueTangJiLu */;
 		};
+		FD4546782F40B98B00B276C3 /* Exceptions for "XueTangJiLuWidget" folder in "XueTangJiLuWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FD4546602F40B98A00B276C3 /* XueTangJiLuWidgetExtension */;
+		};
+		FD4546842F40BB2300B276C3 /* Exceptions for "XueTangJiLu" folder in "XueTangJiLuWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Models/Enums/GlucoseLevel.swift,
+				Models/Enums/GlucoseUnit.swift,
+				Models/Enums/MealContext.swift,
+				Models/GlucoseRecord.swift,
+				Models/UserSettings.swift,
+				Services/GlucoseCalculator.swift,
+				Services/TagEngine.swift,
+				Utilities/Constants.swift,
+				"Utilities/Extensions/Color+Theme.swift",
+				Utilities/GlucoseUnitConverter.swift,
+			);
+			target = FD4546602F40B98A00B276C3 /* XueTangJiLuWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -44,6 +98,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				AEC6FE0A2F3E221E00E58FE8 /* Exceptions for "XueTangJiLu" folder in "XueTangJiLu" target */,
+				FD4546842F40BB2300B276C3 /* Exceptions for "XueTangJiLu" folder in "XueTangJiLuWidgetExtension" target */,
 			);
 			path = XueTangJiLu;
 			sourceTree = "<group>";
@@ -56,6 +111,14 @@
 		AEC6FE052F3E221E00E58FE8 /* XueTangJiLuUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = XueTangJiLuUITests;
+			sourceTree = "<group>";
+		};
+		FD4546672F40B98A00B276C3 /* XueTangJiLuWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FD4546782F40B98B00B276C3 /* Exceptions for "XueTangJiLuWidget" folder in "XueTangJiLuWidgetExtension" target */,
+			);
+			path = XueTangJiLuWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -82,15 +145,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FD45465E2F40B98A00B276C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD4546662F40B98A00B276C3 /* SwiftUI.framework in Frameworks */,
+				FD4546642F40B98A00B276C3 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		AEC6FDDE2F3E221D00E58FE8 = {
 			isa = PBXGroup;
 			children = (
+				FD45468E2F40BBF700B276C3 /* XueTangJiLuWidgetExtension.entitlements */,
 				AEC6FDE92F3E221D00E58FE8 /* XueTangJiLu */,
 				AEC6FDFB2F3E221E00E58FE8 /* XueTangJiLuTests */,
 				AEC6FE052F3E221E00E58FE8 /* XueTangJiLuUITests */,
+				FD4546672F40B98A00B276C3 /* XueTangJiLuWidget */,
+				FD4546622F40B98A00B276C3 /* Frameworks */,
 				AEC6FDE82F3E221D00E58FE8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -101,8 +176,18 @@
 				AEC6FDE72F3E221D00E58FE8 /* XueTangJiLu.app */,
 				AEC6FDF82F3E221E00E58FE8 /* XueTangJiLuTests.xctest */,
 				AEC6FE022F3E221E00E58FE8 /* XueTangJiLuUITests.xctest */,
+				FD4546612F40B98A00B276C3 /* XueTangJiLuWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		FD4546622F40B98A00B276C3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FD4546632F40B98A00B276C3 /* WidgetKit.framework */,
+				FD4546652F40B98A00B276C3 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -115,10 +200,12 @@
 				AEC6FDE32F3E221D00E58FE8 /* Sources */,
 				AEC6FDE42F3E221D00E58FE8 /* Frameworks */,
 				AEC6FDE52F3E221D00E58FE8 /* Resources */,
+				FD4546742F40B98B00B276C3 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				FD4546722F40B98B00B276C3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				AEC6FDE92F3E221D00E58FE8 /* XueTangJiLu */,
@@ -176,6 +263,28 @@
 			productReference = AEC6FE022F3E221E00E58FE8 /* XueTangJiLuUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		FD4546602F40B98A00B276C3 /* XueTangJiLuWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FD4546772F40B98B00B276C3 /* Build configuration list for PBXNativeTarget "XueTangJiLuWidgetExtension" */;
+			buildPhases = (
+				FD45465D2F40B98A00B276C3 /* Sources */,
+				FD45465E2F40B98A00B276C3 /* Frameworks */,
+				FD45465F2F40B98A00B276C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				FD4546672F40B98A00B276C3 /* XueTangJiLuWidget */,
+			);
+			name = XueTangJiLuWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = XueTangJiLuWidgetExtension;
+			productReference = FD4546612F40B98A00B276C3 /* XueTangJiLuWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -197,6 +306,9 @@
 						CreatedOnToolsVersion = 26.0.1;
 						TestTargetID = AEC6FDE62F3E221D00E58FE8;
 					};
+					FD4546602F40B98A00B276C3 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
 				};
 			};
 			buildConfigurationList = AEC6FDE22F3E221D00E58FE8 /* Build configuration list for PBXProject "XueTangJiLu" */;
@@ -205,6 +317,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = AEC6FDDE2F3E221D00E58FE8;
 			minimizedProjectReferenceProxies = 1;
@@ -216,6 +329,7 @@
 				AEC6FDE62F3E221D00E58FE8 /* XueTangJiLu */,
 				AEC6FDF72F3E221E00E58FE8 /* XueTangJiLuTests */,
 				AEC6FE012F3E221E00E58FE8 /* XueTangJiLuUITests */,
+				FD4546602F40B98A00B276C3 /* XueTangJiLuWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -236,6 +350,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AEC6FE002F3E221E00E58FE8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FD45465F2F40B98A00B276C3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -266,6 +387,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FD45465D2F40B98A00B276C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -278,6 +406,11 @@
 			isa = PBXTargetDependency;
 			target = AEC6FDE62F3E221D00E58FE8 /* XueTangJiLu */;
 			targetProxy = AEC6FE032F3E221E00E58FE8 /* PBXContainerItemProxy */;
+		};
+		FD4546722F40B98B00B276C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FD4546602F40B98A00B276C3 /* XueTangJiLuWidgetExtension */;
+			targetProxy = FD4546712F40B98B00B276C3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -403,7 +536,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -461,7 +594,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -479,7 +612,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3LSP26D33P;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xxl.XueTangJiLuTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -501,7 +634,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 3LSP26D33P;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xxl.XueTangJiLuTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -555,6 +688,70 @@
 			};
 			name = Release;
 		};
+		FD4546752F40B98B00B276C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = XueTangJiLuWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3LSP26D33P;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = XueTangJiLuWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = XueTangJiLuWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xxl.XueTangJiLu.XueTangJiLuWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FD4546762F40B98B00B276C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = XueTangJiLuWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3LSP26D33P;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = XueTangJiLuWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = XueTangJiLuWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xxl.XueTangJiLu.XueTangJiLuWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -590,6 +787,15 @@
 			buildConfigurations = (
 				AEC6FE142F3E221E00E58FE8 /* Debug */,
 				AEC6FE152F3E221E00E58FE8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FD4546772F40B98B00B276C3 /* Build configuration list for PBXNativeTarget "XueTangJiLuWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD4546752F40B98B00B276C3 /* Debug */,
+				FD4546762F40B98B00B276C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

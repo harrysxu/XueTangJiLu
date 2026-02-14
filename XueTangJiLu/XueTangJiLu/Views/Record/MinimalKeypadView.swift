@@ -56,17 +56,20 @@ struct MinimalKeypadView: View {
 struct KeypadButton: View {
     let label: String?
     let icon: String?
+    let identifier: String
     let action: () -> Void
 
     init(label: String, action: @escaping () -> Void) {
         self.label = label
         self.icon = nil
+        self.identifier = "keypad_\(label == "." ? "dot" : label)"
         self.action = action
     }
 
     init(icon: String, action: @escaping () -> Void) {
         self.label = nil
         self.icon = icon
+        self.identifier = "keypad_delete"
         self.action = action
     }
 
@@ -91,6 +94,7 @@ struct KeypadButton: View {
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonMedium))
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(identifier)
         .accessibilityLabel(accessLabel)
     }
 

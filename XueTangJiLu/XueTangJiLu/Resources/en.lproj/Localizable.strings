@@ -1,0 +1,168 @@
+/* Tab Bar */
+"tab.dashboard" = "Home";
+"tab.log" = "Log";
+"tab.insights" = "Insights";
+"tab.profile" = "Profile";
+
+/* Dashboard */
+"greeting.morning" = "Good Morning";
+"greeting.afternoon" = "Good Afternoon";
+"greeting.evening" = "Good Evening";
+"latest.glucose" = "Latest Glucose";
+"today.summary" = "Today Summary";
+"today.records" = "Today Records";
+"today.average" = "Today Average";
+"today.tir" = "Time in Range";
+"today.medication" = "Today Medication";
+"quick.glucose" = "Log Glucose";
+"quick.medication" = "Log Medicine";
+"quick.meal" = "Log Meal";
+"today.insight" = "Today's Insight";
+"recent.records" = "Recent Records";
+
+/* Record Input */
+"save.record" = "Save Record";
+"cancel" = "Cancel";
+"note" = "Note";
+"hide.note" = "Hide Note";
+"add.note.optional" = "Add note (optional)";
+"select.datetime" = "Select Date and Time";
+"select.time" = "Select Time";
+"done" = "Done";
+
+/* Quick Notes */
+"note.exercise" = "After Exercise";
+"note.stress" = "Stressed";
+"note.sick" = "Sick";
+"note.travel" = "Traveling";
+"note.snack" = "Snack";
+"note.alcohol" = "Alcohol";
+
+/* Meal Context */
+"meal.before_breakfast" = "Before Breakfast";
+"meal.after_breakfast" = "After Breakfast";
+"meal.before_lunch" = "Before Lunch";
+"meal.after_lunch" = "After Lunch";
+"meal.before_dinner" = "Before Dinner";
+"meal.after_dinner" = "After Dinner";
+"meal.fasting" = "Fasting";
+"meal.bedtime" = "Bedtime";
+"meal.other" = "Other";
+
+/* Glucose Level */
+"level.low" = "Low";
+"level.normal" = "Normal";
+"level.high" = "High";
+"level.veryHigh" = "Very High";
+
+/* Medication */
+"med.rapid_insulin" = "Rapid Insulin";
+"med.long_insulin" = "Long-acting Insulin";
+"med.mixed_insulin" = "Mixed Insulin";
+"med.oral_medicine" = "Oral Medicine";
+"med.other" = "Other";
+"med.save" = "Save Medication";
+"med.name.placeholder" = "Medication name (optional)";
+
+/* Meal Record */
+"meal.carb_low" = "Low Carb";
+"meal.carb_medium" = "Medium Carb";
+"meal.carb_high" = "High Carb";
+"meal.record" = "Log Meal";
+"meal.take_photo" = "Camera";
+"meal.album" = "Album";
+"meal.carb_level" = "Carb Level";
+"meal.description" = "Meal Description";
+"meal.description.placeholder" = "e.g. Rice + vegetables + chicken";
+
+/* Insights / Trends */
+"insights.title" = "Insights";
+"insights.average" = "Average Glucose";
+"insights.a1c" = "Estimated A1C";
+"insights.tir" = "Time in Range";
+"insights.records" = "Record Count";
+"insights.cv" = "Coefficient of Variation (CV%)";
+"insights.stable" = "Stable";
+"insights.volatile" = "Volatile";
+"insights.target.cv" = "Target < 36%";
+"insights.target.tir" = "Target > 70%";
+"insights.weekly" = "Weekly Comparison";
+"insights.a1c_goal" = "A1C Goal Tracking";
+"insights.smart" = "Smart Insights";
+
+/* Profile */
+"profile.title" = "Profile";
+"profile.nickname" = "Sugar Master";
+"profile.total" = "Total";
+"profile.days" = "Days";
+"profile.streak" = "Streak";
+"profile.achievements" = "Achievements";
+"profile.preferences" = "Preferences";
+"profile.data" = "Data Management";
+"profile.about" = "About";
+"profile.unit" = "Glucose Unit";
+"profile.target" = "Target Range";
+"profile.reminders" = "Reminders";
+"profile.smart_tag" = "Smart Tags";
+"profile.health" = "Apple Health";
+"profile.icloud" = "iCloud Sync";
+"profile.export_pdf" = "Export PDF Report";
+"profile.export_csv" = "Export CSV Data";
+"profile.share" = "Share Summary";
+"profile.version" = "Version";
+"profile.privacy" = "Privacy Policy";
+"profile.disclaimer" = "Disclaimer";
+"profile.rate" = "Rate Us";
+"profile.connected" = "Connected";
+"profile.connect" = "Connect";
+"profile.auto" = "Auto";
+
+/* Achievements */
+"achievement.streak" = "Streak";
+"achievement.first" = "First Record";
+"achievement.hundred" = "100 Records";
+"achievement.tir" = "TIR Achieved";
+
+/* Reminders */
+"reminder.title" = "Reminders";
+"reminder.permission" = "Notification Permission";
+"reminder.enabled" = "Enabled";
+"reminder.enable" = "Enable";
+"reminder.measurement" = "Measurement Reminders";
+"reminder.inactivity" = "Inactivity Reminder";
+"reminder.interval" = "Interval";
+"reminder.off" = "Off";
+"reminder.save" = "Save Reminders";
+
+/* Onboarding */
+"onboarding.welcome" = "XueTang Record";
+"onboarding.slogan" = "Simple Glucose Management";
+"onboarding.start" = "Get Started";
+"onboarding.next" = "Next";
+"onboarding.unit.title" = "Choose Your Unit";
+"onboarding.unit.subtitle" = "You can change this in Settings";
+"onboarding.edu.title" = "Learn Key Metrics";
+"onboarding.edu.subtitle" = "Help you understand your glucose data";
+"onboarding.goal.title" = "Set Your Goals";
+"onboarding.goal.subtitle" = "You can adjust anytime in Settings";
+"onboarding.health.title" = "Health Data Sync";
+"onboarding.health.connect" = "Connect Health";
+"onboarding.health.skip" = "Maybe Later";
+
+/* Empty States */
+"empty.no_records" = "No records yet";
+"empty.tap_add" = "Tap the buttons below to start recording";
+"empty.no_glucose" = "No glucose records";
+"empty.no_medication" = "No medication records";
+"empty.no_trends" = "No trend data";
+"empty.trends_hint" = "Start recording glucose to see trends and insights";
+
+/* Share */
+"share.title" = "Share Summary";
+"share.button" = "Share Card";
+"share.week" = "This Week";
+"share.month" = "This Month";
+
+/* Activity */
+"activity.steps" = "Today Steps";
+"activity.exercise" = "Exercise Time";

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import StoreKit
 
 /// 设置页
 struct SettingsView: View {
@@ -202,8 +203,9 @@ struct SettingsView: View {
     }
 
     private func requestReview() {
-        guard let url = URL(string: "https://apps.apple.com/app/id_placeholder") else { return }
-        UIApplication.shared.open(url)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            AppStore.requestReview(in: windowScene)
+        }
     }
 }
 

@@ -103,6 +103,7 @@ struct HomeView: View {
                     level: latest.glucoseLevel,
                     style: .hero
                 )
+                .accessibilityIdentifier("latestGlucoseValue")
 
                 HStack(spacing: AppConstants.Spacing.xs) {
                     Image(systemName: latest.mealContext.iconName)
@@ -230,6 +231,7 @@ struct HomeView: View {
                 .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
         }
         .padding(.bottom, AppConstants.Spacing.lg)
+        .accessibilityIdentifier("addRecord")
         .accessibilityLabel("添加血糖记录")
         .accessibilityHint("双击打开血糖录入键盘")
     }

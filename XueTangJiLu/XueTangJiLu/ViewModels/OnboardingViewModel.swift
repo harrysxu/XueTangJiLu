@@ -12,14 +12,20 @@ import Observation
 @Observable
 final class OnboardingViewModel {
 
-    /// 当前步骤 (0: 欢迎, 1: 单位选择, 2: HealthKit 授权)
+    /// 当前步骤 (0: 欢迎, 1: 单位选择, 2: 科普, 3: 目标设置, 4: HealthKit)
     var currentStep: Int = 0
 
     /// 用户选择的血糖单位
     var selectedUnit: GlucoseUnit = .systemDefault
 
+    /// A1C 目标值
+    var targetA1C: Double = 7.0
+
+    /// 每日记录目标
+    var dailyRecordGoal: Int = 4
+
     /// 总步骤数
-    let totalSteps = 3
+    let totalSteps = 5
 
     /// 是否为最后一步
     var isLastStep: Bool {

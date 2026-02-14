@@ -36,6 +36,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: [GlucoseRecord.self, UserSettings.self], inMemory: true)
+        .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self], inMemory: true)
         .environment(HealthKitManager())
 }

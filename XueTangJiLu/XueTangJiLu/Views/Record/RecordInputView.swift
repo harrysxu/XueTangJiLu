@@ -33,26 +33,33 @@ struct RecordInputView: View {
         return .primary
     }
 
+    /// 快捷备注标签
+    private let quickNotes = ["运动后", "压力大", "生病", "旅行", "加餐", "饮酒"]
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // 数值预览区域
+                // 数值预览区域（带渐变背景）
                 valuePreviewSection
-                    .padding(.top, AppConstants.Spacing.lg)
+                    .padding(.top, AppConstants.Spacing.sm)
 
-                // 场景标签选择器
+                // 场景标签选择器（网格）
                 mealContextSelector
-                    .padding(.top, AppConstants.Spacing.lg)
+                    .padding(.top, AppConstants.Spacing.md)
+
+                // 快捷备注标签
+                quickNoteSelector
+                    .padding(.top, AppConstants.Spacing.sm)
 
                 // 日期时间
                 dateTimeSection
-                    .padding(.top, AppConstants.Spacing.md)
+                    .padding(.top, AppConstants.Spacing.sm)
 
                 // 备注区域
                 if viewModel.showNoteField {
                     noteSection
-                        .padding(.top, AppConstants.Spacing.md)
-                        .transition(.opacity)
+                        .padding(.top, AppConstants.Spacing.sm)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
                 }
 
                 Spacer()
@@ -61,11 +68,11 @@ struct RecordInputView: View {
                 MinimalKeypadView { key in
                     viewModel.handleKeyPress(key, unit: unit)
                 }
-                .padding(.top, AppConstants.Spacing.md)
+                .padding(.top, AppConstants.Spacing.sm)
 
                 // 保存按钮
                 saveButton
-                    .padding(.top, AppConstants.Spacing.lg)
+                    .padding(.top, AppConstants.Spacing.md)
                     .padding(.horizontal, AppConstants.Spacing.lg)
                     .padding(.bottom, AppConstants.Spacing.sm)
             }
@@ -87,10 +94,10 @@ struct RecordInputView: View {
         }
     }
 
-    // MARK: - 数值预览
+    // MARK: - 数值预览（带渐变背景）
 
     private var valuePreviewSection: some View {
-        VStack(spacing: AppConstants.Spacing.sm) {
+        VStack(spacing: AppConstants.Spacing.xs) {
             Text(viewModel.inputText.isEmpty ? "0.0" : viewModel.inputText)
                 .font(.glucoseDisplay)
                 .foregroundStyle(viewModel.inputText.isEmpty ? Color(.tertiaryLabel) : valueColor)
@@ -101,10 +108,35 @@ struct RecordInputView: View {
             Text(unit.rawValue)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+
+            // 血糖水平指示
+            if let level = viewModel.currentLevel(unit: unit) {
+                HStack(spacing: 4) {
+                    Image(systemName: level.accessoryIconName)
+                        .font(.caption2)
+                    Text(level.description)
+                        .font(.caption.weight(.medium))
+                }
+                .foregroundStyle(Color.forGlucoseLevel(level))
+                .transition(.opacity)
+            }
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppConstants.Spacing.md)
+        .background(
+            Group {
+                if let level = viewModel.currentLevel(unit: unit) {
+                    Color.glucoseGradient(for: level)
+                } else {
+                    Color.clear
+                }
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
+        .padding(.horizontal, AppConstants.Spacing.lg)
     }
 
-    // MARK: - 场景标签选择器
+    // MARK: - 场景标签选择器（2行可滚动）
 
     private var mealContextSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -116,6 +148,44 @@ struct RecordInputView: View {
                     ) {
                         viewModel.selectedMealContext = context
                     }
+                }
+            }
+            .padding(.horizontal, AppConstants.Spacing.lg)
+        }
+    }
+
+    // MARK: - 快捷备注标签
+
+    private var quickNoteSelector: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: AppConstants.Spacing.xs) {
+                ForEach(quickNotes, id: \.self) { note in
+                    Button(action: {
+                        HapticManager.selection()
+                        if viewModel.noteText == note {
+                            viewModel.noteText = ""
+                        } else {
+                            viewModel.noteText = note
+                            viewModel.showNoteField = true
+                        }
+                    }) {
+                        Text(note)
+                            .font(.caption2)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(
+                                viewModel.noteText == note
+                                    ? Color.brandPrimary.opacity(0.15)
+                                    : Color(.quaternarySystemFill)
+                            )
+                            .foregroundStyle(
+                                viewModel.noteText == note
+                                    ? Color.brandPrimary
+                                    : .secondary
+                            )
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, AppConstants.Spacing.lg)
