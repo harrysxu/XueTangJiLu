@@ -25,16 +25,13 @@ struct RecordInputView: View {
         settings.preferredUnit
     }
 
-    /// 当前输入值对应的颜色
+    /// 当前输入值对应的颜色（场景感知）
     private var valueColor: Color {
         if let mmolL = viewModel.normalizedValue(unit: unit) {
-            return Color.forGlucoseValue(mmolL)
+            return Color.forGlucoseValue(mmolL, tagId: viewModel.selectedSceneTagId, settings: settings)
         }
         return .primary
     }
-
-    /// 快捷备注标签
-    private let quickNotes = ["运动后", "压力大", "生病", "旅行", "加餐", "饮酒"]
 
     var body: some View {
         NavigationStack {
@@ -77,14 +74,15 @@ struct RecordInputView: View {
                     .padding(.bottom, AppConstants.Spacing.sm)
             }
             .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(viewModel.isEditMode ? String(localized: "record.edit") : "")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") {
+                    Button(String(localized: "cancel")) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .primaryAction) {
-                    Button(viewModel.showNoteField ? "隐藏备注" : "备注") {
+                    Button(viewModel.showNoteField ? String(localized: "hide.note") : String(localized: "note")) {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             viewModel.showNoteField.toggle()
                         }
@@ -110,11 +108,11 @@ struct RecordInputView: View {
                 .foregroundStyle(.secondary)
 
             // 血糖水平指示
-            if let level = viewModel.currentLevel(unit: unit) {
+            if let level = viewModel.currentLevel(unit: unit, settings: settings) {
                 HStack(spacing: 4) {
                     Image(systemName: level.accessoryIconName)
                         .font(.caption2)
-                    Text(level.description)
+                    Text(level.localizedDescription)
                         .font(.caption.weight(.medium))
                 }
                 .foregroundStyle(Color.forGlucoseLevel(level))
@@ -125,7 +123,7 @@ struct RecordInputView: View {
         .padding(.vertical, AppConstants.Spacing.md)
         .background(
             Group {
-                if let level = viewModel.currentLevel(unit: unit) {
+                if let level = viewModel.currentLevel(unit: unit, settings: settings) {
                     Color.glucoseGradient(for: level)
                 } else {
                     Color.clear
@@ -136,17 +134,38 @@ struct RecordInputView: View {
         .padding(.horizontal, AppConstants.Spacing.lg)
     }
 
-    // MARK: - 场景标签选择器（2行可滚动）
+    // MARK: - 场景标签选择器（按用户配置顺序和可见性）
 
     private var mealContextSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppConstants.Spacing.sm) {
-                ForEach(MealContext.allCases, id: \.self) { context in
+                // 使用推荐的场景标签(根据用户类型)
+                ForEach(settings.recommendedSceneTags) { tag in
                     MealContextTag(
-                        context: context,
-                        isSelected: viewModel.selectedMealContext == context
+                        tagId: tag.id,
+                        label: tag.label,
+                        iconName: tag.icon,
+                        isSelected: viewModel.selectedSceneTagId == tag.id
                     ) {
-                        viewModel.selectedMealContext = context
+                        viewModel.selectedSceneTagId = tag.id
+                    }
+                }
+                
+                // "更多"按钮(如果有隐藏的场景)
+                if settings.visibleSceneTags.count > settings.recommendedSceneTags.count {
+                    Button(action: {
+                        // TODO: 显示所有场景的弹窗
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "ellipsis")
+                            Text(String(localized: "record.more"))
+                        }
+                        .font(.caption.weight(.medium))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color(.quaternarySystemFill))
+                        .foregroundStyle(.secondary)
+                        .clipShape(Capsule())
                     }
                 }
             }
@@ -154,36 +173,40 @@ struct RecordInputView: View {
         }
     }
 
-    // MARK: - 快捷备注标签
+    // MARK: - 快捷备注标签（按用户配置）
 
     private var quickNoteSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppConstants.Spacing.xs) {
-                ForEach(quickNotes, id: \.self) { note in
+                ForEach(settings.visibleAnnotationTags) { tag in
                     Button(action: {
                         HapticManager.selection()
-                        if viewModel.noteText == note {
+                        if viewModel.noteText == tag.label {
                             viewModel.noteText = ""
                         } else {
-                            viewModel.noteText = note
+                            viewModel.noteText = tag.label
                             viewModel.showNoteField = true
                         }
                     }) {
-                        Text(note)
-                            .font(.caption2)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(
-                                viewModel.noteText == note
-                                    ? Color.brandPrimary.opacity(0.15)
-                                    : Color(.quaternarySystemFill)
-                            )
-                            .foregroundStyle(
-                                viewModel.noteText == note
-                                    ? Color.brandPrimary
-                                    : .secondary
-                            )
-                            .clipShape(Capsule())
+                        HStack(spacing: 4) {
+                            Image(systemName: tag.icon)
+                                .font(.caption2)
+                            Text(tag.label)
+                                .font(.caption2)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            viewModel.noteText == tag.label
+                                ? Color.brandPrimary.opacity(0.15)
+                                : Color(.quaternarySystemFill)
+                        )
+                        .foregroundStyle(
+                            viewModel.noteText == tag.label
+                                ? Color.brandPrimary
+                                : .secondary
+                        )
+                        .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
                 }
@@ -198,38 +221,74 @@ struct RecordInputView: View {
         Button(action: {
             showDatePicker.toggle()
         }) {
-            Text(viewModel.selectedDate.fullDateTimeString)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+            HStack(spacing: 6) {
+                Image(systemName: "calendar.badge.clock")
+                    .font(.caption)
+                Text(viewModel.selectedDate.fullDateTimeString)
+                    .font(.footnote)
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+            }
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color(.quaternarySystemFill))
+            .clipShape(Capsule())
         }
         .sheet(isPresented: $showDatePicker) {
             NavigationStack {
-                DatePicker(
-                    "选择日期和时间",
-                    selection: $viewModel.selectedDate,
-                    in: ...Date.now,
-                    displayedComponents: [.date, .hourAndMinute]
-                )
-                .datePickerStyle(.graphical)
-                .padding()
-                .navigationTitle("选择时间")
+                VStack(spacing: 0) {
+                    DatePicker(
+                        String(localized: "select.datetime"),
+                        selection: $viewModel.selectedDate,
+                        in: ...Date.now,
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                    .datePickerStyle(.graphical)
+                    .padding()
+                    
+                    Divider()
+                    
+                    // 快捷时间选择
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(String(localized: "record.quick_select"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal)
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                QuickTimeButton(title: String(localized: "record.time.now"), date: Date.now, selectedDate: $viewModel.selectedDate)
+                                QuickTimeButton(title: String(localized: "record.time.1h_ago"), date: Date.now.addingTimeInterval(-3600), selectedDate: $viewModel.selectedDate)
+                                QuickTimeButton(title: String(localized: "record.time.2h_ago"), date: Date.now.addingTimeInterval(-7200), selectedDate: $viewModel.selectedDate)
+                                QuickTimeButton(title: String(localized: "record.time.today_7am"), date: Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date.now) ?? Date.now, selectedDate: $viewModel.selectedDate)
+                                QuickTimeButton(title: String(localized: "record.time.today_12pm"), date: Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date.now) ?? Date.now, selectedDate: $viewModel.selectedDate)
+                                QuickTimeButton(title: String(localized: "record.time.today_6pm"), date: Calendar.current.date(bySettingHour: 18, minute: 0, second: 0, of: Date.now) ?? Date.now, selectedDate: $viewModel.selectedDate)
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.vertical, 12)
+                    .background(Color(.systemGroupedBackground))
+                }
+                .navigationTitle(String(localized: "select.time"))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("完成") {
+                        Button(String(localized: "done")) {
                             showDatePicker = false
                         }
                     }
                 }
             }
-            .presentationDetents([.medium])
+            .presentationDetents([.large])
         }
     }
 
     // MARK: - 备注
 
     private var noteSection: some View {
-        TextField("添加备注（可选）", text: $viewModel.noteText)
+        TextField(String(localized: "add.note.optional"), text: $viewModel.noteText)
             .font(.subheadline)
             .padding(AppConstants.Spacing.md)
             .background(Color(.tertiarySystemGroupedBackground))
@@ -256,7 +315,7 @@ struct RecordInputView: View {
                     ProgressView()
                         .tint(.white)
                 } else {
-                    Text("保存记录")
+                    Text(viewModel.isEditMode ? String(localized: "record.save_changes") : String(localized: "save.record"))
                         .font(.body.weight(.semibold))
                 }
             }
@@ -271,8 +330,35 @@ struct RecordInputView: View {
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonLarge))
         }
         .disabled(!viewModel.isSaveEnabled(unit: unit) || viewModel.isSaving)
-        .accessibilityLabel("保存记录 \(viewModel.inputText) \(unit.rawValue) \(viewModel.selectedMealContext.displayName)")
+        .accessibilityLabel("\(viewModel.isEditMode ? String(localized: "record.save_changes") : String(localized: "save.record")) \(viewModel.inputText) \(unit.rawValue) \(settings.displayName(for: viewModel.selectedSceneTagId))")
         .accessibilityIdentifier("saveRecord")
+    }
+}
+
+// MARK: - 快捷时间选择按钮
+
+private struct QuickTimeButton: View {
+    let title: String
+    let date: Date
+    @Binding var selectedDate: Date
+    
+    private var isSelected: Bool {
+        Calendar.current.isDate(selectedDate, equalTo: date, toGranularity: .minute)
+    }
+    
+    var body: some View {
+        Button(action: {
+            selectedDate = date
+            HapticManager.selection()
+        }) {
+            Text(title)
+                .font(.caption)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(isSelected ? Color.brandPrimary.opacity(0.15) : Color(.quaternarySystemFill))
+                .foregroundStyle(isSelected ? Color.brandPrimary : .secondary)
+                .clipShape(Capsule())
+        }
     }
 }
 

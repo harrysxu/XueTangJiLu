@@ -39,8 +39,7 @@ struct OnboardingView: View {
                 welcomeStep.tag(0)
                 unitSelectionStep.tag(1)
                 educationStep.tag(2)
-                goalSettingStep.tag(3)
-                healthKitStep.tag(4)
+                healthKitStep.tag(3)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(.smooth, value: viewModel.currentStep)
@@ -60,16 +59,16 @@ struct OnboardingView: View {
                 .foregroundStyle(Color.brandPrimary)
 
             VStack(spacing: AppConstants.Spacing.sm) {
-                Text("学糖记录")
+                Text(String(localized: "onboarding.welcome"))
                     .font(.title)
                     .fontWeight(.bold)
 
-                Text("让控糖回归简单")
+                Text(String(localized: "onboarding.slogan"))
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
 
-            Text("本应用仅用于个人健康数据记录，不提供任何医疗诊断或治疗建议。请在做出任何医疗决定前咨询您的医生。")
+            Text(String(localized: "onboarding.disclaimer"))
                 .font(.caption)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
@@ -77,7 +76,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            onboardingButton("开始使用") {
+            onboardingButton(String(localized: "onboarding.start")) {
                 viewModel.nextStep()
             }
         }
@@ -90,24 +89,24 @@ struct OnboardingView: View {
             Spacer()
 
             VStack(spacing: AppConstants.Spacing.sm) {
-                Text("选择您的血糖单位")
+                Text(String(localized: "onboarding.unit.title"))
                     .font(.title2)
                     .fontWeight(.bold)
 
-                Text("可随时在设置中更改")
+                Text(String(localized: "onboarding.unit.subtitle"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
             VStack(spacing: AppConstants.Spacing.md) {
-                unitCard(unit: .mmolL, subtitle: "中国/欧洲常用")
-                unitCard(unit: .mgdL, subtitle: "美国/日本常用")
+                unitCard(unit: .mmolL, subtitle: String(localized: "onboarding.unit.mmol_region"))
+                unitCard(unit: .mgdL, subtitle: String(localized: "onboarding.unit.mgdl_region"))
             }
             .padding(.horizontal, AppConstants.Spacing.xxl)
 
             Spacer()
 
-            onboardingButton("下一步") {
+            onboardingButton(String(localized: "onboarding.next")) {
                 viewModel.nextStep()
             }
         }
@@ -124,11 +123,11 @@ struct OnboardingView: View {
                 .foregroundStyle(Color.brandPrimary)
 
             VStack(spacing: AppConstants.Spacing.sm) {
-                Text("了解关键指标")
+                Text(String(localized: "onboarding.edu.title"))
                     .font(.title2)
                     .fontWeight(.bold)
 
-                Text("帮助您更好地理解血糖数据")
+                Text(String(localized: "onboarding.edu.subtitle"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -136,20 +135,14 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: AppConstants.Spacing.lg) {
                 educationItem(
                     icon: "target",
-                    title: "TIR（达标率）",
-                    description: "血糖在目标范围内的时间比例。目标 > 70% 为良好。"
-                )
-
-                educationItem(
-                    icon: "percent",
-                    title: "A1C（糖化血红蛋白）",
-                    description: "反映 2-3 个月平均血糖水平。一般目标 < 7%。"
+                    title: String(localized: "onboarding.edu.tir_title"),
+                    description: String(localized: "onboarding.edu.tir_desc")
                 )
 
                 educationItem(
                     icon: "waveform.path.ecg",
-                    title: "CV%（波动系数）",
-                    description: "衡量血糖波动程度。< 36% 认为稳定。"
+                    title: String(localized: "onboarding.edu.cv_title"),
+                    description: String(localized: "onboarding.edu.cv_desc")
                 )
             }
             .padding(AppConstants.Spacing.lg)
@@ -159,7 +152,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            onboardingButton("下一步") {
+            onboardingButton(String(localized: "onboarding.next")) {
                 viewModel.nextStep()
             }
         }
@@ -182,85 +175,7 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - 第 4 步：目标设置
-
-    private var goalSettingStep: some View {
-        VStack(spacing: AppConstants.Spacing.xl) {
-            Spacer()
-
-            Image(systemName: "flag.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(Color("GlucoseNormal"))
-
-            VStack(spacing: AppConstants.Spacing.sm) {
-                Text("设定您的控糖目标")
-                    .font(.title2)
-                    .fontWeight(.bold)
-
-                Text("可随时在设置中调整")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-
-            VStack(spacing: AppConstants.Spacing.lg) {
-                // A1C 目标
-                VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-                    Text("A1C 目标")
-                        .font(.subheadline.weight(.medium))
-
-                    HStack {
-                        Text(String(format: "%.1f%%", viewModel.targetA1C))
-                            .font(.glucoseHero)
-                            .foregroundStyle(Color.brandPrimary)
-
-                        Spacer()
-
-                        Stepper("", value: $viewModel.targetA1C, in: 5.0...10.0, step: 0.5)
-                            .labelsHidden()
-                    }
-
-                    Text("一般建议 < 7.0%，具体请遵医嘱")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
-
-                Divider()
-
-                // 每日记录目标
-                VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-                    Text("每日记录目标")
-                        .font(.subheadline.weight(.medium))
-
-                    HStack {
-                        Text("\(viewModel.dailyRecordGoal) 次")
-                            .font(.glucoseHero)
-                            .foregroundStyle(Color.brandPrimary)
-
-                        Spacer()
-
-                        Stepper("", value: $viewModel.dailyRecordGoal, in: 1...10)
-                            .labelsHidden()
-                    }
-
-                    Text("建议每天至少测 4 次（三餐前 + 睡前）")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                }
-            }
-            .padding(AppConstants.Spacing.lg)
-            .background(Color(.secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-            .padding(.horizontal, AppConstants.Spacing.xxl)
-
-            Spacer()
-
-            onboardingButton("下一步") {
-                viewModel.nextStep()
-            }
-        }
-    }
-
-    // MARK: - 第 5 步：HealthKit 授权
+    // MARK: - 第 4 步：HealthKit 授权
 
     private var healthKitStep: some View {
         VStack(spacing: AppConstants.Spacing.xl) {
@@ -271,20 +186,20 @@ struct OnboardingView: View {
                 .foregroundStyle(.red)
 
             VStack(spacing: AppConstants.Spacing.sm) {
-                Text("健康数据同步")
+                Text(String(localized: "onboarding.health.title"))
                     .font(.title2)
                     .fontWeight(.bold)
 
-                Text("连接 Apple Health 后，\n您的血糖数据将自动备份到系统\u{201C}健康\u{201D}应用中。")
+                Text(String(localized: "onboarding.health.subtitle"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
 
             VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
-                benefitRow(icon: "checkmark.shield", text: "数据备份更安全")
-                benefitRow(icon: "arrow.triangle.2.circlepath", text: "删除 App 数据不丢失")
-                benefitRow(icon: "heart.text.square", text: "与其他健康数据联动查看")
+                benefitRow(icon: "checkmark.shield", text: String(localized: "onboarding.health.benefit1"))
+                benefitRow(icon: "arrow.triangle.2.circlepath", text: String(localized: "onboarding.health.benefit2"))
+                benefitRow(icon: "heart.text.square", text: String(localized: "onboarding.health.benefit3"))
             }
             .padding(AppConstants.Spacing.lg)
             .background(Color(.secondarySystemGroupedBackground))
@@ -294,7 +209,7 @@ struct OnboardingView: View {
             Spacer()
 
             // 连接按钮
-            onboardingButton("连接 Health") {
+            onboardingButton(String(localized: "onboarding.health.connect")) {
                 Task {
                     try? await healthKitManager.requestAuthorization()
                     completeOnboarding(healthKitEnabled: true)
@@ -305,7 +220,7 @@ struct OnboardingView: View {
             Button(action: {
                 completeOnboarding(healthKitEnabled: false)
             }) {
-                Text("稍后再说")
+                Text(String(localized: "onboarding.health.skip"))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -386,8 +301,6 @@ struct OnboardingView: View {
 
         targetSettings.preferredUnit = viewModel.selectedUnit
         targetSettings.healthKitSyncEnabled = healthKitEnabled
-        targetSettings.targetA1C = viewModel.targetA1C
-        targetSettings.dailyRecordGoal = viewModel.dailyRecordGoal
         targetSettings.hasCompletedOnboarding = true
     }
 }

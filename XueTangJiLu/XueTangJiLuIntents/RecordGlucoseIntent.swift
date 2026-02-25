@@ -9,7 +9,7 @@ import AppIntents
 import SwiftData
 import WidgetKit
 
-/// Siri 语音录入 Intent - "用学糖记录记录血糖"
+/// Siri 语音录入 Intent - "用血糖记录记录血糖"
 struct RecordGlucoseIntent: AppIntent {
     static var title: LocalizedStringResource = "记录血糖"
     static var description = IntentDescription("快速记录一次血糖数值")

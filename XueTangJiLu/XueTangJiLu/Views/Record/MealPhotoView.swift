@@ -20,21 +20,42 @@ struct MealPhotoView: View {
     @State private var noteText: String = ""
     @State private var selectedDate: Date = .now
     @State private var showDatePicker = false
+    @State private var showPhotoSection = false
     @State private var showCamera = false
     @State private var isSaving = false
+    
+    /// 编辑模式：正在编辑的记录
+    var editingRecord: MealRecord? = nil
+    
+    /// 是否处于编辑模式
+    private var isEditMode: Bool {
+        editingRecord != nil
+    }
+    
+    init(editingRecord: MealRecord? = nil) {
+        self.editingRecord = editingRecord
+        if let record = editingRecord {
+            _carbLevel = State(initialValue: record.carbLevel)
+            _mealDescription = State(initialValue: record.mealDescription)
+            _noteText = State(initialValue: record.note ?? "")
+            _selectedDate = State(initialValue: record.timestamp)
+            _selectedImageData = State(initialValue: record.photoData)
+            _showPhotoSection = State(initialValue: record.hasPhoto)
+        }
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: AppConstants.Spacing.xl) {
-                    // 照片区域
-                    photoSection
-
                     // 碳水水平选择
                     carbLevelSelector
 
                     // 饮食描述
                     descriptionField
+
+                    // 照片区域（可选）
+                    photoSectionToggle
 
                     // 日期时间
                     dateTimeSection
@@ -45,17 +66,69 @@ struct MealPhotoView: View {
                 .padding(.horizontal, AppConstants.Spacing.lg)
                 .padding(.vertical, AppConstants.Spacing.lg)
             }
-            .navigationTitle("记录饮食")
+            .navigationTitle(isEditMode ? String(localized: "meal.edit") : String(localized: "meal.record"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
+                    Button(String(localized: "cancel")) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") { saveMeal() }
-                        .disabled(isSaving)
+                    Button(String(localized: "save")) { saveMeal() }
+                        .disabled(!isSaveEnabled || isSaving)
                         .fontWeight(.semibold)
                 }
+            }
+        }
+    }
+
+    // MARK: - 照片区域切换
+
+    private var photoSectionToggle: some View {
+        VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
+            HStack {
+                Text(String(localized: "meal.photo"))
+                    .font(.subheadline.weight(.medium))
+                Text(String(localized: "meal.optional"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                if selectedImageData != nil || showPhotoSection {
+                    Button(action: {
+                        withAnimation {
+                            showPhotoSection.toggle()
+                            if !showPhotoSection {
+                                selectedImageData = nil
+                                selectedItem = nil
+                            }
+                        }
+                    }) {
+                        Image(systemName: showPhotoSection ? "chevron.up.circle" : "chevron.down.circle")
+                            .foregroundStyle(Color.brandPrimary)
+                    }
+                }
+            }
+            
+            if showPhotoSection {
+                photoSection
+            } else {
+                Button(action: {
+                    withAnimation {
+                        showPhotoSection = true
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: "photo.badge.plus")
+                            .font(.title3)
+                        Text(String(localized: "meal.add_photo"))
+                            .font(.subheadline)
+                    }
+                    .foregroundStyle(Color.brandPrimary)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 60)
+                    .background(Color(.tertiarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
+                }
+                .buttonStyle(.plain)
             }
         }
     }
@@ -72,7 +145,10 @@ struct MealPhotoView: View {
                     .frame(height: 200)
                     .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
                     .overlay(alignment: .topTrailing) {
-                        Button(action: { selectedImageData = nil }) {
+                        Button(action: { 
+                            selectedImageData = nil
+                            selectedItem = nil
+                        }) {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.title3)
                                 .foregroundStyle(.white)
@@ -88,7 +164,7 @@ struct MealPhotoView: View {
                             Image(systemName: "camera.fill")
                                 .font(.title2)
                                 .foregroundStyle(Color.brandPrimary)
-                            Text("拍照")
+                            Text(String(localized: "meal.take_photo"))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -105,7 +181,7 @@ struct MealPhotoView: View {
                             Image(systemName: "photo.on.rectangle")
                                 .font(.title2)
                                 .foregroundStyle(Color.brandPrimary)
-                            Text("相册")
+                            Text(String(localized: "meal.choose_from_library"))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -131,7 +207,7 @@ struct MealPhotoView: View {
 
     private var carbLevelSelector: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-            Text("碳水水平")
+            Text(String(localized: "meal.carb_level"))
                 .font(.subheadline.weight(.medium))
 
             HStack(spacing: AppConstants.Spacing.md) {
@@ -143,7 +219,7 @@ struct MealPhotoView: View {
                         VStack(spacing: AppConstants.Spacing.xs) {
                             Image(systemName: level.iconName)
                                 .font(.title3)
-                            Text(level.displayName)
+                            Text(level.localizedDisplayName)
                                 .font(.caption)
                         }
                         .frame(maxWidth: .infinity)
@@ -177,14 +253,25 @@ struct MealPhotoView: View {
 
     private var descriptionField: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-            Text("饮食描述")
-                .font(.subheadline.weight(.medium))
-            TextField("如\"米饭 + 青菜 + 鸡胸肉\"", text: $mealDescription)
+            HStack {
+                Text(String(localized: "meal.description"))
+                    .font(.subheadline.weight(.medium))
+                Text("*")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.red)
+            }
+            TextField(String(localized: "meal.description_placeholder"), text: $mealDescription)
                 .font(.subheadline)
                 .padding(AppConstants.Spacing.md)
                 .background(Color(.tertiarySystemGroupedBackground))
                 .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.input))
         }
+    }
+    
+    // MARK: - 保存验证
+    
+    private var isSaveEnabled: Bool {
+        !mealDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     // MARK: - 日期时间
@@ -201,14 +288,14 @@ struct MealPhotoView: View {
         }
         .sheet(isPresented: $showDatePicker) {
             NavigationStack {
-                DatePicker("选择时间", selection: $selectedDate, in: ...Date.now, displayedComponents: [.date, .hourAndMinute])
+                DatePicker(String(localized: "select.datetime"), selection: $selectedDate, in: ...Date.now, displayedComponents: [.date, .hourAndMinute])
                     .datePickerStyle(.graphical)
                     .padding()
-                    .navigationTitle("选择时间")
+                    .navigationTitle(String(localized: "select.time"))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("完成") { showDatePicker = false }
+                            Button(String(localized: "done")) { showDatePicker = false }
                         }
                     }
             }
@@ -220,9 +307,9 @@ struct MealPhotoView: View {
 
     private var noteField: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-            Text("备注")
+            Text(String(localized: "note"))
                 .font(.subheadline.weight(.medium))
-            TextField("可选备注", text: $noteText)
+            TextField(String(localized: "add.note.optional"), text: $noteText)
                 .font(.subheadline)
                 .padding(AppConstants.Spacing.md)
                 .background(Color(.tertiarySystemGroupedBackground))
@@ -233,6 +320,10 @@ struct MealPhotoView: View {
     // MARK: - 保存
 
     private func saveMeal() {
+        guard !mealDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return
+        }
+        
         isSaving = true
 
         // 压缩照片
@@ -242,15 +333,25 @@ struct MealPhotoView: View {
             compressedData = uiImage.jpegData(compressionQuality: 0.6)
         }
 
-        let record = MealRecord(
-            carbLevel: carbLevel,
-            mealDescription: mealDescription,
-            photoData: compressedData,
-            timestamp: selectedDate,
-            note: noteText.isEmpty ? nil : noteText
-        )
+        if let existingRecord = editingRecord {
+            // 编辑模式：更新现有记录
+            existingRecord.carbLevel = carbLevel
+            existingRecord.mealDescription = mealDescription
+            existingRecord.photoData = compressedData
+            existingRecord.timestamp = selectedDate
+            existingRecord.note = noteText.isEmpty ? nil : noteText
+        } else {
+            // 新建模式：创建新记录
+            let record = MealRecord(
+                carbLevel: carbLevel,
+                mealDescription: mealDescription,
+                photoData: compressedData,
+                timestamp: selectedDate,
+                note: noteText.isEmpty ? nil : noteText
+            )
+            modelContext.insert(record)
+        }
 
-        modelContext.insert(record)
         HapticManager.success()
         isSaving = false
         dismiss()
@@ -258,6 +359,6 @@ struct MealPhotoView: View {
 }
 
 #Preview {
-    MealPhotoView()
+    MealPhotoView(editingRecord: nil)
         .modelContainer(for: [MealRecord.self], inMemory: true)
 }

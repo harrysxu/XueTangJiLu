@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import XueTangJiLu
 
 // MARK: - TagEngine 测试
@@ -15,70 +16,80 @@ struct TagEngineTests {
     @Test("早晨 7 点应推荐早餐前标签")
     func morningTag() {
         let date = createDate(hour: 7, minute: 30)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .beforeBreakfast)
     }
 
     @Test("上午 8:30 应推荐早餐后标签")
     func afterBreakfastTag() {
         let date = createDate(hour: 8, minute: 30)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .afterBreakfast)
     }
 
     @Test("上午 11 点应推荐午餐前标签")
     func beforeLunchTag() {
         let date = createDate(hour: 11, minute: 0)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .beforeLunch)
     }
 
     @Test("中午 12:30 应推荐午餐后标签")
     func afterLunchTag() {
         let date = createDate(hour: 12, minute: 30)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .afterLunch)
     }
 
     @Test("下午 15 点应推荐晚餐前标签")
     func beforeDinnerTag() {
         let date = createDate(hour: 15, minute: 0)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .beforeDinner)
     }
 
     @Test("下午 18 点应推荐晚餐后标签")
     func afterDinnerTag() {
         let date = createDate(hour: 18, minute: 0)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .afterDinner)
     }
 
     @Test("晚上 21 点应推荐睡前标签")
     func bedtimeTag() {
         let date = createDate(hour: 21, minute: 0)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .bedtime)
     }
 
     @Test("午夜应推荐空腹标签")
     func midnightTag() {
         let date = createDate(hour: 0, minute: 0)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .fasting)
     }
 
     @Test("凌晨 3 点应推荐空腹标签")
     func earlyMorningTag() {
         let date = createDate(hour: 3, minute: 0)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .fasting)
     }
 
     @Test("晚上 23 点应推荐空腹标签（跨午夜）")
     func lateNightTag() {
         let date = createDate(hour: 23, minute: 0)
-        let context = TagEngine.suggestContext(for: date)
+        let tagId = TagEngine.suggestTagId(for: date)
+        let context = MealContext(rawValue: tagId)
         #expect(context == .fasting)
     }
 

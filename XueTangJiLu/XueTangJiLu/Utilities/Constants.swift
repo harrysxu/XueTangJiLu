@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 /// 全局常量定义
-enum AppConstants {
+enum AppConstants: Sendable {
 
     // MARK: - 血糖阈值 (mmol/L)
 
@@ -22,7 +22,7 @@ enum AppConstants {
 
     // MARK: - 间距系统 (8pt grid)
 
-    enum Spacing {
+    enum Spacing: Sendable {
         static let xs: CGFloat = 4
         static let sm: CGFloat = 8
         static let md: CGFloat = 12
@@ -34,7 +34,7 @@ enum AppConstants {
 
     // MARK: - 圆角规范
 
-    enum CornerRadius {
+    enum CornerRadius: Sendable {
         static let fullCard: CGFloat = 20
         static let card: CGFloat = 16
         static let buttonLarge: CGFloat = 14
@@ -44,7 +44,7 @@ enum AppConstants {
 
     // MARK: - 组件尺寸
 
-    enum Size {
+    enum Size: Sendable {
         /// 浮动录入按钮尺寸
         static let fabSize: CGFloat = 56
         /// 键盘按键高度
@@ -58,7 +58,7 @@ enum AppConstants {
     // MARK: - 单位转换
 
     /// mmol/L 与 mg/dL 之间的换算因子
-    static let glucoseConversionFactor: Double = 18.0182
+    nonisolated static let glucoseConversionFactor: Double = 18.0182
 
     // MARK: - CV% 阈值
 
@@ -77,6 +77,6 @@ enum AppConstants {
 
     // MARK: - CloudKit
 
-    static let cloudKitContainerID = "iCloud.com.xxl.XueTangJiLu"
-    static let appGroupID = "group.com.xxl.XueTangJiLu"
+    nonisolated static let cloudKitContainerID = "iCloud.com.xxl.XueTangJiLu"
+    nonisolated static let appGroupID = "group.com.xxl.XueTangJiLu"
 }

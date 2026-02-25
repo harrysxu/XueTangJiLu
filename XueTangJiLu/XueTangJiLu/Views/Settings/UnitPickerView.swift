@@ -46,14 +46,14 @@ struct UnitPickerView: View {
                 .buttonStyle(.plain)
             }
         }
-        .navigationTitle("血糖单位")
+        .navigationTitle(String(localized: "unit.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private func unitDescription(_ unit: GlucoseUnit) -> String {
         switch unit {
-        case .mmolL: return "中国、欧洲等地区常用"
-        case .mgdL:  return "美国、日本等地区常用"
+        case .mmolL: return String(localized: "unit.mmol_region")
+        case .mgdL:  return String(localized: "unit.mgdl_region")
         }
     }
 }

@@ -13,13 +13,9 @@ struct WidgetRecordData: Identifiable {
     let id = UUID()
     let value: Double
     let timestamp: Date
-    let mealContextRawValue: String?
+    let sceneTagLabel: String?
+    let sceneTagIcon: String?
     let note: String?
-
-    var mealContext: MealContext? {
-        guard let raw = mealContextRawValue else { return nil }
-        return MealContext(rawValue: raw)
-    }
 
     var glucoseLevel: GlucoseLevel {
         GlucoseLevel.from(value: value)
@@ -40,8 +36,11 @@ struct GlucoseWidgetEntry: TimelineEntry {
     /// 最新记录时间
     let latestTime: Date?
 
-    /// 用餐场景原始值
-    let mealContextRawValue: String?
+    /// 场景标签显示名称（已解析）
+    let sceneTagLabel: String?
+
+    /// 场景标签图标名称（已解析）
+    let sceneTagIcon: String?
 
     /// 用户首选单位原始值
     let unitRawValue: String
@@ -67,18 +66,13 @@ struct GlucoseWidgetEntry: TimelineEntry {
         GlucoseUnit(rawValue: unitRawValue) ?? .mmolL
     }
 
-    var mealContext: MealContext? {
-        guard let raw = mealContextRawValue else { return nil }
-        return MealContext(rawValue: raw)
-    }
-
     var glucoseLevel: GlucoseLevel? {
         guard let value = latestValue else { return nil }
         return GlucoseLevel.from(value: value)
     }
 
     var formattedValue: String {
-        guard let value = latestValue else { return "--" }
+        guard let value = latestValue else { return String(localized: "widget.placeholder_dash") }
         return GlucoseUnitConverter.displayString(mmolLValue: value, in: unit)
     }
 
@@ -89,7 +83,8 @@ struct GlucoseWidgetEntry: TimelineEntry {
             date: .now,
             latestValue: 5.6,
             latestTime: .now,
-            mealContextRawValue: MealContext.beforeBreakfast.rawValue,
+            sceneTagLabel: String(localized: "meal.before_breakfast"),
+            sceneTagIcon: "sunrise",
             unitRawValue: GlucoseUnit.mmolL.rawValue,
             tirValue: 78.0,
             weekTrend: [],
@@ -106,7 +101,8 @@ struct GlucoseWidgetEntry: TimelineEntry {
             date: .now,
             latestValue: nil,
             latestTime: nil,
-            mealContextRawValue: nil,
+            sceneTagLabel: nil,
+            sceneTagIcon: nil,
             unitRawValue: GlucoseUnit.systemDefault.rawValue,
             tirValue: 0,
             weekTrend: [],

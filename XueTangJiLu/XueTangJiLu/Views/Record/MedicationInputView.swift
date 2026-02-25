@@ -49,9 +49,10 @@ struct MedicationInputView: View {
                     .padding(.bottom, AppConstants.Spacing.sm)
             }
             .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(viewModel.isEditMode ? String(localized: "medication.edit") : "")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
+                    Button(String(localized: "cancel")) { dismiss() }
                 }
             }
         }
@@ -69,7 +70,7 @@ struct MedicationInputView: View {
                     .animation(.smooth(duration: 0.15), value: viewModel.dosageText)
             }
 
-            Text(viewModel.selectedType.unitLabel)
+            Text(viewModel.selectedType.localizedUnitLabel)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -88,7 +89,7 @@ struct MedicationInputView: View {
                         HStack(spacing: AppConstants.Spacing.xs) {
                             Image(systemName: type.iconName)
                                 .font(.caption2)
-                            Text(type.displayName)
+                            Text(type.localizedDisplayName)
                                 .font(.footnote)
                         }
                         .padding(.horizontal, AppConstants.Spacing.md)
@@ -111,7 +112,7 @@ struct MedicationInputView: View {
     // MARK: - 药物名称
 
     private var nameField: some View {
-        TextField("药物名称（可选，如\"诺和锐\"）", text: $viewModel.medicationName)
+        TextField(String(localized: "medication.name_placeholder"), text: $viewModel.medicationName)
             .font(.subheadline)
             .padding(AppConstants.Spacing.md)
             .background(Color(.tertiarySystemGroupedBackground))
@@ -130,18 +131,18 @@ struct MedicationInputView: View {
         .sheet(isPresented: $showDatePicker) {
             NavigationStack {
                 DatePicker(
-                    "选择日期和时间",
+                    String(localized: "select.datetime"),
                     selection: $viewModel.selectedDate,
                     in: ...Date.now,
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.graphical)
                 .padding()
-                .navigationTitle("选择时间")
+                .navigationTitle(String(localized: "select.time"))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("完成") { showDatePicker = false }
+                        Button(String(localized: "done")) { showDatePicker = false }
                     }
                 }
             }
@@ -160,7 +161,7 @@ struct MedicationInputView: View {
                 if viewModel.isSaving {
                     ProgressView().tint(.white)
                 } else {
-                    Text("保存用药记录")
+                    Text(viewModel.isEditMode ? String(localized: "save") : String(localized: "medication.save_record"))
                         .font(.body.weight(.semibold))
                 }
             }

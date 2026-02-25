@@ -14,16 +14,83 @@ struct LogView: View {
     @Environment(HealthKitManager.self) private var healthKitManager
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var records: [GlucoseRecord]
     @Query(sort: \MedicationRecord.timestamp, order: .reverse) private var medications: [MedicationRecord]
+    @Query(sort: \MealRecord.timestamp, order: .reverse) private var meals: [MealRecord]
     @Query private var settingsArray: [UserSettings]
     @State private var showRecordInput = false
     @State private var showMedicationInput = false
+    @State private var showMealInput = false
     @State private var glucoseViewModel = GlucoseViewModel()
     @State private var medicationViewModel = MedicationViewModel()
-    @State private var selectedSegment: RecordSegment = .glucose
-
-    enum RecordSegment: String, CaseIterable {
+    @State private var selectedRecordTypes: Set<RecordType> = [.glucose, .medication, .meal]
+    @State private var selectedTimeRange: TimeRange = .all
+    @State private var showCustomDateRange = false
+    @State private var customStartDate = Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date()
+    @State private var customEndDate = Date()
+    @State private var recordToEdit: GlucoseRecord? = nil
+    @State private var medicationToEdit: MedicationRecord? = nil
+    @State private var mealToEdit: MealRecord? = nil
+    
+    enum RecordType: String, CaseIterable, Identifiable {
         case glucose = "血糖"
         case medication = "用药"
+        case meal = "饮食"
+        var id: String { rawValue }
+        var localizedLabel: String {
+            switch self {
+            case .glucose: return String(localized: "log.type.glucose")
+            case .medication: return String(localized: "log.type.medication")
+            case .meal: return String(localized: "log.type.meal")
+            }
+        }
+    }
+    
+    enum TimeRange: String, CaseIterable, Identifiable {
+        case today = "今天"
+        case last7Days = "最近1周"
+        case last30Days = "最近1月"
+        case last90Days = "最近3月"
+        case custom = "自定义"
+        case all = "全部"
+        var id: String { rawValue }
+        var localizedLabel: String {
+            switch self {
+            case .today: return String(localized: "log.time.today")
+            case .last7Days: return String(localized: "log.time.last_7")
+            case .last30Days: return String(localized: "log.time.last_30")
+            case .last90Days: return String(localized: "log.time.last_90")
+            case .custom: return String(localized: "log.time.custom")
+            case .all: return String(localized: "log.time.all")
+            }
+        }
+    }
+    
+    /// 合并的时间轴项目
+    private enum TimelineItem: Identifiable {
+        case glucose(GlucoseRecord)
+        case medication(MedicationRecord)
+        case meal(MealRecord)
+        
+        var id: String {
+            switch self {
+            case .glucose(let record):
+                return "glucose-\(record.id)"
+            case .medication(let record):
+                return "medication-\(record.id)"
+            case .meal(let record):
+                return "meal-\(record.id)"
+            }
+        }
+        
+        var timestamp: Date {
+            switch self {
+            case .glucose(let record):
+                return record.timestamp
+            case .medication(let record):
+                return record.timestamp
+            case .meal(let record):
+                return record.timestamp
+            }
+        }
     }
 
     private var settings: UserSettings {
@@ -33,59 +100,84 @@ struct LogView: View {
     private var unit: GlucoseUnit {
         settings.preferredUnit
     }
-
-    /// 按日期分组的血糖记录
-    private var groupedRecords: [(String, [GlucoseRecord])] {
-        let grouped = Dictionary(grouping: records) { record in
-            record.timestamp.startOfDay
+    
+    /// 合并所有记录并应用筛选
+    private var filteredTimelineItems: [TimelineItem] {
+        // 根据记录类型筛选合并
+        var allItems: [TimelineItem] = []
+        if selectedRecordTypes.contains(.glucose) {
+            allItems += records.map { .glucose($0) }
         }
-        return grouped
-            .sorted { $0.key > $1.key }
-            .map { (date, records) in
-                (date.sectionTitle, records.sorted { $0.timestamp > $1.timestamp })
-            }
+        if selectedRecordTypes.contains(.medication) {
+            allItems += medications.map { .medication($0) }
+        }
+        if selectedRecordTypes.contains(.meal) {
+            allItems += meals.map { .meal($0) }
+        }
+        
+        // 时间范围筛选
+        let filtered = allItems.filter { item in
+            timeRangeFilter(item.timestamp)
+        }
+        
+        return filtered.sorted { $0.timestamp > $1.timestamp }
     }
-
-    /// 按日期分组的用药记录
-    private var groupedMedications: [(String, [MedicationRecord])] {
-        let grouped = Dictionary(grouping: medications) { record in
-            record.timestamp.startOfDay
+    
+    /// 时间范围过滤器
+    private func timeRangeFilter(_ date: Date) -> Bool {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        switch selectedTimeRange {
+        case .today:
+            return calendar.isDateInToday(date)
+        case .last7Days:
+            guard let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) else { return false }
+            return date >= weekAgo
+        case .last30Days:
+            guard let monthAgo = calendar.date(byAdding: .day, value: -30, to: now) else { return false }
+            return date >= monthAgo
+        case .last90Days:
+            guard let threeMonthsAgo = calendar.date(byAdding: .day, value: -90, to: now) else { return false }
+            return date >= threeMonthsAgo
+        case .custom:
+            let startOfCustomStart = calendar.startOfDay(for: customStartDate)
+            let endOfCustomEnd = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: customEndDate)) ?? customEndDate
+            return date >= startOfCustomStart && date < endOfCustomEnd
+        case .all:
+            return true
         }
+    }
+    
+    /// 按日期分组的时间轴（已筛选）
+    private var groupedTimelineItems: [(String, [TimelineItem])] {
+        let grouped = Dictionary(grouping: filteredTimelineItems) { item in
+            item.timestamp.startOfDay
+        }
+        
         return grouped
             .sorted { $0.key > $1.key }
-            .map { (date, records) in
-                (date.sectionTitle, records.sorted { $0.timestamp > $1.timestamp })
+            .map { (date, items) in
+                (date.sectionTitle, items.sorted { $0.timestamp > $1.timestamp })
             }
     }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // 顶部分段选择器
-                Picker("记录类型", selection: $selectedSegment) {
-                    ForEach(RecordSegment.allCases, id: \.self) { segment in
-                        Text(segment.rawValue).tag(segment)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .padding(.horizontal, AppConstants.Spacing.lg)
-                .padding(.top, AppConstants.Spacing.sm)
-
-                // 内容区域
-                ZStack(alignment: .bottom) {
-                    switch selectedSegment {
-                    case .glucose:
-                        glucoseTimeline
-                    case .medication:
-                        medicationTimeline
-                    }
-
-                    // FAB 按钮
-                    fabButton
+            ZStack(alignment: .bottom) {
+                // 统一时间轴内容
+                unifiedTimeline
+                
+                // FAB 按钮 - 改为 Menu
+                fabMenuButton
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    filterMenu
                 }
             }
-            .navigationTitle("记录")
-            .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showRecordInput) {
                 RecordInputView(viewModel: $glucoseViewModel)
                     .presentationDragIndicator(.visible)
@@ -94,107 +186,287 @@ struct LogView: View {
                 MedicationInputView(viewModel: $medicationViewModel)
                     .presentationDragIndicator(.visible)
             }
+            .sheet(isPresented: $showMealInput) {
+                MealPhotoView(editingRecord: mealToEdit)
+                    .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $showCustomDateRange) {
+                CustomDateRangePickerView(
+                    startDate: $customStartDate,
+                    endDate: $customEndDate
+                )
+            }
+            .onChange(of: recordToEdit) { oldValue, newValue in
+                if let record = newValue {
+                    glucoseViewModel.loadRecordForEditing(record, unit: unit)
+                    showRecordInput = true
+                }
+            }
+            .onChange(of: showRecordInput) { oldValue, newValue in
+                if !newValue {
+                    recordToEdit = nil
+                }
+            }
+            .onChange(of: medicationToEdit) { oldValue, newValue in
+                if let record = newValue {
+                    medicationViewModel.loadRecordForEditing(record)
+                    showMedicationInput = true
+                }
+            }
+            .onChange(of: showMedicationInput) { oldValue, newValue in
+                if !newValue {
+                    medicationToEdit = nil
+                }
+            }
+            .onChange(of: showMealInput) { oldValue, newValue in
+                if !newValue {
+                    mealToEdit = nil
+                }
+            }
+        }
+    }
+    
+    // MARK: - 筛选菜单
+    
+    private var filterMenu: some View {
+        Menu {
+            // 记录类型筛选（包含"全部"）
+            Button {
+                selectedRecordTypes = [.glucose, .medication, .meal]
+                selectedTimeRange = .all
+            } label: {
+                Label(
+                    String(localized: "log.time.all"),
+                    systemImage: (selectedRecordTypes.count == 3 && selectedTimeRange == .all) ? "checkmark.circle.fill" : "circle"
+                )
+            }
+            
+            Button {
+                selectedRecordTypes = [.glucose]
+            } label: {
+                Label(
+                    RecordType.glucose.localizedLabel,
+                    systemImage: (selectedRecordTypes == [.glucose]) ? "checkmark.circle.fill" : "circle"
+                )
+            }
+            
+            Button {
+                selectedRecordTypes = [.medication]
+            } label: {
+                Label(
+                    RecordType.medication.localizedLabel,
+                    systemImage: (selectedRecordTypes == [.medication]) ? "checkmark.circle.fill" : "circle"
+                )
+            }
+            
+            Button {
+                selectedRecordTypes = [.meal]
+            } label: {
+                Label(
+                    RecordType.meal.localizedLabel,
+                    systemImage: (selectedRecordTypes == [.meal]) ? "checkmark.circle.fill" : "circle"
+                )
+            }
+            
+            Divider()
+            
+            // 时间范围筛选
+            ForEach([TimeRange.today, .last7Days, .last30Days, .last90Days], id: \.self) { range in
+                Button {
+                    selectedTimeRange = range
+                    // 如果选择了时间范围但没有选择记录类型，自动选择所有类型
+                    if selectedRecordTypes.isEmpty {
+                        selectedRecordTypes = [.glucose, .medication, .meal]
+                    }
+                } label: {
+                    Label(
+                        range.localizedLabel,
+                        systemImage: selectedTimeRange == range ? "checkmark.circle.fill" : "circle"
+                    )
+                }
+            }
+            
+            Button {
+                selectedTimeRange = .custom
+                showCustomDateRange = true
+                // 如果选择了自定义时间但没有选择记录类型，自动选择所有类型
+                if selectedRecordTypes.isEmpty {
+                    selectedRecordTypes = [.glucose, .medication, .meal]
+                }
+            } label: {
+                Label(
+                    customDateRangeLabel,
+                    systemImage: selectedTimeRange == .custom ? "checkmark.circle.fill" : "circle"
+                )
+            }
+        } label: {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+                .foregroundStyle(isFilterActive ? Color.brandPrimary : .primary)
+        }
+        .accessibilityLabel(String(localized: "log.filter_records"))
+    }
+    
+    /// 是否有激活的筛选条件
+    private var isFilterActive: Bool {
+        selectedRecordTypes.count < RecordType.allCases.count || selectedTimeRange != .all
+    }
+    
+    /// 自定义日期范围标签
+    private var customDateRangeLabel: String {
+        if selectedTimeRange == .custom {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "M/d"
+            let start = formatter.string(from: customStartDate)
+            let end = formatter.string(from: customEndDate)
+            return String(format: String(localized: "log.custom_range"), start, end)
+        } else {
+            return TimeRange.custom.localizedLabel
+        }
+    }
+    
+    /// 空状态标题
+    private var emptyStateTitle: String {
+        if records.isEmpty && medications.isEmpty && meals.isEmpty {
+            return String(localized: "empty.no_records")
+        } else if isFilterActive {
+            return String(localized: "log.empty.filtered")
+        } else {
+            return String(localized: "empty.no_records")
+        }
+    }
+    
+    /// 空状态副标题
+    private var emptyStateSubtitle: String {
+        if records.isEmpty && medications.isEmpty && meals.isEmpty {
+            return String(localized: "log.empty.tap_add")
+        } else if isFilterActive {
+            return String(localized: "log.empty.hint")
+        } else {
+            return String(localized: "log.empty.tap_add")
         }
     }
 
-    // MARK: - 血糖时间线
+    // MARK: - 统一时间轴
 
-    private var glucoseTimeline: some View {
+    private var unifiedTimeline: some View {
         ScrollView {
-            LazyVStack(spacing: 0) {
-                if records.isEmpty {
+            LazyVStack(spacing: AppConstants.Spacing.md) {
+                if filteredTimelineItems.isEmpty {
                     EmptyStateView(
-                        icon: "drop",
-                        title: "还没有血糖记录",
-                        subtitle: "点击下方 \"+\" 开始记录"
+                        icon: "line.3.horizontal.decrease.circle",
+                        title: emptyStateTitle,
+                        subtitle: emptyStateSubtitle
                     )
                     .frame(maxWidth: .infinity)
                     .padding(.top, 60)
                 } else {
-                    ForEach(groupedRecords, id: \.0) { sectionTitle, sectionRecords in
-                        Section {
-                            ForEach(sectionRecords) { record in
-                                TimelineRowView(record: record, unit: unit)
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                        Button(role: .destructive) {
-                                            glucoseViewModel.deleteRecord(record, modelContext: modelContext)
-                                        } label: {
-                                            Label("删除", systemImage: "trash")
-                                        }
-                                    }
-                            }
-                        } header: {
+                    ForEach(groupedTimelineItems, id: \.0) { sectionTitle, sectionItems in
+                        VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
+                            // 日期标题
                             Text(sectionTitle)
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.primary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .foregroundStyle(.secondary)
                                 .padding(.horizontal, AppConstants.Spacing.lg)
-                                .padding(.top, AppConstants.Spacing.lg)
-                                .padding(.bottom, AppConstants.Spacing.xs)
+                            
+                            // 记录卡片组
+                            VStack(spacing: 0) {
+                                ForEach(Array(sectionItems.enumerated()), id: \.element.id) { index, item in
+                                    Group {
+                                        switch item {
+                                        case .glucose(let record):
+                                            Button(action: {
+                                                recordToEdit = record
+                                            }) {
+                                                TimelineRowView(record: record, unit: unit, settings: settings)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                                Button(role: .destructive) {
+                                                    glucoseViewModel.deleteRecord(record, modelContext: modelContext)
+                                                } label: {
+                                                    Label(String(localized: "log.delete"), systemImage: "trash")
+                                                }
+                                            }
+                                        case .medication(let record):
+                                            Button(action: {
+                                                medicationToEdit = record
+                                            }) {
+                                                MedicationRowView(record: record)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                                Button(role: .destructive) {
+                                                    medicationViewModel.deleteRecord(record, modelContext: modelContext)
+                                                } label: {
+                                                    Label(String(localized: "log.delete"), systemImage: "trash")
+                                                }
+                                            }
+                                        case .meal(let record):
+                                            Button(action: {
+                                                mealToEdit = record
+                                                showMealInput = true
+                                            }) {
+                                                MealRowView(record: record)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                                Button(role: .destructive) {
+                                                    modelContext.delete(record)
+                                                } label: {
+                                                    Label(String(localized: "log.delete"), systemImage: "trash")
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    if index < sectionItems.count - 1 {
+                                        Divider()
+                                            .padding(.horizontal, AppConstants.Spacing.lg)
+                                    }
+                                }
+                            }
+                            .background(
+                                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                                    .fill(Color.cardBackground)
+                            )
                         }
+                        .padding(.horizontal, AppConstants.Spacing.lg)
                     }
                 }
             }
+            .padding(.top, AppConstants.Spacing.md)
             .padding(.bottom, 100)
         }
+        .background(Color.pageBackground)
     }
 
-    // MARK: - 用药时间线
+    // MARK: - FAB Menu
 
-    private var medicationTimeline: some View {
-        ScrollView {
-            LazyVStack(spacing: 0) {
-                if medications.isEmpty {
-                    EmptyStateView(
-                        icon: "syringe",
-                        title: "还没有用药记录",
-                        subtitle: "点击下方 \"+\" 开始记录用药"
-                    )
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 60)
-                } else {
-                    ForEach(groupedMedications, id: \.0) { sectionTitle, sectionRecords in
-                        Section {
-                            ForEach(sectionRecords) { record in
-                                MedicationRowView(record: record)
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                        Button(role: .destructive) {
-                                            medicationViewModel.deleteRecord(record, modelContext: modelContext)
-                                        } label: {
-                                            Label("删除", systemImage: "trash")
-                                        }
-                                    }
-                            }
-                        } header: {
-                            Text(sectionTitle)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.primary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, AppConstants.Spacing.lg)
-                                .padding(.top, AppConstants.Spacing.lg)
-                                .padding(.bottom, AppConstants.Spacing.xs)
-                        }
-                    }
-                }
-            }
-            .padding(.bottom, 100)
-        }
-    }
-
-    // MARK: - FAB
-
-    private var fabButton: some View {
-        Button(action: {
-            HapticManager.light()
-            switch selectedSegment {
-            case .glucose:
+    private var fabMenuButton: some View {
+        Menu {
+            Button {
+                HapticManager.light()
                 glucoseViewModel.resetInput()
                 showRecordInput = true
-            case .medication:
+            } label: {
+                Label(String(localized: "quick.glucose"), systemImage: "drop.fill")
+            }
+            
+            Button {
+                HapticManager.light()
                 medicationViewModel.resetInput()
                 showMedicationInput = true
+            } label: {
+                Label(String(localized: "quick.medication"), systemImage: "syringe.fill")
             }
-        }) {
+            
+            Button {
+                HapticManager.light()
+                showMealInput = true
+            } label: {
+                Label(String(localized: "meal.record"), systemImage: "fork.knife")
+            }
+        } label: {
             Image(systemName: "plus")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.white)
@@ -204,55 +476,13 @@ struct LogView: View {
                 .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
         }
         .padding(.bottom, AppConstants.Spacing.lg)
-        .accessibilityLabel(selectedSegment == .glucose ? "添加血糖记录" : "添加用药记录")
+        .accessibilityLabel(String(localized: "log.add_record"))
     }
 }
 
-// MARK: - 用药行视图
-
-struct MedicationRowView: View {
-    let record: MedicationRecord
-
-    var body: some View {
-        HStack(spacing: AppConstants.Spacing.md) {
-            // 左侧：图标
-            Image(systemName: record.medicationType.iconName)
-                .font(.body)
-                .foregroundStyle(Color.brandPrimary)
-                .frame(width: 32, height: 32)
-                .background(Color.brandPrimary.opacity(0.12))
-                .clipShape(Circle())
-
-            // 中间：类型 + 名称
-            VStack(alignment: .leading, spacing: 2) {
-                Text(record.medicationType.displayName)
-                    .font(.subheadline)
-                if !record.name.isEmpty {
-                    Text(record.name)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Spacer()
-
-            // 右侧：时间 + 剂量
-            VStack(alignment: .trailing, spacing: 2) {
-                Text(record.displayDosage)
-                    .font(.glucoseCallout)
-                    .foregroundStyle(.primary)
-                Text(record.timestamp, format: .dateTime.hour().minute())
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-            }
-        }
-        .padding(.vertical, AppConstants.Spacing.sm)
-        .padding(.horizontal, AppConstants.Spacing.lg)
-    }
-}
 
 #Preview {
     LogView()
-        .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self], inMemory: true)
+        .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self, MealRecord.self], inMemory: true)
         .environment(HealthKitManager())
 }

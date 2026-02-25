@@ -7,6 +7,9 @@
 
 import Foundation
 import SwiftData
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// 胰岛素/药物类型
 enum MedicationType: String, Codable, CaseIterable {
@@ -24,6 +27,17 @@ enum MedicationType: String, Codable, CaseIterable {
         case .mixedInsulin:  return "预混胰岛素"
         case .oralMedicine:  return "口服药物"
         case .other:         return "其他"
+        }
+    }
+    
+    /// 本地化的显示名称
+    var localizedDisplayName: String {
+        switch self {
+        case .rapidInsulin:  return String(localized: "med.rapid_insulin")
+        case .longInsulin:   return String(localized: "med.long_insulin")
+        case .mixedInsulin:  return String(localized: "med.mixed_insulin")
+        case .oralMedicine:  return String(localized: "med.oral_medicine")
+        case .other:         return String(localized: "med.other")
         }
     }
 
@@ -45,6 +59,16 @@ enum MedicationType: String, Codable, CaseIterable {
             return "单位(U)"
         case .oralMedicine, .other:
             return "mg"
+        }
+    }
+    
+    /// 本地化的单位标签
+    var localizedUnitLabel: String {
+        switch self {
+        case .rapidInsulin, .longInsulin, .mixedInsulin:
+            return String(localized: "med.unit_insulin")
+        case .oralMedicine, .other:
+            return String(localized: "med.unit_mg")
         }
     }
 }
@@ -72,6 +96,9 @@ final class MedicationRecord {
 
     /// 创建时间
     var createdAt: Date = Date.now
+    
+    /// 设备标识符（用于多设备冲突检测）
+    var deviceIdentifier: String?
 
     // MARK: - 计算属性
 
@@ -103,5 +130,28 @@ final class MedicationRecord {
         self.timestamp = timestamp
         self.note = note
         self.createdAt = .now
+        #if canImport(UIKit)
+        self.deviceIdentifier = UIDevice.current.identifierForVendor?.uuidString
+        #endif
+    }
+}
+
+// MARK: - Conflict Resolution
+
+extension MedicationRecord {
+    
+    /// 判断是否与另一条记录重复
+    func isDuplicate(of other: MedicationRecord) -> Bool {
+        // 时间相近、药物类型和剂量相同，则可能重复
+        return abs(timestamp.timeIntervalSince(other.timestamp)) < 60.0 &&
+               medicationType == other.medicationType &&
+               name == other.name &&
+               abs(dosage - other.dosage) < 0.01
+    }
+    
+    /// 在冲突时选择应该保留的记录
+    static func resolveConflict(between record1: MedicationRecord, and record2: MedicationRecord) -> MedicationRecord {
+        // 优先保留创建时间更早的记录
+        return record1.createdAt < record2.createdAt ? record1 : record2
     }
 }

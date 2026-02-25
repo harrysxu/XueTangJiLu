@@ -1,0 +1,40 @@
+/* Widget Strings */
+"app.name" = "血糖记录";
+"latest.glucose" = "最新血糖";
+"empty.no_records" = "还没有任何记录";
+"widget.no_data" = "暂无数据";
+"widget.7day_trend" = "7日趋势";
+"widget.data_insufficient" = "数据不足";
+"widget.tir_label" = "达标率";
+"recent.records" = "最近记录";
+"meal.other" = "其他";
+"today.tir" = "达标率";
+"statistics.average" = "平均血糖";
+"statistics.minmax" = "最高 / 最低";
+"level.low" = "偏低";
+"level.high" = "偏高";
+
+/* Widget Configuration */
+"widget.glucose_home.name" = "血糖记录";
+"widget.glucose_home.description" = "显示最新血糖读数、趋势和记录";
+"widget.lockscreen.name" = "达标率";
+"widget.lockscreen.description" = "在锁屏显示血糖达标率 (TIR)";
+
+/* Extra Large Widget */
+"widget.latest_glucose_title" = "最新血糖";
+"widget.tir_title" = "达标率 (TIR)";
+"widget.glucose_range" = "3.9 ~ 10.0 mmol/L";
+"widget.7day_measurement" = "7 日内 %d 次测量";
+"widget.7day_stats" = "7 日统计";
+"widget.average_label" = "平均";
+"widget.min_label" = "最低";
+"widget.max_label" = "最高";
+"widget.7day_trend_title" = "7 日趋势";
+"widget.insufficient_trend" = "暂无足够的趋势数据";
+"widget.recent_records_title" = "最近记录";
+"widget.no_records_widget" = "暂无记录";
+"widget.chart_low_label" = "低";
+"widget.chart_high_label" = "高";
+"widget.chart_date_label" = "日期";
+"widget.chart_glucose_label" = "血糖";
+"widget.placeholder_dash" = "--";

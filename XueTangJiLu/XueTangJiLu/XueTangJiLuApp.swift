@@ -12,6 +12,8 @@ import SwiftData
 struct XueTangJiLuApp: App {
     let modelContainer: ModelContainer
     let healthKitManager = HealthKitManager()
+    let cloudKitSyncManager = CloudKitSyncManager()
+    let deduplicationService = DataDeduplicationService()
 
     init() {
         let schema = Schema([
@@ -42,6 +44,12 @@ struct XueTangJiLuApp: App {
         WindowGroup {
             ContentView()
                 .environment(healthKitManager)
+                .environment(cloudKitSyncManager)
+                .task {
+                    // 应用启动时执行一次去重
+                    let context = ModelContext(modelContainer)
+                    try? await deduplicationService.deduplicateAll(context: context)
+                }
         }
         .modelContainer(modelContainer)
     }

@@ -16,8 +16,8 @@ struct LockScreenGlucoseWidget: Widget {
         StaticConfiguration(kind: kind, provider: GlucoseTimelineProvider()) { entry in
             LockScreenGlucoseWidgetView(entry: entry)
         }
-        .configurationDisplayName("达标率")
-        .description("在锁屏显示血糖达标率 (TIR)")
+        .configurationDisplayName(String(localized: "widget.lockscreen.name"))
+        .description(String(localized: "widget.lockscreen.description"))
         .supportedFamilies([.accessoryCircular])
     }
 }

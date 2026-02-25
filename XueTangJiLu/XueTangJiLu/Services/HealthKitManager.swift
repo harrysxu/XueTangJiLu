@@ -57,7 +57,11 @@ final class HealthKitManager {
     // MARK: - 写入血糖数据
 
     /// 将血糖记录写入 HealthKit
-    func saveGlucose(value: Double, date: Date, mealContext: MealContext) async throws {
+    /// - Parameters:
+    ///   - value: 血糖值 (mmol/L)
+    ///   - date: 记录时间
+    ///   - sceneTagId: 场景标签 ID，用于映射 HealthKit 的 MealTime
+    func saveGlucose(value: Double, date: Date, sceneTagId: String) async throws {
         guard isAvailable, isAuthorized else { return }
 
         let bloodGlucoseType = HKQuantityType(.bloodGlucose)
@@ -69,7 +73,9 @@ final class HealthKitManager {
             HKMetadataKeyWasUserEntered: true
         ]
 
-        if let hkMealTime = mealContext.healthKitMealTime {
+        // 仅内置标签有 HealthKit MealTime 映射
+        if let mealContext = MealContext(rawValue: sceneTagId),
+           let hkMealTime = mealContext.healthKitMealTime {
             metadata[HKMetadataKeyBloodGlucoseMealTime] = hkMealTime
         }
 

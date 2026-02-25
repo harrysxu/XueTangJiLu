@@ -21,22 +21,22 @@ enum PreviewSampleData {
             GlucoseRecord(
                 value: 5.6,
                 timestamp: calendar.date(byAdding: .minute, value: -20, to: now)!,
-                mealContext: .beforeBreakfast
+                sceneTagId: MealContext.beforeBreakfast.rawValue
             ),
             GlucoseRecord(
                 value: 6.5,
                 timestamp: calendar.date(byAdding: .hour, value: -2, to: now)!,
-                mealContext: .afterBreakfast
+                sceneTagId: MealContext.afterBreakfast.rawValue
             ),
             GlucoseRecord(
                 value: 5.8,
                 timestamp: calendar.date(byAdding: .hour, value: -4, to: now)!,
-                mealContext: .beforeLunch
+                sceneTagId: MealContext.beforeLunch.rawValue
             ),
             GlucoseRecord(
                 value: 7.2,
                 timestamp: calendar.date(byAdding: .hour, value: -6, to: now)!,
-                mealContext: .afterLunch,
+                sceneTagId: MealContext.afterLunch.rawValue,
                 note: "吃了火锅"
             ),
 
@@ -44,63 +44,63 @@ enum PreviewSampleData {
             GlucoseRecord(
                 value: 5.2,
                 timestamp: calendar.date(byAdding: .day, value: -1, to: now)!,
-                mealContext: .fasting
+                sceneTagId: MealContext.fasting.rawValue
             ),
             GlucoseRecord(
                 value: 6.8,
                 timestamp: calendar.date(bySettingHour: 8, minute: 30, second: 0,
                                         of: calendar.date(byAdding: .day, value: -1, to: now)!)!,
-                mealContext: .afterBreakfast
+                sceneTagId: MealContext.afterBreakfast.rawValue
             ),
             GlucoseRecord(
                 value: 8.1,
                 timestamp: calendar.date(bySettingHour: 12, minute: 30, second: 0,
                                         of: calendar.date(byAdding: .day, value: -1, to: now)!)!,
-                mealContext: .afterLunch
+                sceneTagId: MealContext.afterLunch.rawValue
             ),
             GlucoseRecord(
                 value: 5.5,
                 timestamp: calendar.date(bySettingHour: 18, minute: 0, second: 0,
                                         of: calendar.date(byAdding: .day, value: -1, to: now)!)!,
-                mealContext: .beforeDinner
+                sceneTagId: MealContext.beforeDinner.rawValue
             ),
 
             // 前几天的记录
             GlucoseRecord(
                 value: 4.8,
                 timestamp: calendar.date(byAdding: .day, value: -2, to: now)!,
-                mealContext: .fasting
+                sceneTagId: MealContext.fasting.rawValue
             ),
             GlucoseRecord(
                 value: 7.5,
                 timestamp: calendar.date(byAdding: .day, value: -2, to: now)!,
-                mealContext: .afterLunch
+                sceneTagId: MealContext.afterLunch.rawValue
             ),
             GlucoseRecord(
                 value: 6.2,
                 timestamp: calendar.date(byAdding: .day, value: -3, to: now)!,
-                mealContext: .beforeBreakfast
+                sceneTagId: MealContext.beforeBreakfast.rawValue
             ),
             GlucoseRecord(
                 value: 3.5,
                 timestamp: calendar.date(byAdding: .day, value: -3, to: now)!,
-                mealContext: .fasting
+                sceneTagId: MealContext.fasting.rawValue
             ),
             GlucoseRecord(
                 value: 9.8,
                 timestamp: calendar.date(byAdding: .day, value: -4, to: now)!,
-                mealContext: .afterDinner,
+                sceneTagId: MealContext.afterDinner.rawValue,
                 note: "聚餐吃多了"
             ),
             GlucoseRecord(
                 value: 5.9,
                 timestamp: calendar.date(byAdding: .day, value: -5, to: now)!,
-                mealContext: .beforeLunch
+                sceneTagId: MealContext.beforeLunch.rawValue
             ),
             GlucoseRecord(
                 value: 6.7,
                 timestamp: calendar.date(byAdding: .day, value: -6, to: now)!,
-                mealContext: .afterBreakfast
+                sceneTagId: MealContext.afterBreakfast.rawValue
             ),
         ]
     }

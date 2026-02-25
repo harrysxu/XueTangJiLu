@@ -34,7 +34,7 @@ struct WatchHomeView: View {
                     // 最新血糖
                     if let latest = latestRecord {
                         VStack(spacing: 4) {
-                            Text("最新血糖")
+                            Text(String(localized: "watch.latest_glucose"))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
 
@@ -59,14 +59,14 @@ struct WatchHomeView: View {
                                 .foregroundStyle(.tertiary)
                         }
                     } else {
-                        Text("暂无记录")
+                        Text(String(localized: "watch.no_records"))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
 
                     // 快速记录按钮
                     Button(action: { showQuickRecord = true }) {
-                        Label("记录血糖", systemImage: "plus.circle.fill")
+                        Label(String(localized: "watch.record_glucose"), systemImage: "plus.circle.fill")
                             .font(.caption.weight(.semibold))
                     }
                     .buttonStyle(.borderedProminent)
@@ -79,7 +79,7 @@ struct WatchHomeView: View {
                 }
                 .padding(.horizontal)
             }
-            .navigationTitle("学糖记录")
+            .navigationTitle(String(localized: "app.name"))
             .sheet(isPresented: $showQuickRecord) {
                 WatchQuickRecordView()
             }
@@ -89,7 +89,7 @@ struct WatchHomeView: View {
     private var todaySummary: some View {
         let todayRecords = records.filter { $0.timestamp.isToday }
         return VStack(alignment: .leading, spacing: 6) {
-            Text("今日")
+            Text(String(localized: "watch.today"))
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
 
@@ -97,7 +97,7 @@ struct WatchHomeView: View {
                 VStack {
                     Text("\(todayRecords.count)")
                         .font(.caption.weight(.bold))
-                    Text("次数")
+                    Text(String(localized: "watch.count"))
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
                 }
@@ -109,10 +109,10 @@ struct WatchHomeView: View {
                         Text(GlucoseUnitConverter.displayString(mmolLValue: avg, in: unit))
                             .font(.caption.weight(.bold))
                     } else {
-                        Text("--")
+                        Text(String(localized: "watch.placeholder_dash"))
                             .font(.caption.weight(.bold))
                     }
-                    Text("均值")
+                    Text(String(localized: "watch.average"))
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
                 }

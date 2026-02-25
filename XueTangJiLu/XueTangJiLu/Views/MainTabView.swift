@@ -12,36 +12,46 @@ import SwiftData
 struct MainTabView: View {
     @State private var selectedTab: Tab = .dashboard
 
-    enum Tab: String {
-        case dashboard = "首页"
-        case log = "记录"
-        case insights = "洞察"
-        case profile = "我的"
+    enum Tab: String, CaseIterable {
+        case dashboard
+        case log
+        case statistics
+        case profile
+        
+        /// 本地化的标题
+        var localizedTitle: String {
+            switch self {
+            case .dashboard:  return String(localized: "tab.dashboard")
+            case .log:        return String(localized: "tab.log")
+            case .statistics: return String(localized: "tab.statistics")
+            case .profile:    return String(localized: "tab.profile")
+            }
+        }
     }
 
     var body: some View {
         TabView(selection: $selectedTab) {
             DashboardView()
                 .tabItem {
-                    Label(Tab.dashboard.rawValue, systemImage: selectedTab == .dashboard ? "house.fill" : "house")
+                    Label(Tab.dashboard.localizedTitle, systemImage: selectedTab == .dashboard ? "house.fill" : "house")
                 }
                 .tag(Tab.dashboard)
 
             LogView()
                 .tabItem {
-                    Label(Tab.log.rawValue, systemImage: selectedTab == .log ? "square.and.pencil.circle.fill" : "square.and.pencil")
+                    Label(Tab.log.localizedTitle, systemImage: selectedTab == .log ? "square.and.pencil.circle.fill" : "square.and.pencil")
                 }
                 .tag(Tab.log)
 
-            InsightsView()
+            StatisticsView()
                 .tabItem {
-                    Label(Tab.insights.rawValue, systemImage: selectedTab == .insights ? "chart.line.uptrend.xyaxis.circle.fill" : "chart.line.uptrend.xyaxis")
+                    Label(Tab.statistics.localizedTitle, systemImage: selectedTab == .statistics ? "chart.bar.xaxis.ascending" : "chart.bar.xaxis")
                 }
-                .tag(Tab.insights)
+                .tag(Tab.statistics)
 
             ProfileView()
                 .tabItem {
-                    Label(Tab.profile.rawValue, systemImage: selectedTab == .profile ? "person.fill" : "person")
+                    Label(Tab.profile.localizedTitle, systemImage: selectedTab == .profile ? "person.fill" : "person")
                 }
                 .tag(Tab.profile)
         }

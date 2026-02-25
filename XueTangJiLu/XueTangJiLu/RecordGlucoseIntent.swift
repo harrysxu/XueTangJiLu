@@ -9,22 +9,23 @@ import AppIntents
 import SwiftData
 import WidgetKit
 
-/// Siri 语音录入 Intent - "用学糖记录记录血糖"
+/// Siri 语音录入 Intent - "用血糖记录记录血糖"
 struct RecordGlucoseIntent: AppIntent {
-    static var title: LocalizedStringResource = "记录血糖"
-    static var description = IntentDescription("快速记录一次血糖数值")
+    static var title: LocalizedStringResource = "quick.glucose"
+    static var description = IntentDescription("intent.glucose.description")
     static var openAppWhenRun = false
 
-    @Parameter(title: "血糖值", description: "血糖数值（mmol/L 或 mg/dL）")
+    @Parameter(title: "intent.glucose.param.value", description: "intent.glucose.description")
     var glucoseValue: Double
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
         // 从 App Groups 共享容器读取设置
         let schema = Schema([GlucoseRecord.self, UserSettings.self])
+        let appGroupID = AppConstants.appGroupID // 先获取
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            groupContainer: .identifier(AppConstants.appGroupID),
+            groupContainer: .identifier(appGroupID),
             cloudKitDatabase: .none
         )
         let container = try ModelContainer(for: schema, configurations: [config])
@@ -41,15 +42,27 @@ struct RecordGlucoseIntent: AppIntent {
             preferredUnit: preferredUnit
         )
 
-        // 自动推断用餐场景
-        let mealContext = TagEngine.suggestContext()
+        // 自动推断场景标签
+        let sceneTagId = TagEngine.suggestTagId()
+        
+        // 获取显示名称（避免在非隔离上下文中访问计算属性）
+        let tagDisplayName: String
+        if let settings {
+            tagDisplayName = settings.displayName(for: sceneTagId)
+        } else {
+            // 使用本地化映射
+            if let context = MealContext(rawValue: sceneTagId) {
+                tagDisplayName = context.localizedDisplayName
+            } else {
+                tagDisplayName = String(localized: "meal.other")
+            }
+        }
 
         // 创建记录
         let record = GlucoseRecord(
             value: mmolLValue,
             timestamp: .now,
-            mealContext: mealContext,
-            note: nil,
+            sceneTagId: sceneTagId,
             source: "siri"
         )
 
@@ -66,7 +79,8 @@ struct RecordGlucoseIntent: AppIntent {
         )
 
         return .result(
-            dialog: "已记录血糖 \(displayValue) \(preferredUnit.rawValue)（\(mealContext.displayName)）"
+            dialog: IntentDialog(stringLiteral: String(localized: "intent.glucose.success", 
+                                                       defaultValue: "已记录血糖 \(displayValue) \(preferredUnit.rawValue)（\(tagDisplayName)）"))
         )
     }
 }
@@ -81,7 +95,7 @@ struct RecordGlucoseShortcuts: AppShortcutsProvider {
                 "\(.applicationName)记录血糖",
                 "在\(.applicationName)中记录血糖",
             ],
-            shortTitle: "记录血糖",
+            shortTitle: LocalizedStringResource("quick.glucose"),
             systemImageName: "drop.fill"
         )
     }

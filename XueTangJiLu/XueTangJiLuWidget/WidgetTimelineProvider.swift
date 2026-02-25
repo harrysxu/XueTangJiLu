@@ -56,8 +56,6 @@ struct GlucoseTimelineProvider: TimelineProvider {
             let settingsDescriptor = FetchDescriptor<UserSettings>()
             let settings = try context.fetch(settingsDescriptor).first
             let unitRawValue = settings?.preferredUnitRawValue ?? GlucoseUnit.systemDefault.rawValue
-            let targetLow = settings?.targetLow ?? 3.9
-            let targetHigh = settings?.targetHigh ?? 10.0
 
             // 获取最新记录
             var latestDescriptor = FetchDescriptor<GlucoseRecord>(
@@ -66,6 +64,17 @@ struct GlucoseTimelineProvider: TimelineProvider {
             latestDescriptor.fetchLimit = 1
             let latestRecords = try context.fetch(latestDescriptor)
             let latest = latestRecords.first
+
+            // 解析最新记录的场景标签
+            let latestTagLabel: String?
+            let latestTagIcon: String?
+            if let latest {
+                latestTagLabel = resolveTagLabel(tagId: latest.sceneTagId, settings: settings)
+                latestTagIcon = resolveTagIcon(tagId: latest.sceneTagId, settings: settings)
+            } else {
+                latestTagLabel = nil
+                latestTagIcon = nil
+            }
 
             // 获取 7 天内记录（用于趋势图和 TIR）
             let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: .now)!
@@ -77,12 +86,18 @@ struct GlucoseTimelineProvider: TimelineProvider {
             )
             let weekRecords = try context.fetch(weekDescriptor)
 
-            // 计算 TIR
+            // 计算 TIR（逐条按场景阈值评判）
             let tirValue: Double
             if weekRecords.isEmpty {
                 tirValue = 0
+            } else if let settings {
+                let inRange = weekRecords.filter { record in
+                    let range = settings.thresholdRange(for: record.sceneTagId)
+                    return record.value >= range.low && record.value <= range.high
+                }
+                tirValue = Double(inRange.count) / Double(weekRecords.count) * 100.0
             } else {
-                let inRange = weekRecords.filter { $0.value >= targetLow && $0.value <= targetHigh }
+                let inRange = weekRecords.filter { $0.value >= 3.9 && $0.value <= 10.0 }
                 tirValue = Double(inRange.count) / Double(weekRecords.count) * 100.0
             }
 
@@ -99,7 +114,8 @@ struct GlucoseTimelineProvider: TimelineProvider {
                 WidgetRecordData(
                     value: record.value,
                     timestamp: record.timestamp,
-                    mealContextRawValue: record.mealContextRawValue,
+                    sceneTagLabel: resolveTagLabel(tagId: record.sceneTagId, settings: settings),
+                    sceneTagIcon: resolveTagIcon(tagId: record.sceneTagId, settings: settings),
                     note: record.note
                 )
             }
@@ -114,7 +130,8 @@ struct GlucoseTimelineProvider: TimelineProvider {
                 date: .now,
                 latestValue: latest?.value,
                 latestTime: latest?.timestamp,
-                mealContextRawValue: latest?.mealContextRawValue,
+                sceneTagLabel: latestTagLabel,
+                sceneTagIcon: latestTagIcon,
                 unitRawValue: unitRawValue,
                 tirValue: tirValue,
                 weekTrend: weekTrend,
@@ -128,5 +145,21 @@ struct GlucoseTimelineProvider: TimelineProvider {
             // 数据库读取失败，返回空数据
             return .empty
         }
+    }
+
+    // MARK: - 标签解析辅助
+
+    private func resolveTagLabel(tagId: String, settings: UserSettings?) -> String {
+        if let settings {
+            return settings.displayName(for: tagId)
+        }
+        return MealContext(rawValue: tagId)?.localizedDisplayName ?? String(localized: "meal.other")
+    }
+
+    private func resolveTagIcon(tagId: String, settings: UserSettings?) -> String {
+        if let settings {
+            return settings.iconName(for: tagId)
+        }
+        return MealContext(rawValue: tagId)?.iconName ?? "clock"
     }
 }

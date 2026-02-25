@@ -1,7 +1,7 @@
 /* Tab Bar */
 "tab.dashboard" = "Home";
 "tab.log" = "Log";
-"tab.insights" = "Insights";
+"tab.statistics" = "Statistics";
 "tab.profile" = "Profile";
 
 /* Dashboard */
@@ -17,8 +17,24 @@
 "quick.glucose" = "Log Glucose";
 "quick.medication" = "Log Medicine";
 "quick.meal" = "Log Meal";
-"today.insight" = "Today's Insight";
+"today.summary.card" = "Today's Summary";
 "recent.records" = "Recent Records";
+"yesterday.records" = "Yesterday's Records";
+
+/* Dashboard */
+"dashboard.no_records_today" = "No records today";
+"dashboard.tap_add" = "Tap the buttons below to start recording";
+"dashboard.today_summary" = "%d records today, avg %@ %@, TIR %d%%";
+"dashboard.recorded_count" = "%d records today";
+"dashboard.times" = "times";
+"dashboard.medication_count" = "Medications";
+"dashboard.no_patterns_today" = "Not enough data today to identify patterns";
+"dashboard.recent_records" = "Recent Records";
+"dashboard.no_recent" = "No records";
+"dashboard.glucose.title" = "Glucose";
+"dashboard.medication.title" = "Medication";
+"dashboard.meal.title" = "Meal";
+"statistics.count" = "times";
 
 /* Record Input */
 "save.record" = "Save Record";
@@ -49,6 +65,28 @@
 "meal.bedtime" = "Bedtime";
 "meal.other" = "Other";
 
+/* Sync - iCloud Sync */
+"sync.idle" = "Sync Ready";
+"sync.syncing" = "Syncing...";
+"sync.success" = "Synced";
+"sync.failed" = "Sync Failed";
+"sync.offline" = "Offline";
+"sync.settings.title" = "iCloud Sync";
+"sync.settings.enable" = "Enable iCloud Sync";
+"sync.settings.manual_sync" = "Sync Now";
+"sync.settings.last_sync" = "Last Synced";
+"sync.settings.wifi_only" = "WiFi Only Sync";
+"sync.error.not_signed_in" = "Please sign in to iCloud in Settings";
+"sync.error.network" = "Network connection failed";
+"sync.error.quota" = "iCloud storage is full";
+"sync.error.permission" = "iCloud permission required";
+"sync.account.available" = "Signed In";
+"sync.account.unavailable" = "Not Signed In";
+"sync.history.title" = "Sync History";
+"sync.history.empty" = "No sync history";
+"sync.reset.title" = "Reset Sync State";
+"sync.reset.message" = "This will clear local sync cache and re-fetch data from iCloud. Your data will not be deleted.";
+
 /* Glucose Level */
 "level.low" = "Low";
 "level.normal" = "Normal";
@@ -75,20 +113,18 @@
 "meal.description" = "Meal Description";
 "meal.description.placeholder" = "e.g. Rice + vegetables + chicken";
 
-/* Insights / Trends */
-"insights.title" = "Insights";
-"insights.average" = "Average Glucose";
-"insights.a1c" = "Estimated A1C";
-"insights.tir" = "Time in Range";
-"insights.records" = "Record Count";
-"insights.cv" = "Coefficient of Variation (CV%)";
-"insights.stable" = "Stable";
-"insights.volatile" = "Volatile";
-"insights.target.cv" = "Target < 36%";
-"insights.target.tir" = "Target > 70%";
-"insights.weekly" = "Weekly Comparison";
-"insights.a1c_goal" = "A1C Goal Tracking";
-"insights.smart" = "Smart Insights";
+/* Statistics / Trends */
+"statistics.title" = "Statistics";
+"statistics.average" = "Average Glucose";
+"statistics.eA1C" = "Estimated A1C";
+"statistics.tir" = "Time in Range";
+"statistics.records" = "Record Count";
+"statistics.cv" = "Coefficient of Variation (CV%)";
+"statistics.cv.label" = "Coefficient of Variation";
+"statistics.minmax" = "High / Low";
+"statistics.ref.cv" = "Ref < 36%";
+"statistics.ref.tir" = "Ref > 70%";
+"statistics.weekly" = "Weekly Comparison";
 
 /* Profile */
 "profile.title" = "Profile";
@@ -134,18 +170,52 @@
 "reminder.off" = "Off";
 "reminder.save" = "Save Reminders";
 
+/* App Name */
+"app.name" = "Blood Glucose Record";
+
+/* Share Card */
+"share.today_summary" = "Today's Glucose Summary · %@";
+"share.period_summary" = "%@ Glucose Summary";
+"share.disclaimer" = "Data is for reference only and does not constitute medical advice";
+
+/* Disclaimer */
+"disclaimer.title" = "Important Notice";
+"disclaimer.item1" = "This app is a recording tool and cannot replace medical diagnosis";
+"disclaimer.item2" = "All data analysis is for reference only and does not constitute medical advice";
+"disclaimer.item3" = "Seek medical attention immediately if glucose levels are abnormal, follow doctor's advice";
+"disclaimer.item4" = "Immediately consume sugar if experiencing hypoglycemia, call emergency services if necessary";
+"disclaimer.description" = "Blood Glucose Record helps you track and understand your glucose data, but should not be the sole basis for medical decisions. Regular check-ups and professional medical guidance are essential.";
+"disclaimer.navigation_title" = "Usage Notice";
+"disclaimer.accept" = "I Understand";
+"disclaimer.banner" = "Data is for reference only, does not constitute medical advice, please follow doctor's orders";
+
+/* About - Privacy & Disclaimer */
+"about.privacy.title" = "Privacy Policy";
+"about.disclaimer.title" = "Disclaimer";
+"about.privacy.content" = "Blood Glucose Record Privacy Policy\n\nLast Updated: February 12, 2026\n\n1. Data Collection\nThis app does not collect any personal information to developer servers. All glucose records are stored only on your device locally and in your private iCloud account.\n\n2. Data Storage\n• Local Storage: Glucose records are saved in your device's local database\n• iCloud Sync: If you enable iCloud, data will sync across your devices through your private iCloud account\n• Apple Health: If you authorize, glucose data will sync to the Apple Health app\n\n3. Data Security\n• All local data is protected by iOS system-level encryption\n• iCloud transmission uses TLS encryption\n• Developers cannot access any of your data\n\n4. Third-Party Services\nThis app does not integrate any third-party analytics, advertising, or tracking SDKs.\n\n5. Data Export & Deletion\n• You can export all data at any time through the settings page (PDF or CSV format)\n• You can delete any record at any time\n• Deleting the app will remove all local data (data in iCloud and Health needs to be managed separately)\n\n6. Contact Us\nFor privacy-related questions, please contact us through the App Store page.";
+"about.disclaimer.content" = "Disclaimer\n\nImportant Notice: Please read the following carefully before using this application.\n\n1. Not a Medical Device\nBlood Glucose Record (XueTangJiLu) is a personal health data recording tool, not a medical device, and does not have medical diagnostic capabilities.\n\n2. No Medical Advice\nThis app does not provide any form of medical diagnosis, treatment advice, or medication guidance. Statistical data shown in the app (such as average glucose, time in range, etc.) are for reference only and should not be used as a basis for medical decisions.\n\n3. Consult Your Doctor\nBefore making any medical decisions, always consult your doctor or professional healthcare provider. Do not adjust medication dosages or treatment plans based solely on data from this app.\n\n4. Data Accuracy\nData recorded in this app is based on user manual input, and data accuracy is the user's responsibility. Please ensure that the glucose values you enter match your glucose meter readings.\n\n5. Emergency Situations\nIf you experience severe hypoglycemia, hyperglycemia, or other medical emergencies, immediately call emergency services or go to the nearest medical facility.\n\n6. Limitation of Liability\nTo the maximum extent permitted by law, the developer is not responsible for any direct or indirect damages arising from the use of this app.";
+
 /* Onboarding */
-"onboarding.welcome" = "XueTang Record";
+"onboarding.welcome" = "Blood Glucose Record";
 "onboarding.slogan" = "Simple Glucose Management";
 "onboarding.start" = "Get Started";
 "onboarding.next" = "Next";
+"onboarding.disclaimer" = "This app is for personal health data recording only and does not provide medical diagnosis or treatment advice. Please consult your doctor before making any medical decisions.";
 "onboarding.unit.title" = "Choose Your Unit";
 "onboarding.unit.subtitle" = "You can change this in Settings";
+"onboarding.unit.mmol_region" = "China/Europe";
+"onboarding.unit.mgdl_region" = "USA/Japan";
 "onboarding.edu.title" = "Learn Key Metrics";
 "onboarding.edu.subtitle" = "Help you understand your glucose data";
-"onboarding.goal.title" = "Set Your Goals";
-"onboarding.goal.subtitle" = "You can adjust anytime in Settings";
+"onboarding.edu.tir_title" = "TIR (Time in Range)";
+"onboarding.edu.tir_desc" = "Percentage of time glucose is within target range. Goal > 70% is good.";
+"onboarding.edu.cv_title" = "CV% (Coefficient of Variation)";
+"onboarding.edu.cv_desc" = "Measures glucose variability. < 36% is considered stable.";
 "onboarding.health.title" = "Health Data Sync";
+"onboarding.health.subtitle" = "After connecting to Apple Health,\nyour glucose data will be automatically backed up to the system Health app.";
+"onboarding.health.benefit1" = "Data backup is more secure";
+"onboarding.health.benefit2" = "Data persists after app deletion";
+"onboarding.health.benefit3" = "View with other health data";
 "onboarding.health.connect" = "Connect Health";
 "onboarding.health.skip" = "Maybe Later";
 
@@ -154,8 +224,8 @@
 "empty.tap_add" = "Tap the buttons below to start recording";
 "empty.no_glucose" = "No glucose records";
 "empty.no_medication" = "No medication records";
-"empty.no_trends" = "No trend data";
-"empty.trends_hint" = "Start recording glucose to see trends and insights";
+"empty.no_trends" = "No statistics yet";
+"empty.trends_hint" = "Start recording glucose to see your statistics";
 
 /* Share */
 "share.title" = "Share Summary";
@@ -166,3 +236,481 @@
 /* Activity */
 "activity.steps" = "Today Steps";
 "activity.exercise" = "Exercise Time";
+
+/* Factory Reset */
+"factory_reset.title" = "Factory Reset";
+"factory_reset.warning" = "Dangerous Operation";
+"factory_reset.description" = "This will permanently delete all data";
+"factory_reset.data_to_delete" = "Data to be deleted";
+"factory_reset.glucose_records" = "Glucose Records";
+"factory_reset.meal_records" = "Meal Records";
+"factory_reset.medication_records" = "Medication Records";
+"factory_reset.custom_tags" = "Custom Tags";
+"factory_reset.total_items" = "Total: %d items";
+"factory_reset.what_will_reset" = "What will be reset";
+"factory_reset.all_records" = "All glucose, meal, and medication records";
+"factory_reset.custom_scene_tags" = "Custom scene tags and annotation tags";
+"factory_reset.personal_settings" = "Personal settings like glucose unit and target ranges";
+"factory_reset.reminders" = "Reminder settings and display mode";
+"factory_reset.healthkit" = "HealthKit connection status";
+"factory_reset.icloud_warning" = "⚠️ Data will be synced via iCloud, data on other devices will also be deleted";
+"factory_reset.confirm_input" = "Type the following to confirm";
+"factory_reset.type_to_confirm" = "Type: %@";
+"factory_reset.confirm_button" = "Confirm Reset";
+"factory_reset.first_warning_title" = "⚠️ First Confirmation";
+"factory_reset.first_warning_message" = "This will permanently delete %d records and all custom settings.\n\nThis action cannot be undone. Are you sure?";
+"factory_reset.second_warning_title" = "⚠️ Final Confirmation";
+"factory_reset.second_warning_message" = "This is your last chance.\n\nOnce you tap \\\"Confirm Delete\\\", all data will be permanently deleted, including:\n• %d glucose records\n• %d meal records\n• %d medication records\n• All custom tags and settings\n\nThis action cannot be undone!";
+"factory_reset.confirm_delete" = "Confirm Delete";
+"factory_reset.think_again" = "Think Again";
+"factory_reset.complete_title" = "✅ Reset Complete";
+"factory_reset.complete_message" = "All data has been cleared and settings restored to defaults. The app will sync to iCloud automatically.";
+"factory_reset.required_text" = "Delete All Data";
+
+/* ThresholdGroup */
+"threshold.fasting_premeal" = "Fasting/Pre-meal";
+"threshold.postmeal" = "Post-meal";
+"threshold.bedtime" = "Bedtime";
+"threshold.ada_fasting" = "ADA Recommended: 4.4-7.0 mmol/L";
+"threshold.ada_postmeal" = "ADA Recommended: <10.0 mmol/L";
+"threshold.ada_bedtime" = "ADA Recommended: 5.0-8.3 mmol/L";
+
+/* MedicationType Units */
+"med.unit_insulin" = "Units(U)";
+"med.unit_mg" = "mg";
+
+/* DisplayMode */
+"display_mode.simple" = "Simple Mode";
+"display_mode.professional" = "Professional Mode";
+"display_mode.simple.desc" = "For daily quick logging";
+"display_mode.professional.desc" = "Full statistics and analysis";
+
+/* Widget */
+"widget.no_data" = "No Data";
+"widget.7day_trend" = "7-Day Trend";
+"widget.data_insufficient" = "Insufficient Data";
+"widget.tir_label" = "Time in Range";
+
+/* Intent */
+"intent.glucose.description" = "Quickly record a glucose reading";
+"intent.glucose.param.value" = "Glucose Value";
+"intent.glucose.success" = "Recorded glucose %@ %@ (%@)";
+"intent.category" = "Record";
+
+/* ReminderConfig */
+"reminder.before_breakfast" = "Before Breakfast";
+"reminder.after_breakfast" = "After Breakfast";
+"reminder.before_lunch" = "Before Lunch";
+"reminder.after_lunch" = "After Lunch";
+"reminder.before_dinner" = "Before Dinner";
+"reminder.after_dinner" = "After Dinner";
+"reminder.fasting" = "Fasting";
+"reminder.bedtime" = "Bedtime";
+"reminder.not_set" = "Not Set";
+
+/* Settings */
+"settings.title" = "Settings";
+"settings.display_mode" = "Display Mode";
+"settings.display_preferences" = "Display Preferences";
+"settings.display_preferences.footer" = "Simple mode for quick daily logging; Professional mode shows full statistics.";
+"settings.glucose_preferences" = "Glucose Preferences";
+"settings.unit" = "Unit";
+"settings.tags_and_targets" = "Tags & Target Ranges";
+"settings.scenes_count" = "%d scenes";
+"settings.data_sync" = "Data Sync";
+"settings.health_sync" = "Apple Health Sync";
+"settings.data_management" = "Data Management";
+"settings.clear_history" = "Clear History";
+"settings.test_data_generator" = "Test Data Generator";
+"settings.sync_debug" = "Sync Debug";
+
+/* Record Input - Additional */
+"record.edit" = "Edit Record";
+"record.save_changes" = "Save Changes";
+"record.more" = "More";
+"record.quick_select" = "Quick Select";
+"record.time.now" = "Now";
+"record.time.1h_ago" = "1 hour ago";
+"record.time.2h_ago" = "2 hours ago";
+"record.time.today_7am" = "Today 7 AM";
+"record.time.today_12pm" = "Today 12 PM";
+"record.time.today_6pm" = "Today 6 PM";
+"record.modify" = "Modify";
+
+/* Profile - Additional */
+"profile.tag_management" = "Tag Management";
+"profile.tag_summary" = "%d scenes · %d notes";
+"profile.reminders_count" = "%d reminders";
+"profile.monthly_report" = "Monthly Report";
+"achievement.completed" = "Done";
+
+/* Statistics - Additional */
+"statistics.time_range" = "Time Range";
+"statistics.filter_all" = "All";
+"statistics.records_near" = "Near %@";
+"statistics.glucose_distribution" = "Glucose Distribution";
+"statistics.below_range" = "Below Range";
+"statistics.in_range" = "In Range";
+"statistics.above_range" = "Above Range";
+"statistics.per_tag_tir" = "TIR by Scenario";
+"statistics.tag_distribution" = "Glucose by Scenario";
+"statistics.meal_pair" = "Pre/Post Meal Pairs";
+"statistics.spike_hint" = "Spike > 3.0 highlighted";
+"statistics.box_typical" = "Typical";
+"statistics.box_range" = "Daily Range";
+"statistics.box_target" = "Target";
+"statistics.records_count" = "%d records";
+"statistics.range_label" = "Range: %@ - %@ %@";
+"statistics.flat" = "No change";
+"statistics.this_week" = "This Week";
+"statistics.last_week" = "Last Week";
+"statistics.tir_comparison" = "TIR";
+"statistics.hourly_distribution" = "%@ Hourly Distribution";
+"statistics.insufficient_records_hourly" = "Need 3+ records for hourly distribution";
+"statistics.daily_trend" = "%@ Daily Trend";
+"statistics.insufficient_records_daily" = "Need 3+ records for daily trend";
+"statistics.date" = "Date";
+"statistics.avg" = "Avg";
+"statistics.range" = "Range";
+"statistics.count" = "Count";
+"statistics.in_range_short" = "TIR";
+
+/* Log */
+"log.filter_records" = "Filter Records";
+"log.type.glucose" = "Glucose";
+"log.type.medication" = "Medication";
+"log.type.meal" = "Meals";
+"log.time.today" = "Today";
+"log.time.last_7" = "Last 7 Days";
+"log.time.last_30" = "Last 30 Days";
+"log.time.last_90" = "Last 90 Days";
+"log.time.custom" = "Custom";
+"log.time.all" = "All";
+"log.custom_range" = "Custom (%@ - %@)";
+"log.empty.filtered" = "No matching records";
+"log.empty.hint" = "Try adjusting filters";
+"log.empty.tap_add" = "Tap \"+\" below to add";
+"log.add_record" = "Add Record";
+"log.delete" = "Delete";
+
+/* Chart TimeRange (ChartViewModel) */
+"time_range.7d" = "7 Days";
+"time_range.14d" = "14 Days";
+"time_range.30d" = "30 Days";
+"time_range.90d" = "90 Days";
+
+/* Tag Management */
+"tag_management" = "Tag Management";
+"tag.scene_tags" = "Scene Tags";
+"tag.annotation_tags" = "Annotation Tags";
+"tag.show_all" = "Show All Tags";
+"tag.show_recommended" = "Show Recommended Only";
+"tag.add_scene" = "Add Scene Tag";
+"tag.add_annotation" = "Add Annotation Tag";
+"tag.custom" = "Custom";
+"tag.builtin" = "Built-in";
+"tag.hidden_count" = "%d hidden";
+"tag.delete" = "Delete";
+"tag.edit" = "Edit";
+"tag.label_name" = "Tag Name";
+"tag.input_name" = "Enter new annotation tag name";
+"tag.modify_name" = "Modify annotation tag name";
+"tag.add_alert_title" = "Add Annotation Tag";
+"tag.edit_alert_title" = "Edit Tag";
+"tag.scene_footer_collapsed" = "Showing 5 recommended tags. Tap Show All Tags to view and manage all tags.";
+"tag.scene_footer_expanded" = "Tap tag to edit name and icon. Tap threshold range to set target. Long press to reorder. Toggle off to hide. Swipe left to delete custom tags.";
+"tag.annotation_footer" = "Annotation tags mark special states (e.g., after exercise, stressed). Swipe left to edit or delete custom tags";
+"tag.edit_scene" = "Edit Scene Tag";
+"tag.add_scene_title" = "Add Scene Tag";
+"tag.tag_info" = "Tag Info";
+"tag.select_group" = "Group";
+"tag.select_icon" = "Select Icon";
+"tag.restore_default" = "Restore Default Name";
+"tag.group_description" = "Group Description";
+"tag.group_footer" = "Group determines the default target range. You can also set custom ranges after saving.";
+"tag.edit_threshold" = "Edit Target Range";
+"tag.target_range" = "Target Range";
+"tag.lower_limit" = "Lower Limit";
+"tag.upper_limit" = "Upper Limit";
+"tag.reference_advice" = "Reference";
+
+/* Sync Settings */
+"sync.title" = "iCloud Sync";
+"sync.status" = "Status";
+"sync.account" = "iCloud Account";
+"sync.network" = "Network Connection";
+"sync.logged_in" = "Signed In";
+"sync.not_logged_in" = "Not Signed In";
+"sync.restricted" = "Restricted";
+"sync.checking" = "Checking...";
+"sync.temporarily_unavailable" = "Temporarily Unavailable";
+"sync.unknown_status" = "Unknown Status";
+"sync.settings" = "Sync Settings";
+"sync.enable" = "Enable iCloud Sync";
+"sync.wifi_only" = "WiFi Only";
+"sync.sync_now" = "Sync Now";
+"sync.last_sync" = "Last Sync";
+"sync.footer" = "When enabled, data will sync to your iCloud account. WiFi only sync saves cellular data.";
+"sync.history" = "Sync History";
+"sync.no_history" = "No sync history";
+"sync.history_footer" = "Shows recent sync activity";
+
+/* Meal Photo View */
+"meal.edit" = "Edit Meal";
+"meal.record" = "Record Meal";
+"meal.photo" = "Photo";
+"meal.optional" = "(Optional)";
+"meal.collapse" = "Collapse";
+"meal.add_photo" = "Add Photo";
+"meal.take_photo" = "Take Photo";
+"meal.choose_from_library" = "Choose from Library";
+"meal.carb_level" = "Carb Level";
+"meal.description" = "Meal Description";
+"meal.description_placeholder" = "e.g. \"Rice + Vegetables + Chicken\"";
+
+/* Unit Picker */
+"unit.title" = "Glucose Unit";
+"unit.mmol_region" = "Used in China, Europe, etc.";
+"unit.mgdl_region" = "Used in USA, Japan, etc.";
+
+/* Reminder Settings */
+"reminder.title" = "Reminder Settings";
+"reminder.notification_permission" = "Notification Permission";
+"reminder.enabled" = "Enabled";
+"reminder.enable_button" = "Enable";
+"reminder.measurement_reminders" = "Measurement Reminders";
+"reminder.inactivity_reminder" = "Inactivity Reminder";
+"reminder.interval" = "Reminder Interval";
+"reminder.off" = "Off";
+"reminder.hours_4" = "4 Hours";
+"reminder.hours_6" = "6 Hours";
+"reminder.hours_8" = "8 Hours";
+"reminder.hours_12" = "12 Hours";
+"reminder.save" = "Save Reminder Settings";
+"reminder.permission_alert" = "Notification Permission Required";
+"reminder.go_to_settings" = "Go to Settings";
+
+/* Medication Input */
+"medication.save_record" = "Save Medication Record";
+"medication.name_placeholder" = "Medication Name (Optional, e.g. \"NovoRapid\")";
+
+/* PDF Export */
+"pdf.title" = "PDF Report";
+"pdf.start_date" = "Start Date";
+"pdf.end_date" = "End Date";
+"pdf.record_type" = "Record Type";
+"pdf.all_records" = "All Records";
+"pdf.glucose_only" = "Glucose Only";
+"pdf.medication_only" = "Medication Only";
+"pdf.meal_only" = "Meal Only";
+"pdf.share_report" = "Share Report";
+"generating_report" = "Generating Report...";
+
+/* Medication */
+"medication.edit" = "Edit Medication";
+
+/* Notifications */
+"notification.glucose_reminder_title" = "Time to Test Glucose";
+"notification.glucose_reminder_body" = "Remember to record your glucose data";
+"notification.glucose_reminder_labeled" = "%@ - Remember to test glucose";
+"notification.inactivity_title" = "Record Reminder";
+"notification.inactivity_body" = "You haven't recorded glucose for over %d hours";
+
+/* Encouragement Messages */
+"encouragement.week_1" = "One week streak!";
+"encouragement.week_2" = "Two weeks in a row!";
+"encouragement.month_1" = "One month! Keep it up!";
+"encouragement.day_50" = "50 consecutive days! Amazing!";
+"encouragement.day_100" = "100 days! Incredible!";
+"encouragement.year_1" = "A full year! Persistence pays off!";
+
+/* Watch App */
+"watch.latest_glucose" = "Latest Glucose";
+"watch.no_records" = "No Records";
+"watch.record_glucose" = "Record Glucose";
+"watch.today" = "Today";
+"watch.count" = "Count";
+"watch.average" = "Average";
+"watch.placeholder_dash" = "--";
+
+/* Daily Summary Card */
+"daily.today_glucose" = "Today's Glucose";
+"daily.streak_format" = "Consecutive %d days";
+"daily.no_records_today" = "No records today";
+"daily.tap_to_start" = "Tap + button below to start recording";
+"daily.all_in_range" = "All in Range";
+"daily.control_good" = "Good control, keep it up!";
+"daily.out_of_range" = "%d out of range";
+"daily.suggestion" = "Record meals and consult doctor";
+"daily.average_format" = "Average %@";
+"daily.low_warning" = "Low glucose today, stay safe";
+
+/* Factory Reset */
+"factory_reset.navigation_title" = "Clear History";
+"factory_reset.cancel" = "Cancel";
+"factory_reset.danger_title" = "Dangerous Operation";
+"factory_reset.danger_description" = "This will permanently delete all data and sync via iCloud";
+"factory_reset.data_to_delete" = "Data to be Deleted";
+"factory_reset.glucose_records" = "Glucose Records";
+"factory_reset.meal_records" = "Meal Records";
+"factory_reset.medication_records" = "Medication Records";
+"factory_reset.custom_tags" = "Custom Tags";
+"factory_reset.total_items" = "Total: %d items";
+"factory_reset.what_will_reset" = "What Will Be Reset";
+"factory_reset.all_records_item" = "All glucose, meal, and medication records";
+"factory_reset.custom_tags_item" = "Custom scene tags and annotation tags";
+"factory_reset.settings_item" = "Glucose unit, target ranges, and personalization";
+"factory_reset.reminders_item" = "Reminder configuration and display mode";
+"factory_reset.healthkit_item" = "HealthKit connection status";
+"factory_reset.icloud_warning_title" = "⚠️ Important Warning";
+"factory_reset.icloud_sync_warning" = "Data will be synced and deleted via iCloud on all devices logged into the same account!";
+"factory_reset.confirm_input_prompt" = "Type the following to confirm";
+"factory_reset.type_to_confirm_prompt" = "Type: %@";
+"factory_reset.confirm_button" = "Confirm Clear All Data";
+"factory_reset.required_text" = "Delete All Data";
+"factory_reset.first_warning_title" = "⚠️ First Confirmation";
+"factory_reset.first_warning_message" = "This will permanently delete %d records and all custom settings.\n\n⚠️ Important: Data will sync via iCloud to all devices, clearing all device data!\n\nData cannot be recovered after deletion. Are you sure?";
+"factory_reset.think_again_button" = "Think Again";
+"factory_reset.continue_button" = "Continue";
+"factory_reset.second_warning_title" = "⚠️ Final Confirmation";
+"factory_reset.second_warning_message" = "This is your last chance.\n\nAfter clicking \"Confirm Delete\", all data will be permanently deleted, including:\n• %d glucose records\n• %d meal records\n• %d medication records\n• All custom tags and settings\n\n⚠️ This will sync via iCloud to all devices!\n⚠️ This action cannot be undone!";
+"factory_reset.confirm_delete_button" = "Confirm Delete";
+"factory_reset.complete_title" = "✅ Clear Complete";
+"factory_reset.complete_message" = "All history has been cleared and settings restored to defaults. Data will sync to all devices via iCloud.";
+"factory_reset.done_button" = "Done";
+
+/* Sync Components */
+"sync.status.offline" = "Offline";
+"sync.status.syncing" = "Syncing";
+"sync.status.synced" = "Synced";
+"sync.status.failed" = "Failed";
+"sync.last_sync" = "Last sync: %@";
+"sync.pending_items" = "%d items pending";
+"sync.never_synced" = "Never Synced";
+"sync.event.import" = "Import";
+"sync.event.export" = "Export";
+"sync.event.setup" = "Initialize";
+"sync.error.disabled" = "Sync Disabled";
+"sync.error.no_network" = "No Network Connection";
+"sync.error.wifi_required" = "WiFi Required";
+"sync.error.account_unavailable" = "iCloud Account Unavailable";
+
+/* Reminder Settings */
+"reminder.title" = "Reminder Settings";
+"reminder.notification_permission" = "Notification Permission";
+"reminder.enabled" = "Enabled";
+"reminder.enable_button" = "Enable";
+"reminder.measurement_reminders" = "Measurement Reminders";
+"reminder.inactivity_reminder" = "Inactivity Reminder";
+"reminder.interval" = "Remind me after not recording for";
+"reminder.off" = "Off";
+"reminder.hours_4" = "4 hours";
+"reminder.hours_6" = "6 hours";
+"reminder.hours_8" = "8 hours";
+"reminder.hours_12" = "12 hours";
+"reminder.save" = "Save";
+"reminder.permission_alert" = "Notification Permission Required";
+"reminder.go_to_settings" = "Go to Settings";
+"reminder.cancel" = "Cancel";
+"reminder.permission_message" = "Please enable notification permission in System Settings";
+"reminder.before_breakfast" = "Before Breakfast";
+"reminder.after_breakfast" = "After Breakfast";
+"reminder.before_lunch" = "Before Lunch";
+"reminder.after_lunch" = "After Lunch";
+"reminder.before_dinner" = "Before Dinner";
+"reminder.after_dinner" = "After Dinner";
+"reminder.bedtime" = "Bedtime";
+
+/* Monthly Report */
+"monthly.title" = "Monthly Summary";
+"monthly.generating" = "Generating monthly report...";
+"monthly.share_button" = "Share Monthly Report";
+"monthly.filename_prefix" = "Glucose Monthly Summary";
+
+/* CSV Export */
+"csv.title" = "Export CSV Data";
+"csv.date_range_section" = "Select Export Range";
+"csv.start_date" = "Start Date";
+"csv.end_date" = "End Date";
+"csv.record_type_section" = "Record Type";
+"csv.record_type_label" = "Record Type";
+"csv.summary_section" = "Export Summary";
+"csv.date_range_label" = "Date Range";
+"csv.record_count_label" = "Record Count";
+"csv.records_format" = "%d records";
+"csv.export_format_label" = "Export Format";
+"csv.export_format_value" = "CSV (Excel Compatible)";
+"csv.export_button" = "Export CSV File";
+"csv.filename_prefix" = "Glucose Records";
+
+/* Share Card */
+"share.title" = "Share Summary";
+"share.period_label" = "Period";
+"share.week" = "This Week";
+"share.month" = "This Month";
+"share.share_button" = "Share Card";
+
+/* PDF Export */
+"pdf.all_records" = "All Records";
+"pdf.glucose_only" = "Glucose Only";
+"pdf.medication_only" = "Medication Only";
+"pdf.meal_only" = "Meal Only";
+"pdf.disclaimer" = "⚠️ Important: This report is for reference only, not medical advice. Please consult your doctor";
+"pdf.report_title" = "Glucose Record Report";
+"pdf.report_period" = "Report Period: %@";
+"pdf.record_count" = "%d records (%d days, avg %.1f/day)";
+"pdf.average_glucose" = "Average Glucose: %@ %@";
+"pdf.estimated_a1c" = "Estimated A1C: %.1f%%";
+"pdf.tir" = "TIR: %.1f%% (Target > 70%%)";
+"pdf.tar" = "TAR: %.1f%% (Target < 25%%)";
+"pdf.tbr" = "TBR: %.1f%% (Target < 4%%)";
+"pdf.cv" = "CV%%: %.1f%% (Target < 36%%)";
+"pdf.cv_insufficient" = "CV%%: Insufficient data";
+"pdf.medication_days" = "Medication Days: %d";
+"pdf.trend_chart" = "Trend Chart";
+"pdf.table_header_date" = "Date";
+"pdf.table_header_time" = "Time";
+"pdf.table_header_type" = "Type";
+"pdf.table_header_value" = "Value/Description";
+"pdf.table_header_scene" = "Scene/Details";
+"pdf.table_header_note" = "Note";
+"pdf.type_glucose" = "Glucose";
+"pdf.type_medication" = "Medication";
+"pdf.type_meal" = "Meal";
+"pdf.meal_record" = "Meal Record";
+"pdf.other" = "Other";
+"pdf.footer_disclaimer" = "Disclaimer: This report is for informational purposes only and is not a medical diagnosis. Please consult a doctor before making any medical decisions.";
+"pdf.monthly_title" = "%@ Monthly Summary";
+"pdf.generated_date" = "Generated: %@";
+"pdf.core_metrics" = "Core Metrics";
+"pdf.total_records" = "Total Records";
+"pdf.no_records" = "No records this month";
+"pdf.scene_compliance" = "Scene Compliance (by threshold)";
+"pdf.scene_header" = "Scene";
+"pdf.record_count_header" = "Records";
+"pdf.average_header" = "Average";
+"pdf.compliance_rate_header" = "Compliance";
+"pdf.threshold_range_header" = "Threshold Range";
+"pdf.scene_distribution" = "Scene Glucose Distribution";
+"pdf.median_header" = "Median";
+"pdf.q1q3_range_header" = "Q1-Q3 Range";
+"pdf.min_header" = "Min";
+"pdf.max_header" = "Max";
+"pdf.meal_pairing" = "Before/After Meal Pairing";
+"pdf.no_pairing_data" = "No meal pairing data this month";
+"pdf.meal_time" = "Meal";
+"pdf.pair_count" = "Pairs";
+"pdf.avg_rise" = "Avg Rise";
+"pdf.max_rise" = "Max Rise";
+"pdf.over_3_count" = "Over 3.0 Count";
+"pdf.csv_header" = "Type,Date,Time,Glucose,Unit,Threshold Status,Threshold Range,Scene,Medication Type,Medication Name,Dose,Meal Description,Carb Level,Note";
+"pdf.threshold_high" = "High ↑";
+"pdf.threshold_low" = "Low ↓";
+"pdf.threshold_normal" = "Normal";
+"pdf.weekly_title" = "Weekly Report - %@";
+"pdf.weekly_overview" = "This Week Overview";
+"pdf.record_days" = "Record Days";
+"pdf.meal_records" = "Meal Records";
+"pdf.weekly_comparison" = "This Week vs Last Week";
+"pdf.need_full_history" = "Full history needed for comparison";
+"pdf.scene_compliance_short" = "Scene Compliance";

@@ -11,6 +11,28 @@ import SwiftUI
 struct TimelineRowView: View {
     let record: GlucoseRecord
     let unit: GlucoseUnit
+    var settings: UserSettings? = nil
+
+    private var level: GlucoseLevel {
+        if let settings {
+            return record.glucoseLevel(with: settings)
+        }
+        return record.glucoseLevel
+    }
+
+    private var contextDisplayName: String {
+        if let settings {
+            return settings.displayName(for: record.sceneTagId)
+        }
+        return MealContext(rawValue: record.sceneTagId)?.defaultDisplayName ?? "其他"
+    }
+
+    private var contextIconName: String {
+        if let settings {
+            return settings.iconName(for: record.sceneTagId)
+        }
+        return MealContext(rawValue: record.sceneTagId)?.iconName ?? "clock"
+    }
 
     var body: some View {
         HStack(spacing: AppConstants.Spacing.md) {
@@ -21,9 +43,9 @@ struct TimelineRowView: View {
                     .foregroundStyle(.primary)
 
                 HStack(spacing: AppConstants.Spacing.xs) {
-                    Image(systemName: record.mealContext.iconName)
+                    Image(systemName: contextIconName)
                         .font(.caption2)
-                    Text(record.mealContext.displayName)
+                    Text(contextDisplayName)
                         .font(.caption)
                 }
                 .foregroundStyle(.secondary)
@@ -42,32 +64,32 @@ struct TimelineRowView: View {
             GlucoseValueBadge(
                 value: record.value,
                 unit: unit,
-                level: record.glucoseLevel,
+                level: level,
                 style: .callout
             )
         }
-        .padding(.vertical, AppConstants.Spacing.sm)
+        .padding(.vertical, AppConstants.Spacing.md)
         .padding(.horizontal, AppConstants.Spacing.lg)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
-            "\(record.timestamp.timeString) \(record.mealContext.displayName) 血糖 \(record.displayValue(in: unit)) \(unit.rawValue) \(record.glucoseLevel.description)"
+            "\(record.timestamp.timeString) \(contextDisplayName) 血糖 \(record.displayValue(in: unit)) \(unit.rawValue) \(level.description)"
         )
-        .accessibilityHint("右划可删除")
+        .accessibilityHint("轻点可编辑，右划可删除")
     }
 }
 
 #Preview {
     List {
         TimelineRowView(
-            record: GlucoseRecord(value: 5.6, mealContext: .beforeBreakfast),
+            record: GlucoseRecord(value: 5.6, sceneTagId: MealContext.beforeBreakfast.rawValue),
             unit: .mmolL
         )
         TimelineRowView(
-            record: GlucoseRecord(value: 7.8, mealContext: .afterLunch, note: "吃了火锅"),
+            record: GlucoseRecord(value: 7.8, sceneTagId: MealContext.afterLunch.rawValue, note: "吃了火锅"),
             unit: .mmolL
         )
         TimelineRowView(
-            record: GlucoseRecord(value: 3.5, mealContext: .fasting),
+            record: GlucoseRecord(value: 3.5, sceneTagId: MealContext.fasting.rawValue),
             unit: .mmolL
         )
     }

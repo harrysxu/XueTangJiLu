@@ -30,6 +30,9 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // 显示偏好
+                displayPreferencesSection
+                
                 // 血糖偏好
                 glucosePreferencesSection
 
@@ -42,82 +45,83 @@ struct SettingsView: View {
                 // 关于
                 aboutSection
             }
-            .navigationTitle("设置")
+            .navigationTitle(String(localized: "settings.title"))
+        }
+    }
+
+    // MARK: - 显示偏好
+    
+    private var displayPreferencesSection: some View {
+        Section {
+            Picker(String(localized: "settings.display_mode"), selection: Binding(
+                get: { settings.displayMode },
+                set: { settings.displayMode = $0 }
+            )) {
+                ForEach(DisplayMode.allCases, id: \.self) { mode in
+                    Text(mode.localizedDisplayName).tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            
+            Text(settings.displayMode.localizedDescription)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        } header: {
+            Text(String(localized: "settings.display_preferences"))
+        } footer: {
+            Text(String(localized: "settings.display_preferences.footer"))
         }
     }
 
     // MARK: - 血糖偏好
 
     private var glucosePreferencesSection: some View {
-        Section("血糖偏好") {
+        Section(String(localized: "settings.glucose_preferences")) {
             // 单位选择
             NavigationLink {
                 UnitPickerView()
             } label: {
                 HStack {
-                    Text("单位")
+                    Text(String(localized: "settings.unit"))
                     Spacer()
                     Text(settings.preferredUnit.rawValue)
                         .foregroundStyle(.secondary)
                 }
             }
 
-            // 目标下限
-            HStack {
-                Text("目标下限")
-                Spacer()
-                Text(targetLowDisplay)
-                    .foregroundStyle(.secondary)
-                Stepper("", value: Binding(
-                    get: { settings.targetLow },
-                    set: { settings.targetLow = $0 }
-                ), in: 2.0...6.0, step: 0.1)
-                .labelsHidden()
+            // 标签管理（含阈值配置）
+            NavigationLink {
+                TagManagementView()
+            } label: {
+                HStack {
+                    Text(String(localized: "settings.tags_and_targets"))
+                    Spacer()
+                    Text(tagManagementSummary)
+                        .foregroundStyle(.secondary)
+                }
             }
-
-            // 目标上限
-            HStack {
-                Text("目标上限")
-                Spacer()
-                Text(targetHighDisplay)
-                    .foregroundStyle(.secondary)
-                Stepper("", value: Binding(
-                    get: { settings.targetHigh },
-                    set: { settings.targetHigh = $0 }
-                ), in: 5.0...15.0, step: 0.1)
-                .labelsHidden()
-            }
-
-            // 智能标签
-            Toggle("智能标签", isOn: Binding(
-                get: { settings.autoTagEnabled },
-                set: { settings.autoTagEnabled = $0 }
-            ))
         }
     }
 
-    private var targetLowDisplay: String {
-        GlucoseUnitConverter.displayString(mmolLValue: settings.targetLow, in: settings.preferredUnit)
-    }
-
-    private var targetHighDisplay: String {
-        GlucoseUnitConverter.displayString(mmolLValue: settings.targetHigh, in: settings.preferredUnit)
+    private var tagManagementSummary: String {
+        let visibleCount = settings.visibleSceneTags.count
+        return String(format: String(localized: "settings.scenes_count"), visibleCount)
     }
 
     // MARK: - 数据同步
 
     private var dataSyncSection: some View {
-        Section("数据同步") {
+        Section(String(localized: "settings.data_sync")) {
             HStack {
-                Label("Apple Health 同步", systemImage: "heart.fill")
+                Label(String(localized: "settings.health_sync"), systemImage: "heart.fill")
                     .foregroundStyle(.primary)
                 Spacer()
                 if settings.healthKitSyncEnabled {
-                    Text("已连接")
+                    Text(String(localized: "profile.connected"))
                         .font(.caption)
                         .foregroundStyle(.green)
                 } else {
-                    Button("连接") {
+                    Button(String(localized: "profile.connect")) {
                         Task {
                             try? await healthKitManager.requestAuthorization()
                             settings.healthKitSyncEnabled = healthKitManager.isAuthorized
@@ -127,12 +131,14 @@ struct SettingsView: View {
                 }
             }
 
-            HStack {
-                Label("iCloud 同步", systemImage: "icloud")
-                Spacer()
-                Text("自动")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            NavigationLink {
+                SyncSettingsView()
+            } label: {
+                HStack {
+                    Label(String(localized: "profile.icloud"), systemImage: "icloud")
+                    Spacer()
+                    SyncStatusBadge()
+                }
             }
         }
     }
@@ -140,45 +146,50 @@ struct SettingsView: View {
     // MARK: - 数据管理
 
     private var dataManagementSection: some View {
-        Section("数据管理") {
+        Section(String(localized: "settings.data_management")) {
+            #if DEBUG
+            NavigationLink {
+                QuickTestDataView()
+            } label: {
+                Label(String(localized: "settings.test_data_generator"), systemImage: "hammer.fill")
+                    .foregroundStyle(.orange)
+            }
+            
+            NavigationLink {
+                SyncDebugView()
+            } label: {
+                Label(String(localized: "settings.sync_debug"), systemImage: "ladybug.fill")
+                    .foregroundStyle(.purple)
+            }
+            #endif
+            
             NavigationLink {
                 PDFPreviewView()
             } label: {
-                Label("导出 PDF 报告", systemImage: "doc.richtext")
+                Label(String(localized: "profile.export_pdf"), systemImage: "doc.richtext")
             }
 
-            Button(action: exportCSV) {
-                Label("导出 CSV 数据", systemImage: "tablecells")
+            NavigationLink {
+                CSVExportView()
+            } label: {
+                Label(String(localized: "profile.export_csv"), systemImage: "tablecells")
             }
-        }
-    }
-
-    private func exportCSV() {
-        let viewModel = SettingsViewModel()
-        let csv = viewModel.generateCSV(records: allRecords, unit: settings.preferredUnit)
-        let data = csv.data(using: .utf8) ?? Data()
-
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("血糖记录_\(Date.now.shortDateString).csv")
-        try? data.write(to: tempURL)
-
-        let activityVC = UIActivityViewController(
-            activityItems: [tempURL],
-            applicationActivities: nil
-        )
-
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            rootVC.present(activityVC, animated: true)
+            
+            NavigationLink {
+                FactoryResetView()
+            } label: {
+                Label(String(localized: "settings.clear_history"), systemImage: "trash.fill")
+                    .foregroundStyle(.red)
+            }
         }
     }
 
     // MARK: - 关于
 
     private var aboutSection: some View {
-        Section("关于") {
+        Section(String(localized: "profile.about")) {
             HStack {
-                Text("版本")
+                Text(String(localized: "profile.version"))
                 Spacer()
                 Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
                     .foregroundStyle(.secondary)
@@ -187,17 +198,17 @@ struct SettingsView: View {
             NavigationLink {
                 AboutView(type: .privacy)
             } label: {
-                Text("隐私政策")
+                Text(String(localized: "profile.privacy"))
             }
 
             NavigationLink {
                 AboutView(type: .disclaimer)
             } label: {
-                Text("免责声明")
+                Text(String(localized: "profile.disclaimer"))
             }
 
             Button(action: requestReview) {
-                Text("给我们评分")
+                Text(String(localized: "profile.rate"))
             }
         }
     }

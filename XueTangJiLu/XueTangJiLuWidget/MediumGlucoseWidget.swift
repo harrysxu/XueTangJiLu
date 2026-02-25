@@ -17,7 +17,7 @@ struct MediumGlucoseWidgetView: View {
         HStack(spacing: 12) {
             // 左侧：最新读数
             VStack(alignment: .leading, spacing: 4) {
-                Text("最新血糖")
+                Text(String(localized: "latest.glucose"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
 
@@ -33,11 +33,11 @@ struct MediumGlucoseWidgetView: View {
 
                 Spacer()
 
-                if let mealContext = entry.mealContext {
+                if let label = entry.sceneTagLabel {
                     HStack(spacing: 2) {
-                        Image(systemName: mealContext.iconName)
+                        Image(systemName: entry.sceneTagIcon ?? "clock")
                             .font(.caption2)
-                        Text(mealContext.displayName)
+                        Text(label)
                             .font(.caption2)
                     }
                     .foregroundStyle(.secondary)
@@ -57,11 +57,11 @@ struct MediumGlucoseWidgetView: View {
                     .frame(maxWidth: .infinity)
             } else {
                 VStack {
-                    Text("7日趋势")
+                    Text(String(localized: "widget.7day_trend"))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Text("数据不足")
+                    Text(String(localized: "widget.data_insufficient"))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                     Spacer()
@@ -74,15 +74,15 @@ struct MediumGlucoseWidgetView: View {
 
     private var miniTrendChart: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("7日趋势")
+            Text(String(localized: "widget.7day_trend"))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
 
             Chart {
                 ForEach(entry.weekTrend, id: \.0) { dataPoint in
                     LineMark(
-                        x: .value("日期", dataPoint.0),
-                        y: .value("血糖", dataPoint.1)
+                        x: .value(String(localized: "widget.chart_date_label"), dataPoint.0),
+                        y: .value(String(localized: "widget.chart_glucose_label"), dataPoint.1)
                     )
                     .interpolationMethod(.catmullRom)
                     .foregroundStyle(Color.accentColor)

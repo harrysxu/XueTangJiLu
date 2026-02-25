@@ -18,8 +18,8 @@ final class GlucoseViewModel {
     /// 当前输入的文本
     var inputText: String = ""
 
-    /// 选择的用餐场景
-    var selectedMealContext: MealContext = TagEngine.suggestContext()
+    /// 选择的场景标签 ID（支持内置和自定义标签）
+    var selectedSceneTagId: String = TagEngine.suggestTagId()
 
     /// 选择的日期时间
     var selectedDate: Date = .now
@@ -36,6 +36,14 @@ final class GlucoseViewModel {
     /// 保存是否成功（用于动画）
     var saveSuccess: Bool = false
 
+    /// 编辑模式：正在编辑的记录
+    var editingRecord: GlucoseRecord? = nil
+    
+    /// 是否处于编辑模式
+    var isEditMode: Bool {
+        editingRecord != nil
+    }
+
     // MARK: - 计算属性
 
     /// 当前输入的数值
@@ -43,10 +51,16 @@ final class GlucoseViewModel {
         Double(inputText)
     }
 
-    /// 当前输入值的血糖等级（需传入单位以正确转换）
+    /// 当前输入值的血糖等级（通用固定阈值）
     func currentLevel(unit: GlucoseUnit) -> GlucoseLevel? {
         guard let mmolL = normalizedValue(unit: unit) else { return nil }
         return GlucoseLevel.from(value: mmolL)
+    }
+
+    /// 当前输入值的血糖等级（场景感知，基于 sceneTagId）
+    func currentLevel(unit: GlucoseUnit, settings: UserSettings) -> GlucoseLevel? {
+        guard let mmolL = normalizedValue(unit: unit) else { return nil }
+        return GlucoseLevel.from(value: mmolL, tagId: selectedSceneTagId, settings: settings)
     }
 
     /// 保存按钮是否可用
@@ -77,15 +91,13 @@ final class GlucoseViewModel {
     private func handleDigit(_ num: Int, unit: GlucoseUnit) {
         let newText = inputText + "\(num)"
 
-        // 检查小数位数限制
         if let dotIndex = newText.firstIndex(of: ".") {
             let decimalPlaces = newText.distance(from: newText.index(after: dotIndex), to: newText.endIndex)
             if decimalPlaces > unit.maxDecimalPlaces {
-                return  // 忽略超过位数的输入
+                return
             }
         }
 
-        // 去除前导零（但保留 "0." 的情况）
         if inputText == "0" && num != 0 {
             inputText = "\(num)"
         } else {
@@ -94,9 +106,7 @@ final class GlucoseViewModel {
     }
 
     private func handleDecimal(unit: GlucoseUnit) {
-        // mg/dL 不允许小数
         guard unit.maxDecimalPlaces > 0 else { return }
-        // 已有小数点则忽略
         guard !inputText.contains(".") else { return }
 
         if inputText.isEmpty {
@@ -124,35 +134,55 @@ final class GlucoseViewModel {
         isSaving = true
         defer { isSaving = false }
 
-        // 创建记录
-        let record = GlucoseRecord(
-            value: mmolLValue,
-            timestamp: selectedDate,
-            mealContext: selectedMealContext,
-            note: noteText.isEmpty ? nil : noteText
-        )
+        if let existingRecord = editingRecord {
+            // 编辑模式：更新现有记录
+            existingRecord.value = mmolLValue
+            existingRecord.timestamp = selectedDate
+            existingRecord.sceneTagId = selectedSceneTagId
+            existingRecord.note = noteText.isEmpty ? nil : noteText
+            
+            // 如果启用了 HealthKit，更新同步状态
+            if healthKitEnabled, let hkManager = healthKitManager {
+                do {
+                    try await hkManager.saveGlucose(
+                        value: mmolLValue,
+                        date: selectedDate,
+                        sceneTagId: selectedSceneTagId
+                    )
+                    existingRecord.syncedToHealthKit = true
+                } catch {
+                    print("HealthKit 同步失败: \(error)")
+                }
+            }
+        } else {
+            // 新建模式：创建新记录
+            let record = GlucoseRecord(
+                value: mmolLValue,
+                timestamp: selectedDate,
+                sceneTagId: selectedSceneTagId,
+                note: noteText.isEmpty ? nil : noteText
+            )
 
-        modelContext.insert(record)
+            modelContext.insert(record)
 
-        // 同步到 HealthKit
-        if healthKitEnabled, let hkManager = healthKitManager {
-            do {
-                try await hkManager.saveGlucose(
-                    value: mmolLValue,
-                    date: selectedDate,
-                    mealContext: selectedMealContext
-                )
-                record.syncedToHealthKit = true
-            } catch {
-                // HealthKit 同步失败不影响主流程
-                print("HealthKit 同步失败: \(error)")
+            // 同步到 HealthKit
+            if healthKitEnabled, let hkManager = healthKitManager {
+                do {
+                    try await hkManager.saveGlucose(
+                        value: mmolLValue,
+                        date: selectedDate,
+                        sceneTagId: selectedSceneTagId
+                    )
+                    record.syncedToHealthKit = true
+                } catch {
+                    print("HealthKit 同步失败: \(error)")
+                }
             }
         }
 
         HapticManager.success()
         saveSuccess = true
 
-        // 重置输入状态
         resetInput()
     }
 
@@ -165,10 +195,21 @@ final class GlucoseViewModel {
     /// 重置输入状态
     func resetInput() {
         inputText = ""
-        selectedMealContext = TagEngine.suggestContext()
+        selectedSceneTagId = TagEngine.suggestTagId()
         selectedDate = .now
         noteText = ""
         showNoteField = false
+        editingRecord = nil
+    }
+    
+    /// 加载记录进行编辑
+    func loadRecordForEditing(_ record: GlucoseRecord, unit: GlucoseUnit) {
+        editingRecord = record
+        inputText = record.displayValue(in: unit)
+        selectedSceneTagId = record.sceneTagId
+        selectedDate = record.timestamp
+        noteText = record.note ?? ""
+        showNoteField = record.note != nil && !record.note!.isEmpty
     }
 }
 

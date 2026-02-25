@@ -46,8 +46,10 @@ final class NotificationManager {
 
         for reminder in reminders where reminder.isEnabled {
             let content = UNMutableNotificationContent()
-            content.title = "该测血糖了"
-            content.body = reminder.label.isEmpty ? "记得记录您的血糖数据" : "\(reminder.label) - 记得记录血糖"
+            content.title = String(localized: "notification.glucose_reminder_title")
+            content.body = reminder.label.isEmpty ? 
+                String(localized: "notification.glucose_reminder_body") : 
+                String(localized: "notification.glucose_reminder_labeled", defaultValue: "\(reminder.label) - 记得记录血糖")
             content.sound = .default
             content.categoryIdentifier = "GLUCOSE_REMINDER"
 
@@ -78,8 +80,8 @@ final class NotificationManager {
     /// - Parameter hours: 未记录超过多少小时后提醒
     func scheduleInactivityReminder(hours: Int) {
         let content = UNMutableNotificationContent()
-        content.title = "记录提醒"
-        content.body = "您已经超过 \(hours) 小时没有记录血糖了"
+        content.title = String(localized: "notification.inactivity_title")
+        content.body = String(localized: "notification.inactivity_body", defaultValue: "您已经超过 \(hours) 小时没有记录血糖了")
         content.sound = .default
         content.categoryIdentifier = "INACTIVITY_REMINDER"
 

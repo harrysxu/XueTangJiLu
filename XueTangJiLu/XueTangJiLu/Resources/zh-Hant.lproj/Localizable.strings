@@ -1,0 +1,682 @@
+/* Tab Bar */
+"tab.dashboard" = "首頁";
+"tab.log" = "記錄";
+"tab.statistics" = "統計";
+"tab.profile" = "我的";
+
+/* Dashboard */
+"greeting.morning" = "早上好";
+"greeting.afternoon" = "下午好";
+"greeting.evening" = "晚上好";
+"latest.glucose" = "最新血糖";
+"today.summary" = "今日概要";
+"today.records" = "今日記錄";
+"today.average" = "今日均值";
+"today.tir" = "達標率";
+"today.medication" = "今日用藥";
+"quick.glucose" = "記錄血糖";
+"quick.medication" = "記錄用藥";
+"quick.meal" = "拍照飲食";
+"today.summary.card" = "今日摘要";
+"recent.records" = "最近記錄";
+"yesterday.records" = "昨日記錄";
+
+/* Dashboard */
+"dashboard.no_records_today" = "今天還沒有記錄";
+"dashboard.tap_add" = "點擊下方按鈕開始記錄血糖";
+"dashboard.today_summary" = "今日 %d 次記錄，均值 %@ %@，達標率 %d%%";
+"dashboard.recorded_count" = "今日已記錄 %d 次";
+"dashboard.times" = "次";
+"dashboard.medication_count" = "用藥次數";
+"dashboard.no_patterns_today" = "今日數據還不夠多，暫時看不到規律哦";
+"dashboard.recent_records" = "最近記錄";
+"dashboard.no_recent" = "暫無記錄";
+"dashboard.glucose.title" = "血糖";
+"dashboard.medication.title" = "藥物";
+"dashboard.meal.title" = "飲食";
+"statistics.count" = "次";
+
+/* Record Input */
+"save.record" = "保存記錄";
+"cancel" = "取消";
+"note" = "備註";
+"hide.note" = "隱藏備註";
+"add.note.optional" = "添加備註（可選）";
+"select.datetime" = "選擇日期和時間";
+"select.time" = "選擇時間";
+"done" = "完成";
+
+/* Quick Notes */
+"note.exercise" = "運動後";
+"note.stress" = "壓力大";
+"note.sick" = "生病";
+"note.travel" = "旅行";
+"note.snack" = "加餐";
+"note.alcohol" = "飲酒";
+
+/* Meal Context */
+"meal.before_breakfast" = "早餐前";
+"meal.after_breakfast" = "早餐後";
+"meal.before_lunch" = "午餐前";
+"meal.after_lunch" = "午餐後";
+"meal.before_dinner" = "晚餐前";
+"meal.after_dinner" = "晚餐後";
+"meal.fasting" = "空腹";
+"meal.bedtime" = "睡前";
+"meal.other" = "其他";
+
+/* Sync - iCloud 同步相關 */
+"sync.idle" = "同步就緒";
+"sync.syncing" = "正在同步...";
+"sync.success" = "同步成功";
+"sync.failed" = "同步失敗";
+"sync.offline" = "離線模式";
+"sync.settings.title" = "iCloud 同步";
+"sync.settings.enable" = "啟用 iCloud 同步";
+"sync.settings.manual_sync" = "立即同步";
+"sync.settings.last_sync" = "最後同步";
+"sync.settings.wifi_only" = "僅 WiFi 同步";
+"sync.error.not_signed_in" = "請在系統設定中登入 iCloud";
+"sync.error.network" = "網路連接失敗";
+"sync.error.quota" = "iCloud 儲存空間不足";
+"sync.error.permission" = "缺少 iCloud 權限";
+"sync.account.available" = "已登入";
+"sync.account.unavailable" = "未登入";
+"sync.history.title" = "同步歷史";
+"sync.history.empty" = "暫無同步記錄";
+"sync.reset.title" = "重置同步狀態";
+"sync.reset.message" = "這將清除本地同步快取，並重新從 iCloud 拉取數據。此操作不會刪除數據。";
+
+/* Glucose Level */
+"level.low" = "偏低";
+"level.normal" = "正常";
+"level.high" = "偏高";
+"level.veryHigh" = "注意";
+
+/* Medication */
+"med.rapid_insulin" = "速效胰島素";
+"med.long_insulin" = "長效胰島素";
+"med.mixed_insulin" = "預混胰島素";
+"med.oral_medicine" = "口服藥物";
+"med.other" = "其他";
+"med.save" = "保存用藥記錄";
+"med.name.placeholder" = "藥物名稱（可選，如「諾和銳」）";
+
+/* Meal Record */
+"meal.carb_low" = "低碳水";
+"meal.carb_medium" = "中碳水";
+"meal.carb_high" = "高碳水";
+"meal.record" = "記錄飲食";
+"meal.take_photo" = "拍照";
+"meal.album" = "相簿";
+"meal.carb_level" = "碳水水平";
+"meal.description" = "飲食描述";
+"meal.description.placeholder" = "如「米飯 + 青菜 + 雞胸肉」";
+
+/* Statistics / Trends */
+"statistics.title" = "統計";
+"statistics.average" = "平均血糖";
+"statistics.eA1C" = "估算糖化";
+"statistics.tir" = "達標率";
+"statistics.records" = "記錄次數";
+"statistics.cv" = "波動係數 (CV%)";
+"statistics.cv.label" = "波動係數";
+"statistics.minmax" = "最高 / 最低";
+"statistics.ref.cv" = "參考 < 36%";
+"statistics.ref.tir" = "參考 > 70%";
+"statistics.weekly" = "週對比";
+
+/* Profile */
+"profile.title" = "我的";
+"profile.nickname" = "控糖達人";
+"profile.total" = "總記錄";
+"profile.days" = "天";
+"profile.streak" = "連續";
+"profile.achievements" = "成就徽章";
+"profile.preferences" = "偏好設定";
+"profile.data" = "數據管理";
+"profile.about" = "關於";
+"profile.unit" = "血糖單位";
+"profile.target" = "目標範圍";
+"profile.reminders" = "提醒設定";
+"profile.smart_tag" = "智能標籤";
+"profile.health" = "Apple Health";
+"profile.icloud" = "iCloud 同步";
+"profile.export_pdf" = "匯出 PDF 報告";
+"profile.export_csv" = "匯出 CSV 數據";
+"profile.share" = "分享血糖摘要";
+"profile.version" = "版本";
+"profile.privacy" = "隱私政策";
+"profile.disclaimer" = "免責聲明";
+"profile.rate" = "給我們評分";
+"profile.connected" = "已連接";
+"profile.connect" = "連接";
+"profile.auto" = "自動";
+
+/* Achievements */
+"achievement.streak" = "連續記錄";
+"achievement.first" = "初次記錄";
+"achievement.hundred" = "百次記錄";
+"achievement.tir" = "TIR達標";
+
+/* Reminders */
+"reminder.title" = "提醒設定";
+"reminder.permission" = "通知權限";
+"reminder.enabled" = "已開啟";
+"reminder.enable" = "開啟";
+"reminder.measurement" = "測量提醒";
+"reminder.inactivity" = "久未記錄提醒";
+"reminder.interval" = "提醒間隔";
+"reminder.off" = "關閉";
+"reminder.save" = "保存提醒設定";
+
+/* App Name */
+"app.name" = "血糖記錄";
+
+/* Share Card */
+"share.today_summary" = "今日血糖摘要 · %@";
+"share.period_summary" = "%@血糖摘要";
+"share.disclaimer" = "本數據僅供參考，不構成醫療建議";
+
+/* Disclaimer */
+"disclaimer.title" = "重要提示";
+"disclaimer.item1" = "本APP是輔助記錄工具,不能替代醫生診斷";
+"disclaimer.item2" = "所有數據分析僅供參考,不構成醫療建議";
+"disclaimer.item3" = "血糖異常時請及時就醫,遵醫囑調整治療方案";
+"disclaimer.item4" = "低血糖時請立即補充糖分,必要時撥打120";
+"disclaimer.description" = "血糖記錄旨在幫助您記錄和瞭解血糖數據,但不應作為醫療決策的唯一依據。請定期複查,聽從醫生專業指導。";
+"disclaimer.navigation_title" = "使用須知";
+"disclaimer.accept" = "我已知曉";
+"disclaimer.banner" = "數據僅供參考,不構成醫療建議,請遵醫囑";
+
+/* About - Privacy & Disclaimer */
+"about.privacy.title" = "隱私政策";
+"about.disclaimer.title" = "免責聲明";
+"about.privacy.content" = "血糖記錄 隱私政策\n\n最後更新：2026年2月12日\n\n1. 數據收集\n本應用不收集任何個人信息到開發者服務器。所有血糖記錄數據僅存儲在您的設備本地和您的私人 iCloud 帳戶中。\n\n2. 數據存儲\n• 本地存儲：血糖記錄保存在您設備的本地數據庫中\n• iCloud 同步：如果您啟用了 iCloud，數據將通過您的私人 iCloud 帳戶在您的設備之間同步\n• Apple Health：如果您授權，血糖數據將同步到 Apple Health 應用\n\n3. 數據安全\n• 所有本地數據受 iOS 系統級加密保護\n• iCloud 傳輸使用 TLS 加密\n• 開發者無法訪問您的任何數據\n\n4. 第三方服務\n本應用不集成任何第三方分析、廣告或追蹤 SDK。\n\n5. 數據導出與刪除\n• 您可以隨時通過設置頁面導出所有數據（PDF 或 CSV 格式）\n• 您可以隨時刪除任何記錄\n• 刪除應用將移除所有本地數據（iCloud 和 Health 中的數據需單獨管理）\n\n6. 聯繫我們\n如有隱私相關問題，請通過 App Store 頁面聯繫我們。";
+"about.disclaimer.content" = "免責聲明\n\n重要提示：請在使用本應用前仔細閱讀以下內容。\n\n1. 非醫療設備\n血糖記錄（XueTangJiLu）是一款個人健康數據記錄工具，不是醫療器械，不具備醫療診斷功能。\n\n2. 不提供醫療建議\n本應用不提供任何形式的醫療診斷、治療建議或用藥指導。應用中顯示的統計數據（如平均血糖、達標率等）僅供參考，不應作為醫療決策的依據。\n\n3. 諮詢醫生\n在做出任何醫療相關決定之前，請務必諮詢您的醫生或專業醫療人員。不要根據本應用中的數據自行調整藥物劑量或治療方案。\n\n4. 數據準確性\n本應用記錄的數據基於用戶手動輸入，數據的準確性由用戶自行負責。請確保您輸入的血糖數值與血糖儀顯示一致。\n\n5. 緊急情況\n如果您出現嚴重低血糖、高血糖或其他緊急醫療狀況，請立即撥打急救電話或前往最近的醫療機構。\n\n6. 責任限制\n在法律允許的最大範圍內，開發者不對因使用本應用而產生的任何直接或間接損失承擔責任。";
+
+/* Onboarding */
+"onboarding.welcome" = "血糖記錄";
+"onboarding.slogan" = "讓控糖回歸簡單";
+"onboarding.start" = "開始使用";
+"onboarding.next" = "下一步";
+"onboarding.disclaimer" = "本應用僅用於個人健康數據記錄，不提供任何醫療診斷或治療建議。請在做出任何醫療決定前咨詢您的醫生。";
+"onboarding.unit.title" = "選擇您的血糖單位";
+"onboarding.unit.subtitle" = "可隨時在設定中更改";
+"onboarding.unit.mmol_region" = "中國/歐洲常用";
+"onboarding.unit.mgdl_region" = "美國/日本常用";
+"onboarding.edu.title" = "瞭解關鍵指標";
+"onboarding.edu.subtitle" = "幫助您更好地理解血糖數據";
+"onboarding.edu.tir_title" = "TIR（達標率）";
+"onboarding.edu.tir_desc" = "血糖在目標範圍內的時間比例。目標 > 70% 為良好。";
+"onboarding.edu.cv_title" = "CV%（波動係數）";
+"onboarding.edu.cv_desc" = "衡量血糖波動程度。< 36% 認為穩定。";
+"onboarding.health.title" = "健康數據同步";
+"onboarding.health.subtitle" = "連接 Apple Health 後，\n您的血糖數據將自動備份到系統「健康」應用中。";
+"onboarding.health.benefit1" = "數據備份更安全";
+"onboarding.health.benefit2" = "刪除 App 數據不丟失";
+"onboarding.health.benefit3" = "與其他健康數據聯動查看";
+"onboarding.health.connect" = "連接 Health";
+"onboarding.health.skip" = "稍後再說";
+
+/* Empty States */
+"empty.no_records" = "還沒有任何記錄";
+"empty.tap_add" = "點擊下方快捷按鈕開始記錄";
+"empty.no_glucose" = "還沒有血糖記錄";
+"empty.no_medication" = "還沒有用藥記錄";
+"empty.no_trends" = "暫無統計數據";
+"empty.trends_hint" = "開始記錄血糖後，這裡將展示您的統計圖表";
+
+/* Share */
+"share.title" = "分享摘要";
+"share.button" = "分享卡片";
+"share.week" = "本週";
+"share.month" = "本月";
+
+/* Activity */
+"activity.steps" = "今日步數";
+"activity.exercise" = "運動時間";
+
+/* Factory Reset */
+"factory_reset.title" = "恢復出廠設定";
+"factory_reset.warning" = "危險操作";
+"factory_reset.description" = "此操作將永久刪除所有數據";
+"factory_reset.data_to_delete" = "即將刪除的數據";
+"factory_reset.glucose_records" = "血糖記錄";
+"factory_reset.meal_records" = "飲食記錄";
+"factory_reset.medication_records" = "用藥記錄";
+"factory_reset.custom_tags" = "自定義標籤";
+"factory_reset.total_items" = "總計：%d 項數據";
+"factory_reset.what_will_reset" = "將被重置的內容";
+"factory_reset.all_records" = "所有血糖、飲食、用藥記錄";
+"factory_reset.custom_scene_tags" = "自定義場景標籤和備註標籤";
+"factory_reset.personal_settings" = "血糖單位、目標範圍等個性化設定";
+"factory_reset.reminders" = "提醒配置和顯示模式";
+"factory_reset.healthkit" = "HealthKit 連接狀態";
+"factory_reset.icloud_warning" = "⚠️ 數據將通過 iCloud 同步刪除，其他設備上的數據也會被清空";
+"factory_reset.confirm_input" = "請輸入以下文字以確認操作";
+"factory_reset.type_to_confirm" = "請輸入：%@";
+"factory_reset.confirm_button" = "確認重置";
+"factory_reset.first_warning_title" = "⚠️ 第一次確認";
+"factory_reset.first_warning_message" = "此操作將永久刪除 %d 條記錄和所有自定義設定。\n\n刪除後數據無法恢復，您確定要繼續嗎？";
+"factory_reset.second_warning_title" = "⚠️ 最後確認";
+"factory_reset.second_warning_message" = "這是最後一次確認。\n\n點擊「確認刪除」後，所有數據將被永久刪除，包括：\n• %d 條血糖記錄\n• %d 條飲食記錄\n• %d 條用藥記錄\n• 所有自定義標籤和設定\n\n此操作不可撤銷！";
+"factory_reset.confirm_delete" = "確認刪除";
+"factory_reset.think_again" = "我再想想";
+"factory_reset.complete_title" = "✅ 重置完成";
+"factory_reset.complete_message" = "所有數據已清空，設定已恢復默認。應用將自動同步到 iCloud。";
+"factory_reset.required_text" = "刪除所有數據";
+
+/* ThresholdGroup */
+"threshold.fasting_premeal" = "空腹/餐前";
+"threshold.postmeal" = "餐後";
+"threshold.bedtime" = "睡前";
+"threshold.ada_fasting" = "ADA推薦：4.4-7.0 mmol/L";
+"threshold.ada_postmeal" = "ADA推薦：<10.0 mmol/L";
+"threshold.ada_bedtime" = "ADA推薦：5.0-8.3 mmol/L";
+
+/* MedicationType Units */
+"med.unit_insulin" = "單位(U)";
+"med.unit_mg" = "mg";
+
+/* DisplayMode */
+"display_mode.simple" = "簡化模式";
+"display_mode.professional" = "專業模式";
+"display_mode.simple.desc" = "適合日常快速記錄";
+"display_mode.professional.desc" = "顯示完整統計分析";
+
+/* Widget */
+"widget.no_data" = "暫無數據";
+"widget.7day_trend" = "7日趨勢";
+"widget.data_insufficient" = "數據不足";
+"widget.tir_label" = "達標率";
+
+/* Intent */
+"intent.glucose.description" = "快速記錄一次血糖數值";
+"intent.glucose.param.value" = "血糖值";
+"intent.glucose.success" = "已記錄血糖 %@ %@（%@）";
+"intent.category" = "記錄";
+
+/* ReminderConfig */
+"reminder.before_breakfast" = "早餐前";
+"reminder.after_breakfast" = "早餐後";
+"reminder.before_lunch" = "午餐前";
+"reminder.after_lunch" = "午餐後";
+"reminder.before_dinner" = "晚餐前";
+"reminder.after_dinner" = "晚餐後";
+"reminder.fasting" = "空腹";
+"reminder.bedtime" = "睡前";
+"reminder.not_set" = "未設定";
+
+/* Settings */
+"settings.title" = "設定";
+"settings.display_mode" = "顯示模式";
+"settings.display_preferences" = "顯示偏好";
+"settings.display_preferences.footer" = "簡化模式適合日常快速記錄，專業模式顯示完整的統計分析功能";
+"settings.glucose_preferences" = "血糖偏好";
+"settings.unit" = "單位";
+"settings.tags_and_targets" = "標籤與目標範圍";
+"settings.scenes_count" = "%d 個場景";
+"settings.data_sync" = "數據同步";
+"settings.health_sync" = "Apple Health 同步";
+"settings.data_management" = "數據管理";
+"settings.clear_history" = "清除歷史記錄";
+"settings.test_data_generator" = "測試數據生成器";
+"settings.sync_debug" = "同步調試工具";
+
+/* Record Input - Additional */
+"record.edit" = "編輯記錄";
+"record.save_changes" = "保存更改";
+"record.more" = "更多";
+"record.quick_select" = "快捷選擇";
+"record.time.now" = "現在";
+"record.time.1h_ago" = "1小時前";
+"record.time.2h_ago" = "2小時前";
+"record.time.today_7am" = "今天早上7點";
+"record.time.today_12pm" = "今天中午12點";
+"record.time.today_6pm" = "今天下午6點";
+"record.modify" = "修改";
+
+/* Profile - Additional */
+"profile.tag_management" = "標籤管理";
+"profile.tag_summary" = "%d 場景 · %d 備註";
+"profile.reminders_count" = "%d 個提醒";
+"profile.monthly_report" = "月度總結報告";
+"achievement.completed" = "完成";
+
+/* Statistics - Additional */
+"statistics.time_range" = "時間範圍";
+"statistics.filter_all" = "全部";
+"statistics.records_near" = "近%@";
+"statistics.glucose_distribution" = "血糖分佈";
+"statistics.below_range" = "低於範圍";
+"statistics.in_range" = "達標範圍";
+"statistics.above_range" = "高於範圍";
+"statistics.per_tag_tir" = "各場景達標率";
+"statistics.tag_distribution" = "各場景血糖分佈";
+"statistics.meal_pair" = "餐前餐後配對";
+"statistics.spike_hint" = "升幅 > 3.0 標紅";
+"statistics.box_typical" = "典型值";
+"statistics.box_range" = "日常範圍";
+"statistics.box_target" = "目標區域";
+"statistics.records_count" = "%d次";
+"statistics.range_label" = "範圍: %@ - %@ %@";
+"statistics.flat" = "持平";
+"statistics.this_week" = "本週";
+"statistics.last_week" = "上週";
+"statistics.tir_comparison" = "達標率 TIR";
+"statistics.hourly_distribution" = "%@ 時段分佈";
+"statistics.insufficient_records_hourly" = "記錄不足3條，無法生成時段分佈圖";
+"statistics.daily_trend" = "%@ 日期趨勢";
+"statistics.insufficient_records_daily" = "記錄不足3條，無法生成日期趨勢表";
+"statistics.date" = "日期";
+"statistics.avg" = "平均";
+"statistics.range" = "範圍";
+"statistics.count" = "次數";
+"statistics.in_range_short" = "達標";
+
+/* Log */
+"log.filter_records" = "篩選記錄";
+"log.type.glucose" = "血糖";
+"log.type.medication" = "用藥";
+"log.type.meal" = "飲食";
+"log.time.today" = "今天";
+"log.time.last_7" = "最近1週";
+"log.time.last_30" = "最近1月";
+"log.time.last_90" = "最近3月";
+"log.time.custom" = "自定義";
+"log.time.all" = "全部";
+"log.custom_range" = "自定義 (%@ - %@)";
+"log.empty.filtered" = "沒有符合條件的記錄";
+"log.empty.hint" = "嘗試調整篩選條件";
+"log.empty.tap_add" = "點擊下方 \"+\" 開始記錄";
+"log.add_record" = "添加記錄";
+"log.delete" = "刪除";
+
+/* Chart TimeRange (ChartViewModel) */
+"time_range.7d" = "7天";
+"time_range.14d" = "14天";
+"time_range.30d" = "30天";
+"time_range.90d" = "90天";
+
+/* Tag Management */
+"tag_management" = "標籤管理";
+"tag.scene_tags" = "場景標籤";
+"tag.annotation_tags" = "備註標籤";
+"tag.show_all" = "顯示全部標籤";
+"tag.show_recommended" = "只顯示推薦標籤";
+"tag.add_scene" = "添加場景標籤";
+"tag.add_annotation" = "添加備註標籤";
+"tag.custom" = "自定義";
+"tag.builtin" = "內置";
+"tag.hidden_count" = "%d 個隱藏";
+"tag.delete" = "刪除";
+"tag.edit" = "編輯";
+"tag.label_name" = "標籤名稱";
+"tag.input_name" = "輸入新的備註標籤名稱";
+"tag.modify_name" = "修改備註標籤名稱";
+"tag.add_alert_title" = "添加備註標籤";
+"tag.edit_alert_title" = "編輯標籤";
+"tag.scene_footer_collapsed" = "這裡展示5個推薦標籤。點擊顯示全部標籤可查看和管理所有標籤。";
+"tag.scene_footer_expanded" = "點擊標籤可編輯名稱和圖標，點擊閾值範圍可設置該標籤的達標目標。長按拖動可調整順序，關閉後在錄入頁面中隱藏。自定義標籤可左劃刪除。";
+"tag.annotation_footer" = "備註標籤用於標記特殊狀態（如運動後、壓力大等），左劃可編輯或刪除自定義標籤";
+"tag.edit_scene" = "編輯場景標籤";
+"tag.add_scene_title" = "添加場景標籤";
+"tag.tag_info" = "標籤信息";
+"tag.select_group" = "所屬分組";
+"tag.select_icon" = "選擇圖標";
+"tag.restore_default" = "恢復默認名稱";
+"tag.group_description" = "分組說明";
+"tag.group_footer" = "所屬分組決定了該標籤的默認目標範圍。您也可以在保存後為該標籤設置獨立的自定義範圍。";
+"tag.edit_threshold" = "編輯目標範圍";
+"tag.target_range" = "達標範圍";
+"tag.lower_limit" = "下限";
+"tag.upper_limit" = "上限";
+"tag.reference_advice" = "參考建議";
+
+/* Sync Settings */
+"sync.title" = "iCloud 同步";
+"sync.status" = "狀態";
+"sync.account" = "iCloud 帳戶";
+"sync.network" = "網絡連接";
+"sync.logged_in" = "已登錄";
+"sync.not_logged_in" = "未登錄";
+"sync.restricted" = "受限制";
+"sync.checking" = "檢查中...";
+"sync.temporarily_unavailable" = "暫時不可用";
+"sync.unknown_status" = "未知狀態";
+"sync.settings" = "同步設置";
+"sync.enable" = "啟用 iCloud 同步";
+"sync.wifi_only" = "僅 WiFi 同步";
+"sync.sync_now" = "立即同步";
+"sync.last_sync" = "最後同步";
+"sync.footer" = "啟用後，數據將自動同步到您的 iCloud 帳戶。僅 WiFi 同步可以節省流量。";
+"sync.history" = "同步歷史";
+"sync.no_history" = "暫無同步記錄";
+"sync.history_footer" = "顯示最近的同步活動記錄";
+
+/* Meal Photo View */
+"meal.edit" = "編輯飲食";
+"meal.record" = "記錄飲食";
+"meal.photo" = "照片";
+"meal.optional" = "(可選)";
+"meal.collapse" = "收起";
+"meal.add_photo" = "添加照片";
+"meal.take_photo" = "拍照";
+"meal.choose_from_library" = "從相冊選擇";
+"meal.carb_level" = "碳水水平";
+"meal.description" = "飲食描述";
+"meal.description_placeholder" = "如\\\"米飯 + 青菜 + 雞胸肉\\\"";
+
+/* Unit Picker */
+"unit.title" = "血糖單位";
+"unit.mmol_region" = "中國、歐洲等地區常用";
+"unit.mgdl_region" = "美國、日本等地區常用";
+
+/* Reminder Settings */
+"reminder.title" = "提醒設置";
+"reminder.notification_permission" = "通知權限";
+"reminder.enabled" = "已開啟";
+"reminder.enable_button" = "開啟";
+"reminder.measurement_reminders" = "測量提醒";
+"reminder.inactivity_reminder" = "久未記錄提醒";
+"reminder.interval" = "提醒間隔";
+"reminder.off" = "關閉";
+"reminder.hours_4" = "4 小時";
+"reminder.hours_6" = "6 小時";
+"reminder.hours_8" = "8 小時";
+"reminder.hours_12" = "12 小時";
+"reminder.save" = "保存提醒設置";
+"reminder.permission_alert" = "需要通知權限";
+"reminder.go_to_settings" = "去設置";
+
+/* Medication Input */
+"medication.save_record" = "保存用藥記錄";
+"medication.name_placeholder" = "藥物名稱（可選，如\"諾和銳\"）";
+
+/* PDF Export */
+"pdf.title" = "PDF 報告";
+"pdf.start_date" = "開始日期";
+"pdf.end_date" = "結束日期";
+"pdf.record_type" = "記錄類型";
+"pdf.all_records" = "全部記錄";
+"pdf.glucose_only" = "僅血糖";
+"pdf.medication_only" = "僅用藥";
+"pdf.meal_only" = "僅飲食";
+"pdf.share_report" = "分享報告";
+"generating_report" = "生成報告中...";
+
+/* Medication */
+"medication.edit" = "編輯用藥";
+
+/* Notifications */
+"notification.glucose_reminder_title" = "該測血糖了";
+"notification.glucose_reminder_body" = "記得記錄您的血糖數據";
+"notification.glucose_reminder_labeled" = "%@ - 記得記錄血糖";
+"notification.inactivity_title" = "記錄提醒";
+"notification.inactivity_body" = "您已經超過 %d 小時沒有記錄血糖了";
+
+/* Encouragement Messages */
+"encouragement.week_1" = "堅持一週啦！";
+"encouragement.week_2" = "兩週連續記錄！";
+"encouragement.month_1" = "滿月啦！堅持真棒！";
+"encouragement.day_50" = "連續50天！了不起！";
+"encouragement.day_100" = "百日連續！太厲害了！";
+"encouragement.year_1" = "一整年！持之以恆！";
+
+/* Watch App */
+"watch.latest_glucose" = "最新血糖";
+"watch.no_records" = "暫無記錄";
+"watch.record_glucose" = "記錄血糖";
+"watch.today" = "今日";
+"watch.count" = "次數";
+"watch.average" = "均值";
+"watch.placeholder_dash" = "--";
+
+/* Daily Summary Card */
+"daily.today_glucose" = "今日血糖";
+"daily.streak_format" = "已連續記錄 %d 天";
+"daily.no_records_today" = "今天還未記錄血糖";
+"daily.tap_to_start" = "點擊右下角 + 按鈕開始記錄";
+"daily.all_in_range" = "全部達標";
+"daily.control_good" = "控制良好,繼續保持!";
+"daily.out_of_range" = "%d次超標";
+"daily.suggestion" = "建議記錄飲食,咨詢醫生";
+"daily.average_format" = "平均 %@";
+"daily.low_warning" = "今日有低血糖記錄,請注意安全";
+
+/* Sync Components */
+"sync.status.offline" = "離線";
+"sync.status.syncing" = "同步中";
+"sync.status.synced" = "已同步";
+"sync.status.failed" = "失敗";
+"sync.last_sync" = "最後同步: %@";
+"sync.pending_items" = "%d 項待同步";
+"sync.never_synced" = "從未同步";
+"sync.event.import" = "導入";
+"sync.event.export" = "導出";
+"sync.event.setup" = "初始化";
+"sync.error.disabled" = "同步已禁用";
+"sync.error.no_network" = "無網絡連接";
+"sync.error.wifi_required" = "需要WiFi";
+"sync.error.account_unavailable" = "iCloud賬戶不可用";
+
+/* Reminder Settings */
+"reminder.title" = "提醒設定";
+"reminder.notification_permission" = "通知權限";
+"reminder.enabled" = "已開啟";
+"reminder.enable_button" = "開啟";
+"reminder.measurement_reminders" = "測量提醒";
+"reminder.inactivity_reminder" = "久未記錄提醒";
+"reminder.interval" = "未記錄提醒間隔";
+"reminder.off" = "關閉";
+"reminder.hours_4" = "4小時";
+"reminder.hours_6" = "6小時";
+"reminder.hours_8" = "8小時";
+"reminder.hours_12" = "12小時";
+"reminder.save" = "保存";
+"reminder.permission_alert" = "需要通知權限";
+"reminder.go_to_settings" = "前往設定";
+"reminder.cancel" = "取消";
+"reminder.permission_message" = "請在系統設定中開啟通知權限";
+"reminder.before_breakfast" = "早餐前";
+"reminder.after_breakfast" = "早餐後";
+"reminder.before_lunch" = "午餐前";
+"reminder.after_lunch" = "午餐後";
+"reminder.before_dinner" = "晚餐前";
+"reminder.after_dinner" = "晚餐後";
+"reminder.bedtime" = "睡前";
+
+/* Monthly Report */
+"monthly.title" = "月度總結";
+"monthly.generating" = "生成月度報告...";
+"monthly.share_button" = "分享月度報告";
+"monthly.filename_prefix" = "血糖月度總結";
+
+/* CSV Export */
+"csv.title" = "導出 CSV 數據";
+"csv.date_range_section" = "選擇導出範圍";
+"csv.start_date" = "開始日期";
+"csv.end_date" = "結束日期";
+"csv.record_type_section" = "記錄類型";
+"csv.record_type_label" = "記錄類型";
+"csv.summary_section" = "導出摘要";
+"csv.date_range_label" = "日期範圍";
+"csv.record_count_label" = "記錄數量";
+"csv.records_format" = "%d 條";
+"csv.export_format_label" = "導出格式";
+"csv.export_format_value" = "CSV (Excel 兼容)";
+"csv.export_button" = "導出 CSV 文件";
+"csv.filename_prefix" = "血糖記錄";
+
+/* Share Card */
+"share.title" = "分享摘要";
+"share.period_label" = "周期";
+"share.week" = "本周";
+"share.month" = "本月";
+"share.share_button" = "分享卡片";
+
+/* PDF Export */
+"pdf.all_records" = "所有記錄";
+"pdf.glucose_only" = "僅血糖";
+"pdf.medication_only" = "僅用藥";
+"pdf.meal_only" = "僅飲食";
+"pdf.disclaimer" = "⚠️ 重要提示：本報告僅供參考,不構成醫療建議,請遵醫囑";
+"pdf.report_title" = "血糖記錄報告";
+"pdf.report_period" = "報告周期：%@";
+"pdf.record_count" = "%d 次（%d 天有記錄，日均 %.1f 次）";
+"pdf.average_glucose" = "平均血糖：%@ %@";
+"pdf.estimated_a1c" = "預估 A1C：%.1f%%";
+"pdf.tir" = "達標率 (TIR)：%.1f%%（目標 > 70%%）";
+"pdf.tar" = "高於範圍 (TAR)：%.1f%%（目標 < 25%%）";
+"pdf.tbr" = "低於範圍 (TBR)：%.1f%%（目標 < 4%%）";
+"pdf.cv" = "波動系數 (CV%%)：%.1f%%（目標 < 36%%）";
+"pdf.cv_insufficient" = "波動系數 (CV%%)：數據不足";
+"pdf.medication_days" = "用藥天數：%d 天";
+"pdf.trend_chart" = "趨勢圖表";
+"pdf.table_header_date" = "日期";
+"pdf.table_header_time" = "時間";
+"pdf.table_header_type" = "類型";
+"pdf.table_header_value" = "數值/描述";
+"pdf.table_header_scene" = "場景/詳情";
+"pdf.table_header_note" = "備註";
+"pdf.type_glucose" = "血糖";
+"pdf.type_medication" = "用藥";
+"pdf.type_meal" = "飲食";
+"pdf.meal_record" = "飲食記錄";
+"pdf.other" = "其他";
+"pdf.footer_disclaimer" = "免責聲明：本報告僅用於信息記錄，不作為醫療診斷依據。做出醫療決定前請咨詢醫生。";
+"pdf.monthly_title" = "%@ 血糖月度總結";
+"pdf.generated_date" = "生成日期：%@";
+"pdf.core_metrics" = "核心指標概覽";
+"pdf.total_records" = "總記錄次數";
+"pdf.no_records" = "本月暫無記錄數據";
+"pdf.scene_compliance" = "各場景達標率（按獨立閾值）";
+"pdf.scene_header" = "場景";
+"pdf.record_count_header" = "記錄數";
+"pdf.average_header" = "平均值";
+"pdf.compliance_rate_header" = "達標率";
+"pdf.threshold_range_header" = "閾值範圍";
+"pdf.scene_distribution" = "各場景血糖分佈";
+"pdf.median_header" = "中位數";
+"pdf.q1q3_range_header" = "Q1–Q3 範圍";
+"pdf.min_header" = "最低";
+"pdf.max_header" = "最高";
+"pdf.meal_pairing" = "餐前餐後配對分析";
+"pdf.no_pairing_data" = "本月暫無可配對的餐前餐後數據";
+"pdf.meal_time" = "餐次";
+"pdf.pair_count" = "配對數";
+"pdf.avg_rise" = "平均升幅";
+"pdf.max_rise" = "最大升幅";
+"pdf.over_3_count" = "超標次數(>3.0)";
+"pdf.csv_header" = "類型,日期,時間,血糖值,單位,閾值狀態,閾值範圍,場景,藥物類型,藥物名稱,劑量,飲食描述,碳水等級,備註";
+"pdf.threshold_high" = "偏高 ↑";
+"pdf.threshold_low" = "偏低 ↓";
+"pdf.threshold_normal" = "正常";
+"pdf.weekly_title" = "周報告 - %@";
+"pdf.weekly_overview" = "本周概況";
+"pdf.record_days" = "記錄天數";
+"pdf.meal_records" = "飲食記錄";
+"pdf.weekly_comparison" = "本周 vs 上周對比";
+"pdf.need_full_history" = "需要完整歷史數據進行對比分析";
+"pdf.scene_compliance_short" = "各場景達標率";

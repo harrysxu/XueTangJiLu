@@ -16,8 +16,15 @@ struct ShareCardView: View {
     @State private var generatedImage: UIImage?
 
     enum SharePeriod: String, CaseIterable {
-        case week = "本周"
-        case month = "本月"
+        case week = "week"
+        case month = "month"
+        
+        var localizedName: String {
+            switch self {
+            case .week: return String(localized: "share.week")
+            case .month: return String(localized: "share.month")
+            }
+        }
 
         var days: Int {
             switch self {
@@ -39,9 +46,9 @@ struct ShareCardView: View {
     var body: some View {
         VStack(spacing: AppConstants.Spacing.xl) {
             // 周期选择
-            Picker("周期", selection: $selectedPeriod) {
+            Picker(String(localized: "share.period_label"), selection: $selectedPeriod) {
                 ForEach(SharePeriod.allCases, id: \.self) { period in
-                    Text(period.rawValue).tag(period)
+                    Text(period.localizedName).tag(period)
                 }
             }
             .pickerStyle(.segmented)
@@ -62,7 +69,7 @@ struct ShareCardView: View {
 
             // 分享按钮
             Button(action: shareCard) {
-                Label("分享卡片", systemImage: "square.and.arrow.up")
+                Label(String(localized: "share.share_button"), systemImage: "square.and.arrow.up")
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -76,7 +83,7 @@ struct ShareCardView: View {
             Spacer()
         }
         .padding(.top, AppConstants.Spacing.lg)
-        .navigationTitle("分享摘要")
+        .navigationTitle(String(localized: "share.title"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { generateCard() }
         .onChange(of: selectedPeriod) { _, _ in generateCard() }
@@ -86,9 +93,8 @@ struct ShareCardView: View {
         generatedImage = ShareCardGenerator.generateSummaryCard(
             records: filteredRecords,
             unit: settings.preferredUnit,
-            period: selectedPeriod.rawValue,
-            targetLow: settings.targetLow,
-            targetHigh: settings.targetHigh
+            period: selectedPeriod.localizedName,
+            settings: settings
         )
     }
 

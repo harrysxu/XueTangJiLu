@@ -16,15 +16,13 @@ struct ShareCardGenerator {
     ///   - records: 血糖记录
     ///   - unit: 显示单位
     ///   - period: 摘要周期描述（如"本周"）
-    ///   - targetLow: 目标下限
-    ///   - targetHigh: 目标上限
+    ///   - settings: 用户设置（用于逐条上下文达标率计算）
     /// - Returns: 生成的 UIImage
     static func generateSummaryCard(
         records: [GlucoseRecord],
         unit: GlucoseUnit,
         period: String,
-        targetLow: Double,
-        targetHigh: Double
+        settings: UserSettings
     ) -> UIImage? {
         let width: CGFloat = 375
         let height: CGFloat = 480
@@ -53,7 +51,7 @@ struct ShareCardGenerator {
             var yOffset: CGFloat = 40
 
             // App 名称
-            let appName = "学糖记录"
+            let appName = String(localized: "app.name")
             let appAttrs: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: 14, weight: .medium),
                 .foregroundColor: UIColor(red: 0.31, green: 0.275, blue: 0.898, alpha: 1.0)
@@ -66,7 +64,8 @@ struct ShareCardGenerator {
                 .font: UIFont.systemFont(ofSize: 22, weight: .bold),
                 .foregroundColor: UIColor.label
             ]
-            "\(period)血糖摘要".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: titleAttrs)
+            let periodTitle = String(localized: "share.period_summary", defaultValue: "\(period)血糖摘要")
+            periodTitle.draw(at: CGPoint(x: margin, y: yOffset), withAttributes: titleAttrs)
             yOffset += 40
 
             // 统计数据
@@ -80,16 +79,14 @@ struct ShareCardGenerator {
             ]
 
             let avg = GlucoseCalculator.estimatedAverageGlucose(records: records)
-            let tir = GlucoseCalculator.timeInRange(records: records, low: targetLow, high: targetHigh)
+            let tir = GlucoseCalculator.contextualTimeInRange(records: records, settings: settings)
             let cv = GlucoseCalculator.coefficientOfVariation(records: records)
-            let a1c = avg.map { GlucoseCalculator.estimatedA1C(averageGlucoseMmolL: $0) }
 
             let metrics: [(String, String)] = [
-                ("平均血糖", avg.map { GlucoseUnitConverter.displayString(mmolLValue: $0, in: unit) + " " + unit.rawValue } ?? "--"),
-                ("记录次数", "\(records.count) 次"),
-                ("达标率 (TIR)", String(format: "%.0f%%", tir)),
-                ("预估 A1C", a1c.map { String(format: "%.1f%%", $0) } ?? "--"),
-                ("波动系数 (CV%)", cv.map { String(format: "%.1f%%", $0) } ?? "--"),
+                (String(localized: "statistics.average"), avg.map { GlucoseUnitConverter.displayString(mmolLValue: $0, in: unit) + " " + unit.rawValue } ?? "--"),
+                (String(localized: "statistics.count"), "\(records.count) " + String(localized: "dashboard.times")),
+                (String(localized: "statistics.tir"), String(format: "%.0f%%", tir)),
+                (String(localized: "statistics.cv"), cv.map { String(format: "%.1f%%", $0) } ?? "--"),
             ]
 
             for (label, value) in metrics {
@@ -100,7 +97,7 @@ struct ShareCardGenerator {
             }
 
             // 底部 disclaimer
-            let disclaimer = "本数据仅供参考，不构成医疗建议"
+            let disclaimer = String(localized: "share.disclaimer")
             let disclaimerAttrs: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: 10),
                 .foregroundColor: UIColor.tertiaryLabel

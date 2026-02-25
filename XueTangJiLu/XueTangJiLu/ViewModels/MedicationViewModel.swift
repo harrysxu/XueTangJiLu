@@ -36,6 +36,14 @@ final class MedicationViewModel {
     /// 保存是否成功
     var saveSuccess: Bool = false
 
+    /// 编辑模式：正在编辑的记录
+    var editingRecord: MedicationRecord? = nil
+    
+    /// 是否处于编辑模式
+    var isEditMode: Bool {
+        editingRecord != nil
+    }
+
     // MARK: - 计算属性
 
     /// 当前输入的剂量数值
@@ -81,15 +89,25 @@ final class MedicationViewModel {
 
         isSaving = true
 
-        let record = MedicationRecord(
-            medicationType: selectedType,
-            name: medicationName,
-            dosage: dosage,
-            timestamp: selectedDate,
-            note: noteText.isEmpty ? nil : noteText
-        )
+        if let existingRecord = editingRecord {
+            // 编辑模式：更新现有记录
+            existingRecord.medicationType = selectedType
+            existingRecord.name = medicationName
+            existingRecord.dosage = dosage
+            existingRecord.timestamp = selectedDate
+            existingRecord.note = noteText.isEmpty ? nil : noteText
+        } else {
+            // 新建模式：创建新记录
+            let record = MedicationRecord(
+                medicationType: selectedType,
+                name: medicationName,
+                dosage: dosage,
+                timestamp: selectedDate,
+                note: noteText.isEmpty ? nil : noteText
+            )
+            modelContext.insert(record)
+        }
 
-        modelContext.insert(record)
         HapticManager.success()
         saveSuccess = true
         isSaving = false
@@ -110,5 +128,16 @@ final class MedicationViewModel {
         dosageText = ""
         selectedDate = .now
         noteText = ""
+        editingRecord = nil
+    }
+    
+    /// 加载记录进行编辑
+    func loadRecordForEditing(_ record: MedicationRecord) {
+        editingRecord = record
+        selectedType = record.medicationType
+        medicationName = record.name
+        dosageText = String(format: "%.1f", record.dosage).replacingOccurrences(of: ".0", with: "")
+        selectedDate = record.timestamp
+        noteText = record.note ?? ""
     }
 }

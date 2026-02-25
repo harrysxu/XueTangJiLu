@@ -1,0 +1,40 @@
+/* Widget Strings */
+"app.name" = "Blood Glucose Record";
+"latest.glucose" = "Latest Glucose";
+"empty.no_records" = "No records yet";
+"widget.no_data" = "No Data";
+"widget.7day_trend" = "7-Day Trend";
+"widget.data_insufficient" = "Insufficient Data";
+"widget.tir_label" = "Time in Range";
+"recent.records" = "Recent Records";
+"meal.other" = "Other";
+"today.tir" = "Time in Range";
+"statistics.average" = "Average Glucose";
+"statistics.minmax" = "High / Low";
+"level.low" = "Low";
+"level.high" = "High";
+
+/* Widget Configuration */
+"widget.glucose_home.name" = "Blood Glucose";
+"widget.glucose_home.description" = "Display latest glucose reading, trend, and records";
+"widget.lockscreen.name" = "TIR";
+"widget.lockscreen.description" = "Display Time in Range on lock screen";
+
+/* Extra Large Widget */
+"widget.latest_glucose_title" = "Latest Glucose";
+"widget.tir_title" = "TIR";
+"widget.glucose_range" = "3.9 ~ 10.0 mmol/L";
+"widget.7day_measurement" = "%d measurements in 7 days";
+"widget.7day_stats" = "7-Day Stats";
+"widget.average_label" = "Average";
+"widget.min_label" = "Min";
+"widget.max_label" = "Max";
+"widget.7day_trend_title" = "7-Day Trend";
+"widget.insufficient_trend" = "Insufficient trend data";
+"widget.recent_records_title" = "Recent Records";
+"widget.no_records_widget" = "No Records";
+"widget.chart_low_label" = "Low";
+"widget.chart_high_label" = "High";
+"widget.chart_date_label" = "Date";
+"widget.chart_glucose_label" = "Glucose";
+"widget.placeholder_dash" = "--";

@@ -12,6 +12,8 @@ import PDFKit
 /// PDF 报告预览页
 struct PDFPreviewView: View {
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
+    @Query(sort: \MedicationRecord.timestamp, order: .reverse) private var allMedications: [MedicationRecord]
+    @Query(sort: \MealRecord.timestamp, order: .reverse) private var allMeals: [MealRecord]
     @Query private var settingsArray: [UserSettings]
     @State private var settingsVM = SettingsViewModel()
     @State private var pdfData: Data?
@@ -30,6 +32,10 @@ struct PDFPreviewView: View {
             // 日期范围选择
             dateRangeSection
                 .padding(.horizontal, AppConstants.Spacing.lg)
+            
+            // 记录类型选择
+            recordTypeSection
+                .padding(.horizontal, AppConstants.Spacing.lg)
 
             // PDF 预览
             if let pdfData {
@@ -39,7 +45,7 @@ struct PDFPreviewView: View {
             } else {
                 VStack {
                     Spacer()
-                    ProgressView("生成报告中...")
+                    ProgressView(String(localized: "generating_report"))
                     Spacer()
                 }
             }
@@ -47,7 +53,7 @@ struct PDFPreviewView: View {
             // 分享按钮
             if pdfData != nil {
                 Button(action: sharePDF) {
-                    Label("分享报告", systemImage: "square.and.arrow.up")
+                    Label(String(localized: "pdf.share_report"), systemImage: "square.and.arrow.up")
                         .font(.body.weight(.semibold))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -59,7 +65,7 @@ struct PDFPreviewView: View {
                 .padding(.bottom, AppConstants.Spacing.sm)
             }
         }
-        .navigationTitle("PDF 报告")
+        .navigationTitle(String(localized: "pdf.title"))
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             generatePDF()
@@ -70,6 +76,9 @@ struct PDFPreviewView: View {
         .onChange(of: settingsVM.exportEndDate) {
             generatePDF()
         }
+        .onChange(of: settingsVM.exportRecordType) {
+            generatePDF()
+        }
     }
 
     // MARK: - 日期范围
@@ -77,14 +86,14 @@ struct PDFPreviewView: View {
     private var dateRangeSection: some View {
         VStack(spacing: AppConstants.Spacing.sm) {
             DatePicker(
-                "开始日期",
+                String(localized: "pdf.start_date"),
                 selection: $settingsVM.exportStartDate,
                 in: ...settingsVM.exportEndDate,
                 displayedComponents: .date
             )
 
             DatePicker(
-                "结束日期",
+                String(localized: "pdf.end_date"),
                 selection: $settingsVM.exportEndDate,
                 in: settingsVM.exportStartDate...Date.now,
                 displayedComponents: .date
@@ -95,11 +104,39 @@ struct PDFPreviewView: View {
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
     }
+    
+    // MARK: - 记录类型选择
+    
+    private var recordTypeSection: some View {
+        VStack(spacing: AppConstants.Spacing.sm) {
+            HStack {
+                Text(String(localized: "pdf.record_type"))
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+            }
+            
+            Picker(String(localized: "pdf.record_type"), selection: $settingsVM.exportRecordType) {
+                ForEach(ExportRecordType.allCases) { type in
+                    Text(type.localizedName).tag(type)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+        .padding(AppConstants.Spacing.lg)
+        .background(Color(.secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
+    }
 
     // MARK: - 方法
 
     private func generatePDF() {
-        pdfData = settingsVM.generatePDF(records: allRecords, unit: unit)
+        pdfData = settingsVM.generatePDF(
+            records: allRecords, 
+            unit: unit, 
+            settings: settings,
+            medications: allMedications,
+            meals: allMeals
+        )
     }
 
     private func sharePDF() {
@@ -142,5 +179,5 @@ struct PDFKitView: UIViewRepresentable {
     NavigationStack {
         PDFPreviewView()
     }
-    .modelContainer(for: [GlucoseRecord.self, UserSettings.self], inMemory: true)
+    .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self, MealRecord.self], inMemory: true)
 }

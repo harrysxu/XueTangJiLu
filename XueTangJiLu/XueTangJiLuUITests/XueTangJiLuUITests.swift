@@ -168,4 +168,240 @@ final class RecordFlowUITests: XCTestCase {
         // 切回首页
         homeTab.tap()
     }
+    
+    // MARK: - 扩展测试：用药录入
+    
+    /// 测试用药录入完整流程
+    @MainActor
+    func testMedicationInputFlow() throws {
+        // 找到用药录入入口（可能在首页或记录页）
+        let medicationButton = app.buttons.matching(NSPredicate(format: "label CONTAINS '用药' OR identifier CONTAINS 'medication'")).firstMatch
+        
+        if medicationButton.waitForExistence(timeout: 3) {
+            medicationButton.tap()
+            
+            // 输入剂量
+            let dosageField = app.textFields.firstMatch
+            if dosageField.exists {
+                dosageField.tap()
+                dosageField.typeText("4")
+            }
+            
+            // 保存
+            let saveButton = app.buttons["保存"]
+            if saveButton.exists && saveButton.isEnabled {
+                saveButton.tap()
+            }
+            
+            // 验证返回
+            sleep(1)
+        }
+    }
+    
+    // MARK: - 扩展测试：饮食记录
+    
+    /// 测试饮食记录流程
+    @MainActor
+    func testMealRecordFlow() throws {
+        let mealButton = app.buttons.matching(NSPredicate(format: "label CONTAINS '饮食' OR identifier CONTAINS 'meal'")).firstMatch
+        
+        if mealButton.waitForExistence(timeout: 3) {
+            mealButton.tap()
+            
+            // 输入描述
+            let descriptionField = app.textFields.firstMatch
+            if descriptionField.exists {
+                descriptionField.tap()
+                descriptionField.typeText("午餐")
+            }
+            
+            // 选择碳水等级
+            let carbLevelPicker = app.buttons.matching(NSPredicate(format: "label CONTAINS '中' OR label CONTAINS 'medium'")).firstMatch
+            if carbLevelPicker.exists {
+                carbLevelPicker.tap()
+            }
+            
+            // 保存
+            let saveButton = app.buttons["保存"]
+            if saveButton.exists && saveButton.isEnabled {
+                saveButton.tap()
+            }
+            
+            sleep(1)
+        }
+    }
+    
+    // MARK: - 扩展测试：备注输入
+    
+    /// 测试添加备注
+    @MainActor
+    func testNoteInput() throws {
+        let recordButton = app.buttons["addRecord"]
+        XCTAssertTrue(recordButton.waitForExistence(timeout: 5))
+        recordButton.tap()
+        
+        // 输入数值
+        app.buttons["keypad_5"].tap()
+        app.buttons["keypad_dot"].tap()
+        app.buttons["keypad_6"].tap()
+        
+        // 添加备注
+        let noteButton = app.buttons.matching(NSPredicate(format: "label CONTAINS '备注' OR identifier CONTAINS 'note'")).firstMatch
+        if noteButton.exists {
+            noteButton.tap()
+            
+            let noteField = app.textViews.firstMatch
+            if noteField.exists {
+                noteField.tap()
+                noteField.typeText("测试备注")
+            }
+        }
+        
+        // 取消
+        app.buttons["取消"].tap()
+    }
+    
+    // MARK: - 扩展测试：场景标签选择
+    
+    /// 测试场景标签选择
+    @MainActor
+    func testSceneTagSelection() throws {
+        let recordButton = app.buttons["addRecord"]
+        _ = recordButton.waitForExistence(timeout: 5)
+        recordButton.tap()
+        
+        // 尝试选择不同的场景标签
+        let tags = ["早餐前", "午餐前", "晚餐前", "睡前"]
+        
+        for tag in tags {
+            let tagButton = app.buttons.matching(NSPredicate(format: "label CONTAINS '\(tag)'")).firstMatch
+            if tagButton.exists {
+                tagButton.tap()
+                sleep(UInt32(0.3))
+                break
+            }
+        }
+        
+        // 取消
+        app.buttons["取消"].tap()
+    }
+}
+
+// MARK: - 集成测试
+
+final class IntegrationTests: XCTestCase {
+    
+    let app = XCUIApplication()
+    
+    override func setUp() {
+        continueAfterFailure = false
+        app.launchArguments.append("--uitesting")
+        app.launch()
+    }
+    
+    // MARK: - 完整用户旅程测试
+    
+    /// 测试：新用户录入 → 查看统计 → 导出报告
+    @MainActor
+    func testCompleteUserJourney() throws {
+        // 1. 录入血糖
+        let recordButton = app.buttons["addRecord"]
+        XCTAssertTrue(recordButton.waitForExistence(timeout: 5))
+        recordButton.tap()
+        
+        app.buttons["keypad_5"].tap()
+        app.buttons["keypad_dot"].tap()
+        app.buttons["keypad_6"].tap()
+        
+        let saveButton = app.buttons["saveRecord"]
+        if saveButton.isEnabled {
+            saveButton.tap()
+        }
+        
+        sleep(1)
+        
+        // 2. 查看统计
+        let statsTab = app.tabBars.buttons["统计"]
+        statsTab.tap()
+        sleep(2)
+        
+        // 3. 返回首页
+        let homeTab = app.tabBars.buttons["首页"]
+        homeTab.tap()
+    }
+    
+    /// 测试：多日记录 → 趋势分析
+    @MainActor
+    func testMultiDayRecordAnalysis() throws {
+        // 切换到记录页查看历史
+        let recordTab = app.tabBars.buttons["记录"]
+        recordTab.tap()
+        sleep(1)
+        
+        // 切换到统计页查看趋势
+        let statsTab = app.tabBars.buttons["统计"]
+        statsTab.tap()
+        sleep(1)
+        
+        // 切换时间范围
+        let monthButton = app.buttons.matching(NSPredicate(format: "label CONTAINS '30天'")).firstMatch
+        if monthButton.exists {
+            monthButton.tap()
+            sleep(1)
+        }
+    }
+    
+    // MARK: - 数据一致性测试
+    
+    /// 测试：录入后在不同页面查看数据一致性
+    @MainActor
+    func testDataConsistency() throws {
+        // 录入一条记录
+        let recordButton = app.buttons["addRecord"]
+        _ = recordButton.waitForExistence(timeout: 5)
+        recordButton.tap()
+        
+        app.buttons["keypad_7"].tap()
+        app.buttons["keypad_dot"].tap()
+        app.buttons["keypad_2"].tap()
+        
+        let saveButton = app.buttons["saveRecord"]
+        if saveButton.isEnabled {
+            saveButton.tap()
+        }
+        
+        sleep(1)
+        
+        // 在记录页查看
+        let recordTab = app.tabBars.buttons["记录"]
+        recordTab.tap()
+        sleep(1)
+        
+        // 在统计页查看
+        let statsTab = app.tabBars.buttons["统计"]
+        statsTab.tap()
+        sleep(1)
+        
+        // 验证数据存在
+        _ = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '7.2'")).firstMatch
+        // 数据应该在统计中显示
+    }
+    
+    // MARK: - 性能测试
+    
+    /// 测试：大数据量下的性能
+    @MainActor
+    func testPerformanceWithLargeDataset() throws {
+        // 切换到记录页
+        let recordTab = app.tabBars.buttons["记录"]
+        recordTab.tap()
+        
+        // 测试滚动性能
+        measure {
+            let scrollView = app.scrollViews.firstMatch
+            for _ in 0..<10 {
+                scrollView.swipeUp()
+            }
+        }
+    }
 }

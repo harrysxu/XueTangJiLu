@@ -7,6 +7,9 @@
 
 import Foundation
 import SwiftData
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// 血糖记录数据模型
 /// 遵循 CloudKit 同步规则：所有属性均为 Optional 或提供默认值，无 unique 约束
@@ -23,9 +26,8 @@ final class GlucoseRecord {
 
     // MARK: - 元数据
 
-    /// 用餐场景（餐前/餐后/空腹/睡前/其他）
-    /// 使用 rawValue 字符串存储以兼容 CloudKit
-    var mealContextRawValue: String = MealContext.other.rawValue
+    /// 场景标签 ID（内置标签存 MealContext.rawValue，自定义标签存 UUID）
+    var sceneTagId: String = MealContext.other.rawValue
 
     /// 用户备注（如"吃了火锅"、"运动后"）
     var note: String?
@@ -38,13 +40,25 @@ final class GlucoseRecord {
 
     /// 创建时间（用于 CloudKit 冲突解决）
     var createdAt: Date = Date.now
+    
+    /// 设备标识符（用于多设备冲突检测，可选）
+    var deviceIdentifier: String?
 
     // MARK: - 计算属性
 
-    /// 用餐场景枚举转换
-    var mealContext: MealContext {
-        get { MealContext(rawValue: mealContextRawValue) ?? .other }
-        set { mealContextRawValue = newValue.rawValue }
+    /// 获取完整的 SceneTag 信息
+    func sceneTag(from settings: UserSettings) -> SceneTag? {
+        settings.sceneTag(for: sceneTagId)
+    }
+
+    /// 获取所属 ThresholdGroup（用于分组分析）
+    func thresholdGroup(from settings: UserSettings) -> ThresholdGroup {
+        settings.thresholdGroup(for: sceneTagId)
+    }
+
+    /// 对应的内置 MealContext（仅用于 HealthKit 映射，自定义标签返回 nil）
+    var builtInMealContext: MealContext? {
+        MealContext(rawValue: sceneTagId)
     }
 
     /// 将内部 mmol/L 值转换为 mg/dL
@@ -52,9 +66,14 @@ final class GlucoseRecord {
         value * 18.0182
     }
 
-    /// 血糖状态判定（基于通用范围）
+    /// 血糖状态判定（基于通用固定范围，用于无 settings 的场景如 Widget）
     var glucoseLevel: GlucoseLevel {
         GlucoseLevel.from(value: value)
+    }
+
+    /// 血糖状态判定（场景感知，使用用户的分场景阈值设置）
+    func glucoseLevel(with settings: UserSettings) -> GlucoseLevel {
+        GlucoseLevel.from(value: value, tagId: sceneTagId, settings: settings)
     }
 
     /// 格式化显示值
@@ -71,14 +90,41 @@ final class GlucoseRecord {
 
     init(value: Double,
          timestamp: Date = .now,
-         mealContext: MealContext = .other,
+         sceneTagId: String = MealContext.other.rawValue,
          note: String? = nil,
          source: String = "manual") {
         self.value = value
         self.timestamp = timestamp
-        self.mealContextRawValue = mealContext.rawValue
+        self.sceneTagId = sceneTagId
         self.note = note
         self.source = source
         self.createdAt = .now
+        #if canImport(UIKit)
+        self.deviceIdentifier = UIDevice.current.identifierForVendor?.uuidString
+        #endif
+    }
+}
+
+// MARK: - Conflict Resolution
+
+extension GlucoseRecord {
+    
+    /// 生成用于去重的唯一键
+    var deduplicationKey: String {
+        "\(timestamp.timeIntervalSince1970)_\(value)_\(sceneTagId)"
+    }
+    
+    /// 判断是否与另一条记录重复
+    func isDuplicate(of other: GlucoseRecord) -> Bool {
+        // 时间相同、数值相同、场景相同，则视为重复
+        return abs(timestamp.timeIntervalSince(other.timestamp)) < 1.0 &&
+               abs(value - other.value) < 0.01 &&
+               sceneTagId == other.sceneTagId
+    }
+    
+    /// 在冲突时选择应该保留的记录
+    static func resolveConflict(between record1: GlucoseRecord, and record2: GlucoseRecord) -> GlucoseRecord {
+        // 优先保留创建时间更早的记录
+        return record1.createdAt < record2.createdAt ? record1 : record2
     }
 }

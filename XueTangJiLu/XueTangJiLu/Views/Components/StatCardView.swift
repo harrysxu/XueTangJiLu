@@ -13,29 +13,41 @@ struct StatCardView: View {
     let value: String         // 数值（如"6.2"）
     let subtitle: String?     // 单位或参考（如"mmol/L"）
     let tintColor: Color?     // 可选的强调色
+    let metricType: MetricType? // 可选的指标类型（用于显示解释按钮）
 
-    init(title: String, value: String, subtitle: String? = nil, tintColor: Color? = nil) {
+    init(title: String, value: String, subtitle: String? = nil, tintColor: Color? = nil, metricType: MetricType? = nil) {
         self.title = title
         self.value = value
         self.subtitle = subtitle
         self.tintColor = tintColor
+        self.metricType = metricType
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-            Text(title)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+            // 第一行：标题 + 副标题/问号图标
+            HStack(spacing: 4) {
+                Text(title)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                
+                if let metricType {
+                    MetricExplanationView(metricType: metricType)
+                } else if let subtitle {
+                    Text("(\(subtitle))")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .frame(height: 18)
 
+            // 第二行：数值
             Text(value)
                 .font(.glucoseMetric)
                 .foregroundStyle(tintColor ?? .primary)
-
-            if let subtitle {
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-            }
+                .frame(height: 32, alignment: .leading)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppConstants.Spacing.md)
@@ -46,11 +58,59 @@ struct StatCardView: View {
     }
 }
 
-#Preview {
+#Preview("基础卡片 - 两行") {
     HStack {
-        StatCardView(title: "次数", value: "4", subtitle: "今日")
-        StatCardView(title: "均值", value: "6.2", subtitle: "mmol/L", tintColor: .glucoseNormal)
-        StatCardView(title: "达标率", value: "75%", subtitle: "TIR")
+        StatCardView(title: "今日记录", value: "4", subtitle: "次")
+        StatCardView(title: "今日用药", value: "1", subtitle: "次")
+    }
+    .padding()
+}
+
+#Preview("带解释按钮 - 两行") {
+    HStack {
+        StatCardView(
+            title: "今日均值",
+            value: "5.2",
+            tintColor: Color("GlucoseNormal"),
+            metricType: .averageGlucose
+        )
+        StatCardView(
+            title: "达标率",
+            value: "85%",
+            tintColor: Color("GlucoseNormal"),
+            metricType: .timeInRange
+        )
+    }
+    .padding()
+}
+
+#Preview("2x2 网格 - 两行结构") {
+    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        StatCardView(
+            title: "今日记录",
+            value: "7",
+            subtitle: "次"
+        )
+        
+        StatCardView(
+            title: "今日均值",
+            value: "5.2",
+            tintColor: Color("GlucoseNormal"),
+            metricType: .averageGlucose
+        )
+        
+        StatCardView(
+            title: "达标率",
+            value: "85%",
+            tintColor: Color("GlucoseNormal"),
+            metricType: .timeInRange
+        )
+        
+        StatCardView(
+            title: "今日用药",
+            value: "1",
+            subtitle: "次"
+        )
     }
     .padding()
 }

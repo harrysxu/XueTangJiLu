@@ -13,13 +13,26 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var settingsArray: [UserSettings]
 
-    /// 获取或创建用户设置
+    /// 获取或创建用户设置（含 iCloud 同步去重）
     private var settings: UserSettings {
+        // 如果有多份设置（iCloud 同步导致），执行去重合并
+        if settingsArray.count > 1 {
+            let result = UserSettings.deduplicate(settingsArray)
+            for dup in result.toDelete {
+                modelContext.delete(dup)
+            }
+            return result.keep
+        }
+
         if let existing = settingsArray.first {
+            // 初始化本地化的默认标签（仅在首次启动时执行一次）
+            existing.initializeLocalizedDefaultTagsIfNeeded()
             return existing
         }
         let newSettings = UserSettings()
         modelContext.insert(newSettings)
+        // 初始化本地化的默认标签
+        newSettings.initializeLocalizedDefaultTagsIfNeeded()
         return newSettings
     }
 

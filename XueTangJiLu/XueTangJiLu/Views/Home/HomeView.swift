@@ -13,9 +13,18 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(HealthKitManager.self) private var healthKitManager
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var records: [GlucoseRecord]
+    @Query(sort: \MedicationRecord.timestamp, order: .reverse) private var medications: [MedicationRecord]
+    @Query(sort: \MealRecord.timestamp, order: .reverse) private var meals: [MealRecord]
     @Query private var settingsArray: [UserSettings]
     @State private var showRecordInput = false
     @State private var glucoseViewModel = GlucoseViewModel()
+    @State private var showDisclaimer = false
+    @State private var recordToEdit: GlucoseRecord? = nil
+    @State private var medicationViewModel = MedicationViewModel()
+    @State private var medicationToEdit: MedicationRecord? = nil
+    @State private var mealToEdit: MealRecord? = nil
+    @State private var showMedicationInput = false
+    @State private var showMealInput = false
 
     private var settings: UserSettings {
         settingsArray.first ?? UserSettings()
@@ -34,16 +43,53 @@ struct HomeView: View {
     private var todayRecords: [GlucoseRecord] {
         records.filter { $0.timestamp.isToday }
     }
+    
+    /// 合并的时间轴项目
+    private enum TimelineItem: Identifiable {
+        case glucose(GlucoseRecord)
+        case medication(MedicationRecord)
+        case meal(MealRecord)
+        
+        var id: String {
+            switch self {
+            case .glucose(let record):
+                return "glucose-\(record.id)"
+            case .medication(let record):
+                return "medication-\(record.id)"
+            case .meal(let record):
+                return "meal-\(record.id)"
+            }
+        }
+        
+        var timestamp: Date {
+            switch self {
+            case .glucose(let record):
+                return record.timestamp
+            case .medication(let record):
+                return record.timestamp
+            case .meal(let record):
+                return record.timestamp
+            }
+        }
+    }
 
     /// 按日期分组的记录
-    private var groupedRecords: [(String, [GlucoseRecord])] {
-        let grouped = Dictionary(grouping: records) { record in
-            record.timestamp.startOfDay
+    private var groupedRecords: [(String, [TimelineItem])] {
+        // 合并所有记录
+        var allItems: [TimelineItem] = []
+        allItems += records.map { .glucose($0) }
+        allItems += medications.map { .medication($0) }
+        allItems += meals.map { .meal($0) }
+        
+        // 按日期分组
+        let grouped = Dictionary(grouping: allItems) { item in
+            item.timestamp.startOfDay
         }
+        
         return grouped
             .sorted { $0.key > $1.key }
-            .map { (date, records) in
-                (date.sectionTitle, records.sorted { $0.timestamp > $1.timestamp })
+            .map { (date, items) in
+                (date.sectionTitle, items.sorted { $0.timestamp > $1.timestamp })
             }
     }
 
@@ -52,6 +98,14 @@ struct HomeView: View {
             ZStack(alignment: .bottom) {
                 ScrollView {
                     LazyVStack(spacing: 0) {
+                        // 今日总结卡片
+                        DailySummaryCard(
+                            todayRecords: todayRecords,
+                            allRecords: records,
+                            settings: settings
+                        )
+                        .padding(.top)
+                        
                         if records.isEmpty {
                             // 空状态
                             EmptyStateView(
@@ -85,6 +139,52 @@ struct HomeView: View {
                 RecordInputView(viewModel: $glucoseViewModel)
                     .presentationDragIndicator(.visible)
             }
+            .sheet(isPresented: $showMedicationInput) {
+                MedicationInputView(viewModel: $medicationViewModel)
+                    .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $showMealInput) {
+                MealPhotoView(editingRecord: mealToEdit)
+                    .presentationDragIndicator(.visible)
+            }
+            .sheet(isPresented: $showDisclaimer) {
+                DisclaimerView {
+                    settings.hasSeenDisclaimer = true
+                }
+            }
+            .onChange(of: recordToEdit) { oldValue, newValue in
+                if let record = newValue {
+                    glucoseViewModel.loadRecordForEditing(record, unit: unit)
+                    showRecordInput = true
+                }
+            }
+            .onChange(of: showRecordInput) { oldValue, newValue in
+                if !newValue {
+                    recordToEdit = nil
+                }
+            }
+            .onChange(of: medicationToEdit) { oldValue, newValue in
+                if let record = newValue {
+                    medicationViewModel.loadRecordForEditing(record)
+                    showMedicationInput = true
+                }
+            }
+            .onChange(of: showMedicationInput) { oldValue, newValue in
+                if !newValue {
+                    medicationToEdit = nil
+                }
+            }
+            .onChange(of: showMealInput) { oldValue, newValue in
+                if !newValue {
+                    mealToEdit = nil
+                }
+            }
+            .onAppear {
+                // 首次启动显示免责声明
+                if !settings.hasSeenDisclaimer {
+                    showDisclaimer = true
+                }
+            }
         }
     }
 
@@ -100,15 +200,15 @@ struct HomeView: View {
                 GlucoseValueBadge(
                     value: latest.value,
                     unit: unit,
-                    level: latest.glucoseLevel,
+                    level: latest.glucoseLevel(with: settings),
                     style: .hero
                 )
                 .accessibilityIdentifier("latestGlucoseValue")
 
                 HStack(spacing: AppConstants.Spacing.xs) {
-                    Image(systemName: latest.mealContext.iconName)
+                    Image(systemName: settings.iconName(for: latest.sceneTagId))
                         .font(.caption2)
-                    Text(latest.mealContext.displayName)
+                    Text(settings.displayName(for: latest.sceneTagId))
                         .font(.footnote)
                     Text("·")
                         .font(.footnote)
@@ -126,7 +226,7 @@ struct HomeView: View {
 
     private var latestAccessibilityLabel: String {
         guard let latest = latestRecord else { return "暂无记录" }
-        return "最新血糖 \(latest.displayValue(in: unit)) \(unit.rawValue)，\(latest.glucoseLevel.description)，\(latest.mealContext.displayName)"
+        return "最新血糖 \(latest.displayValue(in: unit)) \(unit.rawValue)，\(latest.glucoseLevel(with: settings).description)，\(settings.displayName(for: latest.sceneTagId))"
     }
 
     // MARK: - 今日概要
@@ -179,10 +279,9 @@ struct HomeView: View {
 
     private var todayTIR: String {
         guard !todayRecords.isEmpty else { return "--" }
-        let tir = GlucoseCalculator.timeInRange(
+        let tir = GlucoseCalculator.contextualTimeInRange(
             records: todayRecords,
-            low: settings.targetLow,
-            high: settings.targetHigh
+            settings: settings
         )
         return "\(Int(tir))%"
     }
@@ -192,8 +291,15 @@ struct HomeView: View {
     private var timelineSection: some View {
         ForEach(groupedRecords, id: \.0) { sectionTitle, sectionRecords in
             Section {
-                ForEach(sectionRecords) { record in
-                    TimelineRowView(record: record, unit: unit)
+                ForEach(sectionRecords) { item in
+                    switch item {
+                    case .glucose(let record):
+                        Button(action: {
+                            recordToEdit = record
+                        }) {
+                            TimelineRowView(record: record, unit: unit, settings: settings)
+                        }
+                        .buttonStyle(.plain)
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 glucoseViewModel.deleteRecord(record, modelContext: modelContext)
@@ -201,6 +307,36 @@ struct HomeView: View {
                                 Label("删除", systemImage: "trash")
                             }
                         }
+                    case .medication(let record):
+                        Button(action: {
+                            medicationToEdit = record
+                        }) {
+                            MedicationRowView(record: record)
+                        }
+                        .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                medicationViewModel.deleteRecord(record, modelContext: modelContext)
+                            } label: {
+                                Label("删除", systemImage: "trash")
+                            }
+                        }
+                    case .meal(let record):
+                        Button(action: {
+                            mealToEdit = record
+                            showMealInput = true
+                        }) {
+                            MealRowView(record: record)
+                        }
+                        .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                modelContext.delete(record)
+                            } label: {
+                                Label("删除", systemImage: "trash")
+                            }
+                        }
+                    }
                 }
             } header: {
                 Text(sectionTitle)
@@ -239,6 +375,6 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
-        .modelContainer(for: [GlucoseRecord.self, UserSettings.self], inMemory: true)
+        .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self, MealRecord.self], inMemory: true)
         .environment(HealthKitManager())
 }

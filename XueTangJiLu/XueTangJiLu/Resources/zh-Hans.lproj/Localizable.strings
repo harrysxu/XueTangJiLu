@@ -1,7 +1,7 @@
 /* Tab Bar */
 "tab.dashboard" = "首页";
 "tab.log" = "记录";
-"tab.insights" = "洞察";
+"tab.statistics" = "统计";
 "tab.profile" = "我的";
 
 /* Dashboard */
@@ -17,8 +17,24 @@
 "quick.glucose" = "记录血糖";
 "quick.medication" = "记录用药";
 "quick.meal" = "拍照饮食";
-"today.insight" = "今日洞察";
+"today.summary.card" = "今日摘要";
 "recent.records" = "最近记录";
+"yesterday.records" = "昨日记录";
+
+/* Dashboard */
+"dashboard.no_records_today" = "今天还没有记录";
+"dashboard.tap_add" = "点击下方按钮开始记录血糖";
+"dashboard.today_summary" = "今日 %d 次记录，均值 %@ %@，达标率 %d%%";
+"dashboard.recorded_count" = "今日已记录 %d 次";
+"dashboard.times" = "次";
+"dashboard.medication_count" = "用药次数";
+"dashboard.no_patterns_today" = "今日数据还不够多，暂时看不到规律哦";
+"dashboard.recent_records" = "最近记录";
+"dashboard.no_recent" = "暂无记录";
+"dashboard.glucose.title" = "血糖";
+"dashboard.medication.title" = "药物";
+"dashboard.meal.title" = "饮食";
+"statistics.count" = "次";
 
 /* Record Input */
 "save.record" = "保存记录";
@@ -49,6 +65,28 @@
 "meal.bedtime" = "睡前";
 "meal.other" = "其他";
 
+/* Sync - iCloud 同步相关 */
+"sync.idle" = "同步就绪";
+"sync.syncing" = "正在同步...";
+"sync.success" = "同步成功";
+"sync.failed" = "同步失败";
+"sync.offline" = "离线模式";
+"sync.settings.title" = "iCloud 同步";
+"sync.settings.enable" = "启用 iCloud 同步";
+"sync.settings.manual_sync" = "立即同步";
+"sync.settings.last_sync" = "最后同步";
+"sync.settings.wifi_only" = "仅 WiFi 同步";
+"sync.error.not_signed_in" = "请在系统设置中登录 iCloud";
+"sync.error.network" = "网络连接失败";
+"sync.error.quota" = "iCloud 存储空间不足";
+"sync.error.permission" = "缺少 iCloud 权限";
+"sync.account.available" = "已登录";
+"sync.account.unavailable" = "未登录";
+"sync.history.title" = "同步历史";
+"sync.history.empty" = "暂无同步记录";
+"sync.reset.title" = "重置同步状态";
+"sync.reset.message" = "这将清除本地同步缓存，并重新从 iCloud 拉取数据。此操作不会删除数据。";
+
 /* Glucose Level */
 "level.low" = "偏低";
 "level.normal" = "正常";
@@ -75,20 +113,18 @@
 "meal.description" = "饮食描述";
 "meal.description.placeholder" = "如\"米饭 + 青菜 + 鸡胸肉\"";
 
-/* Insights / Trends */
-"insights.title" = "洞察";
-"insights.average" = "平均血糖";
-"insights.a1c" = "预估 A1C";
-"insights.tir" = "达标率";
-"insights.records" = "记录次数";
-"insights.cv" = "波动系数 (CV%)";
-"insights.stable" = "稳定";
-"insights.volatile" = "波动较大";
-"insights.target.cv" = "目标 < 36%";
-"insights.target.tir" = "目标 > 70%";
-"insights.weekly" = "周对比";
-"insights.a1c_goal" = "A1C 目标追踪";
-"insights.smart" = "智能洞察";
+/* Statistics / Trends */
+"statistics.title" = "统计";
+"statistics.average" = "平均血糖";
+"statistics.eA1C" = "估算糖化";
+"statistics.tir" = "达标率";
+"statistics.records" = "记录次数";
+"statistics.cv" = "波动系数 (CV%)";
+"statistics.cv.label" = "波动系数";
+"statistics.minmax" = "最高 / 最低";
+"statistics.ref.cv" = "参考 < 36%";
+"statistics.ref.tir" = "参考 > 70%";
+"statistics.weekly" = "周对比";
 
 /* Profile */
 "profile.title" = "我的";
@@ -134,18 +170,52 @@
 "reminder.off" = "关闭";
 "reminder.save" = "保存提醒设置";
 
+/* App Name */
+"app.name" = "血糖记录";
+
+/* Share Card */
+"share.today_summary" = "今日血糖摘要 · %@";
+"share.period_summary" = "%@血糖摘要";
+"share.disclaimer" = "本数据仅供参考，不构成医疗建议";
+
+/* Disclaimer */
+"disclaimer.title" = "重要提示";
+"disclaimer.item1" = "本APP是辅助记录工具,不能替代医生诊断";
+"disclaimer.item2" = "所有数据分析仅供参考,不构成医疗建议";
+"disclaimer.item3" = "血糖异常时请及时就医,遵医嘱调整治疗方案";
+"disclaimer.item4" = "低血糖时请立即补充糖分,必要时拨打120";
+"disclaimer.description" = "血糖记录旨在帮助您记录和了解血糖数据,但不应作为医疗决策的唯一依据。请定期复查,听从医生专业指导。";
+"disclaimer.navigation_title" = "使用须知";
+"disclaimer.accept" = "我已知晓";
+"disclaimer.banner" = "数据仅供参考,不构成医疗建议,请遵医嘱";
+
+/* About - Privacy & Disclaimer */
+"about.privacy.title" = "隐私政策";
+"about.disclaimer.title" = "免责声明";
+"about.privacy.content" = "血糖记录 隐私政策\n\n最后更新：2026年2月12日\n\n1. 数据收集\n本应用不收集任何个人信息到开发者服务器。所有血糖记录数据仅存储在您的设备本地和您的私人 iCloud 账户中。\n\n2. 数据存储\n• 本地存储：血糖记录保存在您设备的本地数据库中\n• iCloud 同步：如果您启用了 iCloud，数据将通过您的私人 iCloud 账户在您的设备之间同步\n• Apple Health：如果您授权，血糖数据将同步到 Apple Health 应用\n\n3. 数据安全\n• 所有本地数据受 iOS 系统级加密保护\n• iCloud 传输使用 TLS 加密\n• 开发者无法访问您的任何数据\n\n4. 第三方服务\n本应用不集成任何第三方分析、广告或追踪 SDK。\n\n5. 数据导出与删除\n• 您可以随时通过设置页面导出所有数据（PDF 或 CSV 格式）\n• 您可以随时删除任何记录\n• 删除应用将移除所有本地数据（iCloud 和 Health 中的数据需单独管理）\n\n6. 联系我们\n如有隐私相关问题，请通过 App Store 页面联系我们。";
+"about.disclaimer.content" = "免责声明\n\n重要提示：请在使用本应用前仔细阅读以下内容。\n\n1. 非医疗设备\n血糖记录（XueTangJiLu）是一款个人健康数据记录工具，不是医疗器械，不具备医疗诊断功能。\n\n2. 不提供医疗建议\n本应用不提供任何形式的医疗诊断、治疗建议或用药指导。应用中显示的统计数据（如平均血糖、达标率等）仅供参考，不应作为医疗决策的依据。\n\n3. 咨询医生\n在做出任何医疗相关决定之前，请务必咨询您的医生或专业医疗人员。不要根据本应用中的数据自行调整药物剂量或治疗方案。\n\n4. 数据准确性\n本应用记录的数据基于用户手动输入，数据的准确性由用户自行负责。请确保您输入的血糖数值与血糖仪显示一致。\n\n5. 紧急情况\n如果您出现严重低血糖、高血糖或其他紧急医疗状况，请立即拨打急救电话或前往最近的医疗机构。\n\n6. 责任限制\n在法律允许的最大范围内，开发者不对因使用本应用而产生的任何直接或间接损失承担责任。";
+
 /* Onboarding */
-"onboarding.welcome" = "学糖记录";
+"onboarding.welcome" = "血糖记录";
 "onboarding.slogan" = "让控糖回归简单";
 "onboarding.start" = "开始使用";
 "onboarding.next" = "下一步";
+"onboarding.disclaimer" = "本应用仅用于个人健康数据记录，不提供任何医疗诊断或治疗建议。请在做出任何医疗决定前咨询您的医生。";
 "onboarding.unit.title" = "选择您的血糖单位";
 "onboarding.unit.subtitle" = "可随时在设置中更改";
+"onboarding.unit.mmol_region" = "中国/欧洲常用";
+"onboarding.unit.mgdl_region" = "美国/日本常用";
 "onboarding.edu.title" = "了解关键指标";
 "onboarding.edu.subtitle" = "帮助您更好地理解血糖数据";
-"onboarding.goal.title" = "设定您的控糖目标";
-"onboarding.goal.subtitle" = "可随时在设置中调整";
+"onboarding.edu.tir_title" = "TIR（达标率）";
+"onboarding.edu.tir_desc" = "血糖在目标范围内的时间比例。目标 > 70% 为良好。";
+"onboarding.edu.cv_title" = "CV%（波动系数）";
+"onboarding.edu.cv_desc" = "衡量血糖波动程度。< 36% 认为稳定。";
 "onboarding.health.title" = "健康数据同步";
+"onboarding.health.subtitle" = "连接 Apple Health 后，您的血糖数据将自动备份到系统\"健康\"应用中。";
+"onboarding.health.benefit1" = "数据备份更安全";
+"onboarding.health.benefit2" = "删除 App 数据不丢失";
+"onboarding.health.benefit3" = "与其他健康数据联动查看";
 "onboarding.health.connect" = "连接 Health";
 "onboarding.health.skip" = "稍后再说";
 
@@ -154,8 +224,8 @@
 "empty.tap_add" = "点击下方快捷按钮开始记录";
 "empty.no_glucose" = "还没有血糖记录";
 "empty.no_medication" = "还没有用药记录";
-"empty.no_trends" = "暂无趋势数据";
-"empty.trends_hint" = "开始记录血糖后，这里将展示您的趋势图表和洞察";
+"empty.no_trends" = "暂无统计数据";
+"empty.trends_hint" = "开始记录血糖后，这里将展示您的统计图表";
 
 /* Share */
 "share.title" = "分享摘要";
@@ -166,3 +236,448 @@
 /* Activity */
 "activity.steps" = "今日步数";
 "activity.exercise" = "运动时间";
+
+/* Factory Reset */
+"factory_reset.title" = "恢复出厂设置";
+"factory_reset.warning" = "危险操作";
+"factory_reset.description" = "此操作将永久删除所有数据";
+"factory_reset.data_to_delete" = "即将删除的数据";
+"factory_reset.glucose_records" = "血糖记录";
+"factory_reset.meal_records" = "饮食记录";
+"factory_reset.medication_records" = "用药记录";
+"factory_reset.custom_tags" = "自定义标签";
+"factory_reset.total_items" = "总计：%d 项数据";
+"factory_reset.what_will_reset" = "将被重置的内容";
+"factory_reset.all_records" = "所有血糖、饮食、用药记录";
+"factory_reset.custom_scene_tags" = "自定义场景标签和备注标签";
+"factory_reset.personal_settings" = "血糖单位、目标范围等个性化设置";
+"factory_reset.reminders" = "提醒配置和显示模式";
+"factory_reset.healthkit" = "HealthKit 连接状态";
+"factory_reset.icloud_warning" = "⚠️ 数据将通过 iCloud 同步删除，其他设备上的数据也会被清空";
+"factory_reset.confirm_input" = "请输入以下文字以确认操作";
+"factory_reset.type_to_confirm" = "请输入：%@";
+"factory_reset.confirm_button" = "确认重置";
+"factory_reset.first_warning_title" = "⚠️ 第一次确认";
+"factory_reset.first_warning_message" = "此操作将永久删除 %d 条记录和所有自定义设置。\n\n删除后数据无法恢复，您确定要继续吗？";
+"factory_reset.second_warning_title" = "⚠️ 最后确认";
+"factory_reset.second_warning_message" = "这是最后一次确认。\n\n点击\"确认删除\"后，所有数据将被永久删除，包括：\n• %d 条血糖记录\n• %d 条饮食记录\n• %d 条用药记录\n• 所有自定义标签和设置\n\n此操作不可撤销！";
+"factory_reset.confirm_delete" = "确认删除";
+"factory_reset.think_again" = "我再想想";
+"factory_reset.complete_title" = "✅ 重置完成";
+"factory_reset.complete_message" = "所有数据已清空，设置已恢复默认。应用将自动同步到 iCloud。";
+"factory_reset.required_text" = "删除所有数据";
+
+/* ThresholdGroup */
+"threshold.fasting_premeal" = "空腹/餐前";
+"threshold.postmeal" = "餐后";
+"threshold.bedtime" = "睡前";
+"threshold.ada_fasting" = "ADA推荐：4.4-7.0 mmol/L";
+"threshold.ada_postmeal" = "ADA推荐：<10.0 mmol/L";
+"threshold.ada_bedtime" = "ADA推荐：5.0-8.3 mmol/L";
+
+/* MedicationType Units */
+"med.unit_insulin" = "单位(U)";
+"med.unit_mg" = "mg";
+
+/* DisplayMode */
+"display_mode.simple" = "简化模式";
+"display_mode.professional" = "专业模式";
+"display_mode.simple.desc" = "适合日常快速记录";
+"display_mode.professional.desc" = "显示完整统计分析";
+
+/* Widget */
+"widget.no_data" = "暂无数据";
+"widget.7day_trend" = "7日趋势";
+"widget.data_insufficient" = "数据不足";
+"widget.tir_label" = "达标率";
+
+/* Intent */
+"intent.glucose.description" = "快速记录一次血糖数值";
+"intent.glucose.param.value" = "血糖值";
+"intent.glucose.success" = "已记录血糖 %@ %@（%@）";
+"intent.category" = "记录";
+
+/* ReminderConfig */
+"reminder.before_breakfast" = "早餐前";
+"reminder.after_breakfast" = "早餐后";
+"reminder.before_lunch" = "午餐前";
+"reminder.after_lunch" = "午餐后";
+"reminder.before_dinner" = "晚餐前";
+"reminder.after_dinner" = "晚餐后";
+"reminder.fasting" = "空腹";
+"reminder.bedtime" = "睡前";
+"reminder.not_set" = "未设置";
+
+/* Settings */
+"settings.title" = "设置";
+"settings.display_mode" = "显示模式";
+"settings.display_preferences" = "显示偏好";
+"settings.display_preferences.footer" = "简化模式适合日常快速记录，专业模式显示完整的统计分析功能";
+"settings.glucose_preferences" = "血糖偏好";
+"settings.unit" = "单位";
+"settings.tags_and_targets" = "标签与目标范围";
+"settings.scenes_count" = "%d 个场景";
+"settings.data_sync" = "数据同步";
+"settings.health_sync" = "Apple Health 同步";
+"settings.data_management" = "数据管理";
+"settings.clear_history" = "清除历史记录";
+"settings.test_data_generator" = "测试数据生成器";
+"settings.sync_debug" = "同步调试工具";
+
+/* Record Input - Additional */
+"record.edit" = "编辑记录";
+"record.save_changes" = "保存更改";
+"record.more" = "更多";
+"record.quick_select" = "快捷选择";
+"record.time.now" = "现在";
+"record.time.1h_ago" = "1小时前";
+"record.time.2h_ago" = "2小时前";
+"record.time.today_7am" = "今天早上7点";
+"record.time.today_12pm" = "今天中午12点";
+"record.time.today_6pm" = "今天下午6点";
+"record.modify" = "修改";
+
+/* Profile - Additional */
+"profile.tag_management" = "标签管理";
+"profile.tag_summary" = "%d 场景 · %d 备注";
+"profile.reminders_count" = "%d 个提醒";
+"profile.monthly_report" = "月度总结报告";
+
+/* Tag Management */
+"tag_management" = "标签管理";
+"tag.scene_tags" = "场景标签";
+"tag.annotation_tags" = "备注标签";
+"tag.show_all" = "显示全部标签";
+"tag.show_recommended" = "只显示推荐标签";
+"tag.add_scene" = "添加场景标签";
+"tag.add_annotation" = "添加备注标签";
+"tag.custom" = "自定义";
+"tag.builtin" = "内置";
+"tag.hidden_count" = "%d 个隐藏";
+"tag.delete" = "删除";
+"tag.edit" = "编辑";
+"tag.label_name" = "标签名称";
+"tag.input_name" = "输入新的备注标签名称";
+"tag.modify_name" = "修改备注标签名称";
+"tag.add_alert_title" = "添加备注标签";
+"tag.edit_alert_title" = "编辑标签";
+"tag.scene_footer_collapsed" = "这里展示5个推荐标签。点击显示全部标签可查看和管理所有标签。";
+"tag.scene_footer_expanded" = "点击标签可编辑名称和图标，点击阈值范围可设置该标签的达标目标。长按拖动可调整顺序，关闭后在录入页面中隐藏。自定义标签可左划删除。";
+"tag.annotation_footer" = "备注标签用于标记特殊状态（如运动后、压力大等），左划可编辑或删除自定义标签";
+"tag.edit_scene" = "编辑场景标签";
+"tag.add_scene_title" = "添加场景标签";
+"tag.tag_info" = "标签信息";
+"tag.select_group" = "所属分组";
+"tag.select_icon" = "选择图标";
+"tag.restore_default" = "恢复默认名称";
+"tag.group_description" = "分组说明";
+"tag.group_footer" = "所属分组决定了该标签的默认目标范围。您也可以在保存后为该标签设置独立的自定义范围。";
+"tag.edit_threshold" = "编辑目标范围";
+"tag.target_range" = "达标范围";
+"tag.lower_limit" = "下限";
+"tag.upper_limit" = "上限";
+"tag.reference_advice" = "参考建议";
+
+/* Sync Settings */
+"sync.title" = "iCloud 同步";
+"sync.status" = "状态";
+"sync.account" = "iCloud 账户";
+"sync.network" = "网络连接";
+"sync.logged_in" = "已登录";
+"sync.not_logged_in" = "未登录";
+"sync.restricted" = "受限制";
+"sync.checking" = "检查中...";
+"sync.temporarily_unavailable" = "暂时不可用";
+"sync.unknown_status" = "未知状态";
+"sync.settings" = "同步设置";
+"sync.enable" = "启用 iCloud 同步";
+"sync.wifi_only" = "仅 WiFi 同步";
+"sync.sync_now" = "立即同步";
+"sync.last_sync" = "最后同步";
+"sync.footer" = "启用后，数据将自动同步到您的 iCloud 账户。仅 WiFi 同步可以节省流量。";
+"sync.history" = "同步历史";
+"sync.no_history" = "暂无同步记录";
+"sync.history_footer" = "显示最近的同步活动记录";
+
+/* Meal Photo View */
+"meal.edit" = "编辑饮食";
+"meal.record" = "记录饮食";
+"meal.photo" = "照片";
+"meal.optional" = "(可选)";
+"meal.collapse" = "收起";
+"meal.add_photo" = "添加照片";
+"meal.take_photo" = "拍照";
+"meal.choose_from_library" = "从相册选择";
+"meal.carb_level" = "碳水水平";
+"meal.description" = "饮食描述";
+"meal.description_placeholder" = "如\"米饭 + 青菜 + 鸡胸肉\"";
+
+/* Unit Picker */
+"unit.title" = "血糖单位";
+"unit.mmol_region" = "中国、欧洲等地区常用";
+"unit.mgdl_region" = "美国、日本等地区常用";
+
+/* Reminder Settings */
+"reminder.title" = "提醒设置";
+"reminder.notification_permission" = "通知权限";
+"reminder.enabled" = "已开启";
+"reminder.enable_button" = "开启";
+"reminder.measurement_reminders" = "测量提醒";
+"reminder.inactivity_reminder" = "久未记录提醒";
+"reminder.interval" = "提醒间隔";
+"reminder.off" = "关闭";
+"reminder.hours_4" = "4 小时";
+"reminder.hours_6" = "6 小时";
+"reminder.hours_8" = "8 小时";
+"reminder.hours_12" = "12 小时";
+"reminder.save" = "保存提醒设置";
+"reminder.permission_alert" = "需要通知权限";
+"reminder.go_to_settings" = "去设置";
+
+/* Medication Input */
+"medication.save_record" = "保存用药记录";
+"medication.name_placeholder" = "药物名称（可选，如\"诺和锐\"）";
+
+/* PDF Export */
+"pdf.title" = "PDF 报告";
+"pdf.start_date" = "开始日期";
+"pdf.end_date" = "结束日期";
+"pdf.record_type" = "记录类型";
+"pdf.all_records" = "全部记录";
+"pdf.glucose_only" = "仅血糖";
+"pdf.medication_only" = "仅用药";
+"pdf.meal_only" = "仅饮食";
+"pdf.share_report" = "分享报告";
+"generating_report" = "生成报告中...";
+
+/* Medication */
+"medication.edit" = "编辑用药";
+
+"achievement.completed" = "完成";
+
+/* Statistics - Additional */
+"statistics.time_range" = "时间范围";
+"statistics.filter_all" = "全部";
+"statistics.records_near" = "近%@";
+"statistics.glucose_distribution" = "血糖分布";
+"statistics.below_range" = "低于范围";
+"statistics.in_range" = "达标范围";
+"statistics.above_range" = "高于范围";
+"statistics.per_tag_tir" = "各场景达标率";
+"statistics.tag_distribution" = "各场景血糖分布";
+"statistics.meal_pair" = "餐前餐后配对";
+"statistics.spike_hint" = "升幅 > 3.0 标红";
+"statistics.box_typical" = "典型值";
+"statistics.box_range" = "日常范围";
+"statistics.box_target" = "目标区域";
+"statistics.records_count" = "%d次";
+"statistics.range_label" = "范围: %@ - %@ %@";
+"statistics.flat" = "持平";
+"statistics.this_week" = "本周";
+"statistics.last_week" = "上周";
+"statistics.tir_comparison" = "达标率 TIR";
+"statistics.hourly_distribution" = "%@ 时段分布";
+"statistics.insufficient_records_hourly" = "记录不足3条，无法生成时段分布图";
+"statistics.daily_trend" = "%@ 日期趋势";
+"statistics.insufficient_records_daily" = "记录不足3条，无法生成日期趋势表";
+"statistics.date" = "日期";
+"statistics.avg" = "平均";
+"statistics.range" = "范围";
+"statistics.count" = "次数";
+"statistics.in_range_short" = "达标";
+
+/* Log */
+"log.filter_records" = "筛选记录";
+"log.type.glucose" = "血糖";
+"log.type.medication" = "用药";
+"log.type.meal" = "饮食";
+"log.time.today" = "今天";
+"log.time.last_7" = "最近1周";
+"log.time.last_30" = "最近1月";
+"log.time.last_90" = "最近3月";
+"log.time.custom" = "自定义";
+"log.time.all" = "全部";
+"log.custom_range" = "自定义 (%@ - %@)";
+"log.empty.filtered" = "没有符合条件的记录";
+"log.empty.hint" = "尝试调整筛选条件";
+"log.empty.tap_add" = "点击下方 \"+\" 开始记录";
+"log.add_record" = "添加记录";
+"log.delete" = "删除";
+
+/* Chart TimeRange (ChartViewModel) */
+"time_range.7d" = "7天";
+"time_range.14d" = "14天";
+"time_range.30d" = "30天";
+"time_range.90d" = "90天";
+
+/* Notifications */
+"notification.glucose_reminder_title" = "该测血糖了";
+"notification.glucose_reminder_body" = "记得记录您的血糖数据";
+"notification.glucose_reminder_labeled" = "%@ - 记得记录血糖";
+"notification.inactivity_title" = "记录提醒";
+"notification.inactivity_body" = "您已经超过 %d 小时没有记录血糖了";
+
+/* Encouragement Messages */
+"encouragement.week_1" = "坚持一周啦！";
+"encouragement.week_2" = "两周连续记录！";
+"encouragement.month_1" = "满月啦！坚持真棒！";
+"encouragement.day_50" = "连续50天！了不起！";
+"encouragement.day_100" = "百日连续！太厉害了！";
+"encouragement.year_1" = "一整年！持之以恒！";
+
+/* Watch App */
+"watch.latest_glucose" = "最新血糖";
+"watch.no_records" = "暂无记录";
+"watch.record_glucose" = "记录血糖";
+"watch.today" = "今日";
+"watch.count" = "次数";
+"watch.average" = "均值";
+"watch.placeholder_dash" = "--";
+
+/* Daily Summary Card */
+"daily.today_glucose" = "今日血糖";
+"daily.streak_format" = "已连续记录 %d 天";
+"daily.no_records_today" = "今天还未记录血糖";
+"daily.tap_to_start" = "点击右下角 + 按钮开始记录";
+"daily.all_in_range" = "全部达标";
+"daily.control_good" = "控制良好,继续保持!";
+"daily.out_of_range" = "%d次超标";
+"daily.suggestion" = "建议记录饮食,咨询医生";
+"daily.average_format" = "平均 %@";
+"daily.low_warning" = "今日有低血糖记录,请注意安全";
+
+/* Sync Components */
+"sync.status.offline" = "离线";
+"sync.status.syncing" = "同步中";
+"sync.status.synced" = "已同步";
+"sync.status.failed" = "失败";
+"sync.last_sync" = "最后同步: %@";
+"sync.pending_items" = "%d 项待同步";
+"sync.never_synced" = "从未同步";
+"sync.event.import" = "导入";
+"sync.event.export" = "导出";
+"sync.event.setup" = "初始化";
+"sync.error.disabled" = "同步已禁用";
+"sync.error.no_network" = "无网络连接";
+"sync.error.wifi_required" = "需要WiFi";
+"sync.error.account_unavailable" = "iCloud账户不可用";
+
+/* Reminder Settings */
+"reminder.title" = "提醒设置";
+"reminder.notification_permission" = "通知权限";
+"reminder.enabled" = "已开启";
+"reminder.enable_button" = "开启";
+"reminder.measurement_reminders" = "测量提醒";
+"reminder.inactivity_reminder" = "久未记录提醒";
+"reminder.interval" = "未记录提醒间隔";
+"reminder.off" = "关闭";
+"reminder.hours_4" = "4小时";
+"reminder.hours_6" = "6小时";
+"reminder.hours_8" = "8小时";
+"reminder.hours_12" = "12小时";
+"reminder.save" = "保存";
+"reminder.permission_alert" = "需要通知权限";
+"reminder.go_to_settings" = "前往设置";
+"reminder.cancel" = "取消";
+"reminder.permission_message" = "请在系统设置中开启通知权限";
+"reminder.before_breakfast" = "早餐前";
+"reminder.after_breakfast" = "早餐后";
+"reminder.before_lunch" = "午餐前";
+"reminder.after_lunch" = "午餐后";
+"reminder.before_dinner" = "晚餐前";
+"reminder.after_dinner" = "晚餐后";
+"reminder.bedtime" = "睡前";
+
+/* Monthly Report */
+"monthly.title" = "月度总结";
+"monthly.generating" = "生成月度报告...";
+"monthly.share_button" = "分享月度报告";
+"monthly.filename_prefix" = "血糖月度总结";
+
+/* CSV Export */
+"csv.title" = "导出 CSV 数据";
+"csv.date_range_section" = "选择导出范围";
+"csv.start_date" = "开始日期";
+"csv.end_date" = "结束日期";
+"csv.record_type_section" = "记录类型";
+"csv.record_type_label" = "记录类型";
+"csv.summary_section" = "导出摘要";
+"csv.date_range_label" = "日期范围";
+"csv.record_count_label" = "记录数量";
+"csv.records_format" = "%d 条";
+"csv.export_format_label" = "导出格式";
+"csv.export_format_value" = "CSV (Excel 兼容)";
+"csv.export_button" = "导出 CSV 文件";
+"csv.filename_prefix" = "血糖记录";
+
+/* Share Card */
+"share.title" = "分享摘要";
+"share.period_label" = "周期";
+"share.week" = "本周";
+"share.month" = "本月";
+"share.share_button" = "分享卡片";
+
+/* PDF Export */
+"pdf.all_records" = "所有记录";
+"pdf.glucose_only" = "仅血糖";
+"pdf.medication_only" = "仅用药";
+"pdf.meal_only" = "仅饮食";
+"pdf.disclaimer" = "⚠️ 重要提示：本报告仅供参考,不构成医疗建议,请遵医嘱";
+"pdf.report_title" = "血糖记录报告";
+"pdf.report_period" = "报告周期：%@";
+"pdf.record_count" = "%d 次（%d 天有记录，日均 %.1f 次）";
+"pdf.average_glucose" = "平均血糖：%@ %@";
+"pdf.estimated_a1c" = "预估 A1C：%.1f%%";
+"pdf.tir" = "达标率 (TIR)：%.1f%%（目标 > 70%%）";
+"pdf.tar" = "高于范围 (TAR)：%.1f%%（目标 < 25%%）";
+"pdf.tbr" = "低于范围 (TBR)：%.1f%%（目标 < 4%%）";
+"pdf.cv" = "波动系数 (CV%%)：%.1f%%（目标 < 36%%）";
+"pdf.cv_insufficient" = "波动系数 (CV%%)：数据不足";
+"pdf.medication_days" = "用药天数：%d 天";
+"pdf.trend_chart" = "趋势图表";
+"pdf.table_header_date" = "日期";
+"pdf.table_header_time" = "时间";
+"pdf.table_header_type" = "类型";
+"pdf.table_header_value" = "数值/描述";
+"pdf.table_header_scene" = "场景/详情";
+"pdf.table_header_note" = "备注";
+"pdf.type_glucose" = "血糖";
+"pdf.type_medication" = "用药";
+"pdf.type_meal" = "饮食";
+"pdf.meal_record" = "饮食记录";
+"pdf.other" = "其他";
+"pdf.footer_disclaimer" = "免责声明：本报告仅用于信息记录，不作为医疗诊断依据。做出医疗决定前请咨询医生。";
+"pdf.monthly_title" = "%@ 血糖月度总结";
+"pdf.generated_date" = "生成日期：%@";
+"pdf.core_metrics" = "核心指标概览";
+"pdf.total_records" = "总记录次数";
+"pdf.no_records" = "本月暂无记录数据";
+"pdf.scene_compliance" = "各场景达标率（按独立阈值）";
+"pdf.scene_header" = "场景";
+"pdf.record_count_header" = "记录数";
+"pdf.average_header" = "平均值";
+"pdf.compliance_rate_header" = "达标率";
+"pdf.threshold_range_header" = "阈值范围";
+"pdf.scene_distribution" = "各场景血糖分布";
+"pdf.median_header" = "中位数";
+"pdf.q1q3_range_header" = "Q1–Q3 范围";
+"pdf.min_header" = "最低";
+"pdf.max_header" = "最高";
+"pdf.meal_pairing" = "餐前餐后配对分析";
+"pdf.no_pairing_data" = "本月暂无可配对的餐前餐后数据";
+"pdf.meal_time" = "餐次";
+"pdf.pair_count" = "配对数";
+"pdf.avg_rise" = "平均升幅";
+"pdf.max_rise" = "最大升幅";
+"pdf.over_3_count" = "超标次数(>3.0)";
+"pdf.csv_header" = "类型,日期,时间,血糖值,单位,阈值状态,阈值范围,场景,药物类型,药物名称,剂量,饮食描述,碳水等级,备注";
+"pdf.threshold_high" = "偏高 ↑";
+"pdf.threshold_low" = "偏低 ↓";
+"pdf.threshold_normal" = "正常";
+"pdf.weekly_title" = "周报告 - %@";
+"pdf.weekly_overview" = "本周概况";
+"pdf.record_days" = "记录天数";
+"pdf.meal_records" = "饮食记录";
+"pdf.weekly_comparison" = "本周 vs 上周对比";
+"pdf.need_full_history" = "需要完整历史数据进行对比分析";
+"pdf.scene_compliance_short" = "各场景达标率";

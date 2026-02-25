@@ -19,7 +19,7 @@ struct LargeGlucoseWidgetView: View {
             HStack(alignment: .top) {
                 // 左侧：最新血糖
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("最新血糖")
+                    Text(String(localized: "latest.glucose"))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
 
@@ -38,11 +38,11 @@ struct LargeGlucoseWidgetView: View {
 
                 // 右侧：统计卡片
                 VStack(alignment: .trailing, spacing: 4) {
-                    if let mealContext = entry.mealContext {
+                    if let label = entry.sceneTagLabel {
                         HStack(spacing: 2) {
-                            Image(systemName: mealContext.iconName)
+                            Image(systemName: entry.sceneTagIcon ?? "clock")
                                 .font(.caption2)
-                            Text(mealContext.displayName)
+                            Text(label)
                                 .font(.caption2)
                         }
                         .foregroundStyle(.secondary)
@@ -56,7 +56,7 @@ struct LargeGlucoseWidgetView: View {
 
                     // TIR 达标率
                     HStack(spacing: 4) {
-                        Text("TIR")
+                        Text(String(localized: "widget.tir_label"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                         Text("\(Int(entry.tirValue))%")
@@ -76,7 +76,7 @@ struct LargeGlucoseWidgetView: View {
                         Image(systemName: "chart.line.uptrend.xyaxis")
                             .font(.title3)
                             .foregroundStyle(.tertiary)
-                        Text("暂无足够的趋势数据")
+                        Text(String(localized: "widget.data_insufficient"))
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                     }
@@ -96,30 +96,30 @@ struct LargeGlucoseWidgetView: View {
     // MARK: - 趋势图
     private var trendChartSection: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("7 日趋势")
+            Text(String(localized: "widget.7day_trend"))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
 
             Chart {
                 // 正常范围区域
                 RectangleMark(
-                    yStart: .value("低", 3.9),
-                    yEnd: .value("高", 10.0)
+                    yStart: .value(String(localized: "widget.chart_low_label"), 3.9),
+                    yEnd: .value(String(localized: "widget.chart_high_label"), 10.0)
                 )
                 .foregroundStyle(Color.green.opacity(0.08))
 
                 ForEach(entry.weekTrend, id: \.0) { dataPoint in
                     LineMark(
-                        x: .value("日期", dataPoint.0),
-                        y: .value("血糖", dataPoint.1)
+                        x: .value(String(localized: "widget.chart_date_label"), dataPoint.0),
+                        y: .value(String(localized: "widget.chart_glucose_label"), dataPoint.1)
                     )
                     .interpolationMethod(.catmullRom)
                     .foregroundStyle(Color.accentColor)
                     .lineStyle(StrokeStyle(lineWidth: 1.5))
 
                     PointMark(
-                        x: .value("日期", dataPoint.0),
-                        y: .value("血糖", dataPoint.1)
+                        x: .value(String(localized: "widget.chart_date_label"), dataPoint.0),
+                        y: .value(String(localized: "widget.chart_glucose_label"), dataPoint.1)
                     )
                     .symbolSize(12)
                     .foregroundStyle(Color.accentColor)
@@ -146,12 +146,12 @@ struct LargeGlucoseWidgetView: View {
     // MARK: - 最近记录列表
     private var recentRecordsSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("最近记录")
+            Text(String(localized: "recent.records"))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
 
             if entry.recentRecords.isEmpty {
-                Text("暂无记录")
+                Text(String(localized: "empty.no_records"))
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -170,12 +170,12 @@ struct LargeGlucoseWidgetView: View {
                             .font(.system(size: 8))
                             .foregroundStyle(Color(record.glucoseLevel.colorName))
 
-                        // 用餐场景
-                        if let meal = record.mealContext {
+                        // 场景标签
+                        if let label = record.sceneTagLabel {
                             HStack(spacing: 1) {
-                                Image(systemName: meal.iconName)
+                                Image(systemName: record.sceneTagIcon ?? "clock")
                                     .font(.system(size: 8))
-                                Text(meal.displayName)
+                                Text(label)
                                     .font(.system(size: 10))
                             }
                             .foregroundStyle(.secondary)

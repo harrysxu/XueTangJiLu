@@ -13,7 +13,7 @@ extension Date {
     var relativeDescription: String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = Locale.current
         return formatter.localizedString(for: self, relativeTo: .now)
     }
 
@@ -27,16 +27,25 @@ extension Date {
     /// 格式化为 "yyyy年M月d日 HH:mm"
     var fullDateTimeString: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy年M月d日 HH:mm"
+        formatter.locale = Locale.current
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
         return formatter.string(from: self)
     }
 
     /// 格式化为 "M月d日"
     var shortDateString: String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "M月d日"
+        formatter.locale = Locale.current
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: self)
+    }
+    
+    /// 格式化为 "yyyy年M月d日"
+    var mediumDateString: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateStyle = .medium
         return formatter.string(from: self)
     }
 
@@ -58,9 +67,9 @@ extension Date {
     /// 获取日期分组标题（"今日"、"昨日"、"M月d日"）
     var sectionTitle: String {
         if isToday {
-            return "今日记录"
+            return String(localized: "today.records")
         } else if isYesterday {
-            return "昨日记录"
+            return String(localized: "yesterday.records")
         } else {
             return shortDateString
         }

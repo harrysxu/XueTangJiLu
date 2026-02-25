@@ -13,6 +13,7 @@ struct TrendView: View {
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
     @Query private var settingsArray: [UserSettings]
     @State private var chartViewModel = ChartViewModel()
+    @State private var showCustomDatePicker = false
 
     private var settings: UserSettings {
         settingsArray.first ?? UserSettings()
@@ -48,11 +49,11 @@ struct TrendView: View {
                         timeRangePicker
                             .padding(.horizontal, AppConstants.Spacing.lg)
 
-                        // 趋势折线图
+                        // 趋势折线图（使用包络范围作为目标带）
                         TrendLineChart(
                             dataPoints: dataPoints,
-                            targetLow: settings.targetLow,
-                            targetHigh: settings.targetHigh,
+                            targetLow: settings.thresholdEnvelope.low,
+                            targetHigh: settings.thresholdEnvelope.high,
                             unit: unit,
                             selectedPoint: $chartViewModel.selectedPoint
                         )
@@ -60,9 +61,6 @@ struct TrendView: View {
 
                         // 关键指标卡片
                         metricsSection
-
-                        // 波动系数
-                        cvSection
                     }
                 }
                 .padding(.vertical, AppConstants.Spacing.lg)
@@ -74,12 +72,54 @@ struct TrendView: View {
     // MARK: - 时间范围选择器
 
     private var timeRangePicker: some View {
-        Picker("时间范围", selection: $chartViewModel.selectedRange) {
-            ForEach(TimeRange.allCases, id: \.self) { range in
-                Text(range.rawValue).tag(range)
+        VStack(spacing: AppConstants.Spacing.sm) {
+            Picker("时间范围", selection: $chartViewModel.selectedRange) {
+                ForEach(TimeRange.allCases) { range in
+                    Text(range.rawValue).tag(range)
+                }
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: chartViewModel.selectedRange) { _, newValue in
+                if newValue == .custom {
+                    showCustomDatePicker = true
+                }
+            }
+            
+            // 自定义日期范围显示
+            if chartViewModel.selectedRange == .custom {
+                HStack {
+                    Image(systemName: "calendar")
+                        .font(.caption)
+                        .foregroundStyle(Color.brandPrimary)
+                    
+                    Text("\(chartViewModel.customStartDate.shortDateString) - \(chartViewModel.customEndDate.shortDateString)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    
+                    Spacer()
+                    
+                    Button {
+                        showCustomDatePicker = true
+                    } label: {
+                        Text("修改")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(Color.brandPrimary)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.brandPrimary.opacity(0.08))
+                )
             }
         }
-        .pickerStyle(.segmented)
+        .sheet(isPresented: $showCustomDatePicker) {
+            CustomDateRangePickerView(
+                startDate: $chartViewModel.customStartDate,
+                endDate: $chartViewModel.customEndDate
+            )
+        }
     }
 
     // MARK: - 关键指标
@@ -95,21 +135,22 @@ struct TrendView: View {
                     tintColor: averageColor
                 )
 
-                // 预估 A1C
-                StatCardView(
-                    title: "预估 A1C",
-                    value: estimatedA1C,
-                    subtitle: nil
-                )
-            }
-
-            HStack(spacing: AppConstants.Spacing.md) {
                 // TIR 达标率
                 StatCardView(
                     title: "达标率",
                     value: tirValue,
                     subtitle: "目标 > 70%",
                     tintColor: tirColor
+                )
+            }
+
+            HStack(spacing: AppConstants.Spacing.md) {
+                // 波动系数
+                StatCardView(
+                    title: "波动系数",
+                    value: cvValue,
+                    subtitle: "目标 < 36%",
+                    tintColor: cvColor
                 )
 
                 // 记录次数
@@ -121,52 +162,6 @@ struct TrendView: View {
             }
         }
         .padding(.horizontal, AppConstants.Spacing.lg)
-    }
-
-    // MARK: - 波动系数
-
-    private var cvSection: some View {
-        Group {
-            if let cv = GlucoseCalculator.coefficientOfVariation(records: rangeRecords) {
-                HStack {
-                    VStack(alignment: .leading, spacing: AppConstants.Spacing.xs) {
-                        Text("波动系数 (CV%)")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-
-                        HStack(spacing: AppConstants.Spacing.sm) {
-                            Text(String(format: "%.1f%%", cv))
-                                .font(.glucoseMetric)
-
-                            Text(cv < AppConstants.cvStableThreshold ? "稳定" : "波动较大")
-                                .font(.caption)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(
-                                    cv < AppConstants.cvStableThreshold
-                                        ? Color.glucoseNormal.opacity(0.15)
-                                        : Color.glucoseHigh.opacity(0.15)
-                                )
-                                .foregroundStyle(
-                                    cv < AppConstants.cvStableThreshold
-                                        ? Color.glucoseNormal
-                                        : Color.glucoseHigh
-                                )
-                                .clipShape(Capsule())
-                        }
-
-                        Text("目标 < 36%")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
-                    Spacer()
-                }
-                .padding(AppConstants.Spacing.lg)
-                .background(Color(.secondarySystemGroupedBackground))
-                .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                .padding(.horizontal, AppConstants.Spacing.lg)
-            }
-        }
     }
 
     // MARK: - 计算属性
@@ -185,30 +180,34 @@ struct TrendView: View {
         return Color.forGlucoseValue(avg)
     }
 
-    private var estimatedA1C: String {
-        guard let avg = GlucoseCalculator.estimatedAverageGlucose(records: rangeRecords) else {
+    private var cvValue: String {
+        guard let cv = GlucoseCalculator.coefficientOfVariation(records: rangeRecords) else {
             return "--"
         }
-        let a1c = GlucoseCalculator.estimatedA1C(averageGlucoseMmolL: avg)
-        return String(format: "%.1f%%", a1c)
+        return String(format: "%.1f%%", cv)
+    }
+
+    private var cvColor: Color? {
+        guard let cv = GlucoseCalculator.coefficientOfVariation(records: rangeRecords) else {
+            return nil
+        }
+        return cv < AppConstants.cvStableThreshold ? .glucoseNormal : .glucoseHigh
     }
 
     private var tirValue: String {
         guard !rangeRecords.isEmpty else { return "--" }
-        let tir = GlucoseCalculator.timeInRange(
+        let tir = GlucoseCalculator.contextualTimeInRange(
             records: rangeRecords,
-            low: settings.targetLow,
-            high: settings.targetHigh
+            settings: settings
         )
         return "\(Int(tir))%"
     }
 
     private var tirColor: Color? {
         guard !rangeRecords.isEmpty else { return nil }
-        let tir = GlucoseCalculator.timeInRange(
+        let tir = GlucoseCalculator.contextualTimeInRange(
             records: rangeRecords,
-            low: settings.targetLow,
-            high: settings.targetHigh
+            settings: settings
         )
         return tir >= AppConstants.tirGoodThreshold ? .glucoseNormal : .glucoseHigh
     }

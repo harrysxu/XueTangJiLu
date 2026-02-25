@@ -1,0 +1,3 @@
+/* Health Permission Descriptions */
+"NSHealthShareUsageDescription" = "Blood Glucose Record needs to read your glucose data to display your complete glucose history in the app.";
+"NSHealthUpdateUsageDescription" = "Blood Glucose Record needs to sync your manually entered glucose data to the Health app for secure backup.";

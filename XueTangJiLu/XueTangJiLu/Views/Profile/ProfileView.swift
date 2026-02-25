@@ -17,6 +17,9 @@ struct ProfileView: View {
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
     @State private var showExportPDF = false
     @State private var showExportCSV = false
+    #if DEBUG
+    @State private var showTestDataGenerator = false
+    #endif
 
     private var settings: UserSettings {
         if let existing = settingsArray.first {
@@ -75,7 +78,12 @@ struct ProfileView: View {
                 .padding(.vertical, AppConstants.Spacing.lg)
             }
             .background(Color.pageBackground)
-            .navigationTitle("我的")
+            .toolbar(.hidden, for: .navigationBar)
+            #if DEBUG
+            .sheet(isPresented: $showTestDataGenerator) {
+                TestDataGeneratorView()
+            }
+            #endif
         }
     }
 
@@ -87,16 +95,21 @@ struct ProfileView: View {
             Image(systemName: "person.circle.fill")
                 .font(.system(size: 56))
                 .foregroundStyle(Color.brandPrimary.opacity(0.7))
+                #if DEBUG
+                .onTapGesture(count: 3) {
+                    showTestDataGenerator = true
+                }
+                #endif
 
             VStack(alignment: .leading, spacing: AppConstants.Spacing.xs) {
-                Text("控糖达人")
+                Text(String(localized: "profile.nickname"))
                     .font(.title3.weight(.semibold))
 
                 HStack(spacing: AppConstants.Spacing.lg) {
                     VStack(alignment: .leading) {
                         Text("\(allRecords.count)")
                             .font(.glucoseCallout)
-                        Text("总记录")
+                        Text(String(localized: "profile.total"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -104,7 +117,7 @@ struct ProfileView: View {
                     VStack(alignment: .leading) {
                         Text("\(totalDays)")
                             .font(.glucoseCallout)
-                        Text("天")
+                        Text(String(localized: "profile.days"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -113,7 +126,7 @@ struct ProfileView: View {
                         Text("\(streakDays)")
                             .font(.glucoseCallout)
                             .foregroundStyle(Color("GlucoseNormal"))
-                        Text("连续")
+                        Text(String(localized: "profile.streak"))
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -134,30 +147,30 @@ struct ProfileView: View {
 
     private var achievementSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
-            Text("成就徽章")
+            Text(String(localized: "profile.achievements"))
                 .font(.subheadline.weight(.semibold))
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: AppConstants.Spacing.md) {
                     achievementBadge(
                         icon: "flame.fill",
-                        title: "连续记录",
-                        subtitle: "\(streakDays) 天",
+                        title: String(localized: "achievement.streak"),
+                        subtitle: "\(streakDays) \(String(localized: "profile.days"))",
                         isAchieved: streakDays >= 3,
                         color: .orange
                     )
 
                     achievementBadge(
                         icon: "star.fill",
-                        title: "初次记录",
-                        subtitle: "完成",
+                        title: String(localized: "achievement.first"),
+                        subtitle: String(localized: "achievement.completed"),
                         isAchieved: !allRecords.isEmpty,
                         color: .yellow
                     )
 
                     achievementBadge(
                         icon: "chart.bar.fill",
-                        title: "百次记录",
+                        title: String(localized: "achievement.hundred"),
                         subtitle: "\(allRecords.count)/100",
                         isAchieved: allRecords.count >= 100,
                         color: Color.brandPrimary
@@ -165,12 +178,12 @@ struct ProfileView: View {
 
                     achievementBadge(
                         icon: "target",
-                        title: "TIR达标",
+                        title: String(localized: "achievement.tir"),
                         subtitle: "> 70%",
                         isAchieved: {
                             let week = allRecords.filter { $0.timestamp >= Date.daysAgo(7) }
                             guard !week.isEmpty else { return false }
-                            let tir = GlucoseCalculator.timeInRange(records: week, low: settings.targetLow, high: settings.targetHigh)
+                            let tir = GlucoseCalculator.contextualTimeInRange(records: week, settings: settings)
                             return tir >= 70
                         }(),
                         color: Color("GlucoseNormal")
@@ -206,49 +219,37 @@ struct ProfileView: View {
 
     private var preferencesSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-            Text("偏好设置")
+            Text(String(localized: "profile.preferences"))
                 .font(.subheadline.weight(.semibold))
 
             VStack(spacing: 0) {
-                settingsRow(icon: "scalemass", title: "血糖单位", detail: settings.preferredUnit.rawValue) {
+                settingsRow(icon: "scalemass", title: String(localized: "profile.unit"), detail: settings.preferredUnit.rawValue) {
                     UnitPickerView()
                 }
 
                 Divider().padding(.leading, 52)
 
-                settingsRow(icon: "target", title: "目标范围", detail: "\(targetLowDisplay) - \(targetHighDisplay)") {
-                    TargetRangeSettingsView()
-                }
-
-                Divider().padding(.leading, 52)
-
-                settingsRow(icon: "bell.badge", title: "提醒设置", detail: reminderSummary) {
+                settingsRow(icon: "bell.badge", title: String(localized: "profile.reminders"), detail: reminderSummary) {
                     ReminderSettingsView()
                 }
 
                 Divider().padding(.leading, 52)
 
-                HStack(spacing: AppConstants.Spacing.md) {
-                    Image(systemName: "wand.and.stars")
-                        .font(.body)
-                        .foregroundStyle(Color.brandPrimary)
-                        .frame(width: 28)
-                    Text("智能标签")
-                        .font(.subheadline)
-                    Spacer()
-                    Toggle("", isOn: Binding(
-                        get: { settings.autoTagEnabled },
-                        set: { settings.autoTagEnabled = $0 }
-                    ))
+                settingsRow(icon: "tag", title: String(localized: "profile.tag_management"), detail: tagManagementSummary) {
+                    TagManagementView()
                 }
-                .padding(.horizontal, AppConstants.Spacing.lg)
-                .padding(.vertical, AppConstants.Spacing.md)
             }
             .background(
                 RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
                     .fill(Color.cardBackground)
             )
         }
+    }
+
+    private var tagManagementSummary: String {
+        let visibleCount = settings.visibleSceneTags.count
+        let annotationCount = settings.visibleAnnotationTags.count
+        return String(format: String(localized: "profile.tag_summary"), visibleCount, annotationCount)
     }
 
     private func settingsRow<Destination: View>(icon: String, title: String, detail: String, @ViewBuilder destination: () -> Destination) -> some View {
@@ -275,24 +276,16 @@ struct ProfileView: View {
         .buttonStyle(.plain)
     }
 
-    private var targetLowDisplay: String {
-        GlucoseUnitConverter.displayString(mmolLValue: settings.targetLow, in: settings.preferredUnit)
-    }
-
-    private var targetHighDisplay: String {
-        GlucoseUnitConverter.displayString(mmolLValue: settings.targetHigh, in: settings.preferredUnit)
-    }
-
     private var reminderSummary: String {
         let enabledCount = settings.reminderConfigs.filter(\.isEnabled).count
-        return enabledCount > 0 ? "\(enabledCount) 个提醒" : "未设置"
+        return enabledCount > 0 ? String(format: String(localized: "profile.reminders_count"), enabledCount) : String(localized: "reminder.not_set")
     }
 
     // MARK: - 数据管理
 
     private var dataManagementSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-            Text("数据管理")
+            Text(String(localized: "profile.data"))
                 .font(.subheadline.weight(.semibold))
 
             VStack(spacing: 0) {
@@ -302,15 +295,15 @@ struct ProfileView: View {
                         .font(.body)
                         .foregroundStyle(.red)
                         .frame(width: 28)
-                    Text("Apple Health")
+                    Text(String(localized: "profile.health"))
                         .font(.subheadline)
                     Spacer()
                     if settings.healthKitSyncEnabled {
-                        Text("已连接")
+                        Text(String(localized: "profile.connected"))
                             .font(.caption)
                             .foregroundStyle(Color("GlucoseNormal"))
                     } else {
-                        Button("连接") {
+                        Button(String(localized: "profile.connect")) {
                             Task {
                                 try? await healthKitManager.requestAuthorization()
                                 settings.healthKitSyncEnabled = healthKitManager.isAuthorized
@@ -326,20 +319,21 @@ struct ProfileView: View {
                 Divider().padding(.leading, 52)
 
                 // iCloud
-                HStack(spacing: AppConstants.Spacing.md) {
-                    Image(systemName: "icloud")
-                        .font(.body)
-                        .foregroundStyle(Color.brandPrimary)
-                        .frame(width: 28)
-                    Text("iCloud 同步")
-                        .font(.subheadline)
-                    Spacer()
-                    Text("自动")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                NavigationLink(destination: SyncSettingsView()) {
+                    HStack(spacing: AppConstants.Spacing.md) {
+                        Image(systemName: "icloud")
+                            .font(.body)
+                            .foregroundStyle(Color.brandPrimary)
+                            .frame(width: 28)
+                        Text(String(localized: "profile.icloud"))
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        SyncStatusBadge()
+                    }
+                    .padding(.horizontal, AppConstants.Spacing.lg)
+                    .padding(.vertical, AppConstants.Spacing.md)
                 }
-                .padding(.horizontal, AppConstants.Spacing.lg)
-                .padding(.vertical, AppConstants.Spacing.md)
 
                 Divider().padding(.leading, 52)
 
@@ -350,7 +344,7 @@ struct ProfileView: View {
                             .font(.body)
                             .foregroundStyle(Color.brandPrimary)
                             .frame(width: 28)
-                        Text("导出 PDF 报告")
+                        Text(String(localized: "profile.export_pdf"))
                             .font(.subheadline)
                             .foregroundStyle(.primary)
                         Spacer()
@@ -365,16 +359,42 @@ struct ProfileView: View {
 
                 Divider().padding(.leading, 52)
 
-                Button(action: exportCSV) {
+                // 月度总结
+                NavigationLink(destination: MonthlyReportView()) {
+                    HStack(spacing: AppConstants.Spacing.md) {
+                        Image(systemName: "calendar.badge.clock")
+                            .font(.body)
+                            .foregroundStyle(Color.brandPrimary)
+                            .frame(width: 28)
+                        Text(String(localized: "profile.monthly_report"))
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.horizontal, AppConstants.Spacing.lg)
+                    .padding(.vertical, AppConstants.Spacing.md)
+                }
+                .buttonStyle(.plain)
+
+                Divider().padding(.leading, 52)
+
+                // 导出 CSV
+                NavigationLink(destination: CSVExportView()) {
                     HStack(spacing: AppConstants.Spacing.md) {
                         Image(systemName: "tablecells")
                             .font(.body)
                             .foregroundStyle(Color.brandPrimary)
                             .frame(width: 28)
-                        Text("导出 CSV 数据")
+                        Text(String(localized: "profile.export_csv"))
                             .font(.subheadline)
                             .foregroundStyle(.primary)
                         Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
                     }
                     .padding(.horizontal, AppConstants.Spacing.lg)
                     .padding(.vertical, AppConstants.Spacing.md)
@@ -389,7 +409,7 @@ struct ProfileView: View {
                             .font(.body)
                             .foregroundStyle(Color.brandPrimary)
                             .frame(width: 28)
-                        Text("分享血糖摘要")
+                        Text(String(localized: "profile.share"))
                             .font(.subheadline)
                             .foregroundStyle(.primary)
                         Spacer()
@@ -409,27 +429,11 @@ struct ProfileView: View {
         }
     }
 
-    private func exportCSV() {
-        let viewModel = SettingsViewModel()
-        let csv = viewModel.generateCSV(records: allRecords, unit: settings.preferredUnit)
-        let data = csv.data(using: .utf8) ?? Data()
-
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("血糖记录_\(Date.now.shortDateString).csv")
-        try? data.write(to: tempURL)
-
-        let activityVC = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            rootVC.present(activityVC, animated: true)
-        }
-    }
-
     // MARK: - 关于
 
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-            Text("关于")
+            Text(String(localized: "profile.about"))
                 .font(.subheadline.weight(.semibold))
 
             VStack(spacing: 0) {
@@ -438,7 +442,7 @@ struct ProfileView: View {
                         .font(.body)
                         .foregroundStyle(Color.brandPrimary)
                         .frame(width: 28)
-                    Text("版本")
+                    Text(String(localized: "profile.version"))
                         .font(.subheadline)
                     Spacer()
                     Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
@@ -456,7 +460,7 @@ struct ProfileView: View {
                             .font(.body)
                             .foregroundStyle(Color.brandPrimary)
                             .frame(width: 28)
-                        Text("隐私政策")
+                        Text(String(localized: "profile.privacy"))
                             .font(.subheadline)
                             .foregroundStyle(.primary)
                         Spacer()
@@ -477,7 +481,7 @@ struct ProfileView: View {
                             .font(.body)
                             .foregroundStyle(Color.brandPrimary)
                             .frame(width: 28)
-                        Text("免责声明")
+                        Text(String(localized: "profile.disclaimer"))
                             .font(.subheadline)
                             .foregroundStyle(.primary)
                         Spacer()
@@ -498,7 +502,7 @@ struct ProfileView: View {
                             .font(.body)
                             .foregroundStyle(.yellow)
                             .frame(width: 28)
-                        Text("给我们评分")
+                        Text(String(localized: "profile.rate"))
                             .font(.subheadline)
                             .foregroundStyle(.primary)
                         Spacer()
@@ -519,75 +523,6 @@ struct ProfileView: View {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             AppStore.requestReview(in: windowScene)
         }
-    }
-}
-
-// MARK: - 目标范围设置子页
-
-struct TargetRangeSettingsView: View {
-    @Query private var settingsArray: [UserSettings]
-
-    private var settings: UserSettings {
-        settingsArray.first ?? UserSettings()
-    }
-
-    var body: some View {
-        Form {
-            Section("目标血糖范围") {
-                HStack {
-                    Text("目标下限")
-                    Spacer()
-                    Text(GlucoseUnitConverter.displayString(mmolLValue: settings.targetLow, in: settings.preferredUnit))
-                        .foregroundStyle(.secondary)
-                    Stepper("", value: Binding(
-                        get: { settings.targetLow },
-                        set: { settings.targetLow = $0 }
-                    ), in: 2.0...6.0, step: 0.1)
-                    .labelsHidden()
-                }
-
-                HStack {
-                    Text("目标上限")
-                    Spacer()
-                    Text(GlucoseUnitConverter.displayString(mmolLValue: settings.targetHigh, in: settings.preferredUnit))
-                        .foregroundStyle(.secondary)
-                    Stepper("", value: Binding(
-                        get: { settings.targetHigh },
-                        set: { settings.targetHigh = $0 }
-                    ), in: 5.0...15.0, step: 0.1)
-                    .labelsHidden()
-                }
-            }
-
-            Section("A1C 目标") {
-                HStack {
-                    Text("目标 A1C")
-                    Spacer()
-                    Text(String(format: "%.1f%%", settings.targetA1C))
-                        .foregroundStyle(.secondary)
-                    Stepper("", value: Binding(
-                        get: { settings.targetA1C },
-                        set: { settings.targetA1C = $0 }
-                    ), in: 4.0...12.0, step: 0.1)
-                    .labelsHidden()
-                }
-            }
-
-            Section("每日记录目标") {
-                HStack {
-                    Text("目标次数")
-                    Spacer()
-                    Text("\(settings.dailyRecordGoal) 次")
-                        .foregroundStyle(.secondary)
-                    Stepper("", value: Binding(
-                        get: { settings.dailyRecordGoal },
-                        set: { settings.dailyRecordGoal = $0 }
-                    ), in: 1...10)
-                    .labelsHidden()
-                }
-            }
-        }
-        .navigationTitle("目标范围")
     }
 }
 

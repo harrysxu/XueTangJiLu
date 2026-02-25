@@ -29,11 +29,11 @@ struct SmallGlucoseWidgetView: View {
             Spacer()
 
             // 场景标签
-            if let mealContext = entry.mealContext {
+            if let label = entry.sceneTagLabel {
                 HStack(spacing: 2) {
-                    Image(systemName: mealContext.iconName)
+                    Image(systemName: entry.sceneTagIcon ?? "clock")
                         .font(.caption2)
-                    Text(mealContext.displayName)
+                    Text(label)
                         .font(.caption2)
                 }
                 .foregroundStyle(.secondary)
@@ -45,7 +45,7 @@ struct SmallGlucoseWidgetView: View {
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             } else {
-                Text("暂无记录")
+                Text(String(localized: "empty.no_records"))
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }

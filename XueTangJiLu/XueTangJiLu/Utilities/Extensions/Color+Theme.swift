@@ -13,9 +13,14 @@ extension Color {
         Color(level.colorName)
     }
 
-    /// 根据血糖值直接获取对应颜色 (mmol/L)
+    /// 根据血糖值直接获取对应颜色 (mmol/L)（通用固定阈值）
     static func forGlucoseValue(_ value: Double) -> Color {
         forGlucoseLevel(GlucoseLevel.from(value: value))
+    }
+
+    /// 根据血糖值 + 标签 ID + 设置获取对应颜色（支持自定义标签）
+    static func forGlucoseValue(_ value: Double, tagId: String, settings: UserSettings) -> Color {
+        forGlucoseLevel(GlucoseLevel.from(value: value, tagId: tagId, settings: settings))
     }
 
     // MARK: - 品牌渐变

@@ -55,7 +55,7 @@ struct ExtraLargeGlucoseWidgetView: View {
 
     private var latestReadingSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("最新血糖")
+            Text(String(localized: "widget.latest_glucose_title"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -72,11 +72,11 @@ struct ExtraLargeGlucoseWidgetView: View {
             }
 
             HStack(spacing: 8) {
-                if let mealContext = entry.mealContext {
+                if let label = entry.sceneTagLabel {
                     HStack(spacing: 2) {
-                        Image(systemName: mealContext.iconName)
+                        Image(systemName: entry.sceneTagIcon ?? "clock")
                             .font(.caption2)
-                        Text(mealContext.displayName)
+                        Text(label)
                             .font(.caption2)
                     }
                     .foregroundStyle(.secondary)
@@ -95,7 +95,7 @@ struct ExtraLargeGlucoseWidgetView: View {
 
     private var tirSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("达标率 (TIR)")
+            Text(String(localized: "widget.tir_title"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -114,10 +114,10 @@ struct ExtraLargeGlucoseWidgetView: View {
                 .frame(width: 50, height: 50)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("3.9 ~ 10.0 mmol/L")
+                    Text(String(localized: "widget.glucose_range"))
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
-                    Text("7 日内 \(entry.weekCount) 次测量")
+                    Text(String(localized: "widget.7day_measurement", defaultValue: "7 日内 \(entry.weekCount) 次测量"))
                         .font(.system(size: 10))
                         .foregroundStyle(.tertiary)
                 }
@@ -129,14 +129,14 @@ struct ExtraLargeGlucoseWidgetView: View {
 
     private var weekStatsSection: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("7 日统计")
+            Text(String(localized: "widget.7day_stats"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             HStack(spacing: 16) {
-                statItem(label: "平均", value: entry.weekAverage, icon: "divide.circle")
-                statItem(label: "最低", value: entry.weekMin, icon: "arrow.down.circle")
-                statItem(label: "最高", value: entry.weekMax, icon: "arrow.up.circle")
+                statItem(label: String(localized: "widget.average_label"), value: entry.weekAverage, icon: "divide.circle")
+                statItem(label: String(localized: "widget.min_label"), value: entry.weekMin, icon: "arrow.down.circle")
+                statItem(label: String(localized: "widget.max_label"), value: entry.weekMax, icon: "arrow.up.circle")
             }
         }
     }
@@ -154,7 +154,7 @@ struct ExtraLargeGlucoseWidgetView: View {
                     .font(.system(.caption2, design: .rounded, weight: .semibold))
                     .monospacedDigit()
             } else {
-                Text("--")
+                Text(String(localized: "widget.placeholder_dash"))
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
@@ -165,7 +165,7 @@ struct ExtraLargeGlucoseWidgetView: View {
 
     private var trendChartSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("7 日趋势")
+            Text(String(localized: "widget.7day_trend_title"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -173,23 +173,23 @@ struct ExtraLargeGlucoseWidgetView: View {
                 Chart {
                     // 正常范围区域
                     RectangleMark(
-                        yStart: .value("低", 3.9),
-                        yEnd: .value("高", 10.0)
+                        yStart: .value(String(localized: "widget.chart_low_label"), 3.9),
+                        yEnd: .value(String(localized: "widget.chart_high_label"), 10.0)
                     )
                     .foregroundStyle(Color.green.opacity(0.08))
 
                     ForEach(entry.weekTrend, id: \.0) { dataPoint in
                         LineMark(
-                            x: .value("日期", dataPoint.0),
-                            y: .value("血糖", dataPoint.1)
+                            x: .value(String(localized: "widget.chart_date_label"), dataPoint.0),
+                            y: .value(String(localized: "widget.chart_glucose_label"), dataPoint.1)
                         )
                         .interpolationMethod(.catmullRom)
                         .foregroundStyle(Color.accentColor)
                         .lineStyle(StrokeStyle(lineWidth: 2))
 
                         PointMark(
-                            x: .value("日期", dataPoint.0),
-                            y: .value("血糖", dataPoint.1)
+                            x: .value(String(localized: "widget.chart_date_label"), dataPoint.0),
+                            y: .value(String(localized: "widget.chart_glucose_label"), dataPoint.1)
                         )
                         .symbolSize(16)
                         .foregroundStyle(Color.accentColor)
@@ -218,7 +218,7 @@ struct ExtraLargeGlucoseWidgetView: View {
                         Image(systemName: "chart.line.uptrend.xyaxis")
                             .font(.title2)
                             .foregroundStyle(.tertiary)
-                        Text("暂无足够的趋势数据")
+                        Text(String(localized: "widget.insufficient_trend"))
                             .font(.caption2)
                             .foregroundStyle(.tertiary)
                     }
@@ -233,14 +233,14 @@ struct ExtraLargeGlucoseWidgetView: View {
 
     private var recentRecordsSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("最近记录")
+            Text(String(localized: "widget.recent_records_title"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             if entry.recentRecords.isEmpty {
                 HStack {
                     Spacer()
-                    Text("暂无记录")
+                    Text(String(localized: "widget.no_records_widget"))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                     Spacer()
@@ -261,12 +261,12 @@ struct ExtraLargeGlucoseWidgetView: View {
                             .foregroundStyle(Color(record.glucoseLevel.colorName))
                             .frame(width: 40, alignment: .leading)
 
-                        // 用餐场景
-                        if let meal = record.mealContext {
+                        // 场景标签
+                        if let label = record.sceneTagLabel {
                             HStack(spacing: 2) {
-                                Image(systemName: meal.iconName)
+                                Image(systemName: record.sceneTagIcon ?? "clock")
                                     .font(.system(size: 9))
-                                Text(meal.displayName)
+                                Text(label)
                                     .font(.system(size: 11))
                             }
                             .foregroundStyle(.secondary)

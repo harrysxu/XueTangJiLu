@@ -14,12 +14,15 @@ struct DashboardView: View {
     @Environment(HealthKitManager.self) private var healthKitManager
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var records: [GlucoseRecord]
     @Query(sort: \MedicationRecord.timestamp, order: .reverse) private var medications: [MedicationRecord]
+    @Query(sort: \MealRecord.timestamp, order: .reverse) private var meals: [MealRecord]
     @Query private var settingsArray: [UserSettings]
     @State private var showRecordInput = false
     @State private var showMedicationInput = false
     @State private var showMealInput = false
     @State private var glucoseViewModel = GlucoseViewModel()
     @State private var medicationViewModel = MedicationViewModel()
+    @State private var showShareSheet = false
+    @State private var shareImage: UIImage?
 
     private var settings: UserSettings {
         settingsArray.first ?? UserSettings()
@@ -40,6 +43,49 @@ struct DashboardView: View {
     private var todayMedications: [MedicationRecord] {
         medications.filter { $0.timestamp.isToday }
     }
+    
+    private var todayMeals: [MealRecord] {
+        meals.filter { $0.timestamp.isToday }
+    }
+    
+    /// 合并的时间轴项目（用于今日记录展示）
+    private enum TimelineItem: Identifiable {
+        case glucose(GlucoseRecord)
+        case medication(MedicationRecord)
+        case meal(MealRecord)
+        
+        var id: String {
+            switch self {
+            case .glucose(let record):
+                return "glucose-\(record.id)"
+            case .medication(let record):
+                return "medication-\(record.id)"
+            case .meal(let record):
+                return "meal-\(record.id)"
+            }
+        }
+        
+        var timestamp: Date {
+            switch self {
+            case .glucose(let record):
+                return record.timestamp
+            case .medication(let record):
+                return record.timestamp
+            case .meal(let record):
+                return record.timestamp
+            }
+        }
+    }
+    
+    /// 今日所有记录的合并时间轴（按时间倒序）
+    private var todayTimelineItems: [TimelineItem] {
+        var items: [TimelineItem] = []
+        items += todayRecords.map { .glucose($0) }
+        items += todayMedications.map { .medication($0) }
+        items += todayMeals.map { .meal($0) }
+        
+        return items.sorted { $0.timestamp > $1.timestamp }
+    }
 
     var body: some View {
         NavigationStack {
@@ -48,8 +94,8 @@ struct DashboardView: View {
                     if records.isEmpty {
                         EmptyStateView(
                             icon: "drop",
-                            title: "还没有任何记录",
-                            subtitle: "点击下方快捷按钮开始记录"
+                            title: String(localized: "empty.no_records"),
+                            subtitle: String(localized: "empty.tap_add")
                         )
                         .frame(maxWidth: .infinity)
                         .padding(.top, 40)
@@ -64,14 +110,9 @@ struct DashboardView: View {
                     // 快捷操作条
                     quickActionBar
 
-                    // 智能洞察卡片
+                    // 今日摘要卡片
                     if !records.isEmpty {
                         insightCard
-                    }
-
-                    // 活动数据
-                    if settings.healthKitSyncEnabled {
-                        activitySection
                     }
 
                     // 最近记录
@@ -105,9 +146,9 @@ struct DashboardView: View {
     private var greetingText: String {
         let hour = Calendar.current.component(.hour, from: .now)
         switch hour {
-        case 5..<12:  return "早上好"
-        case 12..<18: return "下午好"
-        default:      return "晚上好"
+        case 5..<12:  return String(localized: "greeting.morning")
+        case 12..<18: return String(localized: "greeting.afternoon")
+        default:      return String(localized: "greeting.evening")
         }
     }
 
@@ -116,9 +157,10 @@ struct DashboardView: View {
     private var latestGlucoseCard: some View {
         VStack(spacing: AppConstants.Spacing.md) {
             if let latest = latestRecord {
+                let level = latest.glucoseLevel(with: settings)
                 HStack {
                     VStack(alignment: .leading, spacing: AppConstants.Spacing.xs) {
-                        Text("最新血糖")
+                        Text(String(localized: "latest.glucose"))
                             .font(.footnote)
                             .foregroundStyle(.secondary)
 
@@ -126,7 +168,7 @@ struct DashboardView: View {
                             Text(latest.displayValue(in: unit))
                                 .font(.system(size: 48, weight: .bold, design: .rounded))
                                 .monospacedDigit()
-                                .foregroundStyle(Color.forGlucoseLevel(latest.glucoseLevel))
+                                .foregroundStyle(Color.forGlucoseLevel(level))
 
                             Text(unit.rawValue)
                                 .font(.caption)
@@ -134,21 +176,21 @@ struct DashboardView: View {
                         }
 
                         HStack(spacing: AppConstants.Spacing.xs) {
-                            Image(systemName: latest.glucoseLevel.accessoryIconName)
+                            Image(systemName: level.accessoryIconName)
                                 .font(.caption)
-                            Text(latest.glucoseLevel.description)
+                            Text(level.localizedDescription)
                                 .font(.caption.weight(.medium))
                         }
-                        .foregroundStyle(Color.forGlucoseLevel(latest.glucoseLevel))
+                        .foregroundStyle(Color.forGlucoseLevel(level))
                     }
 
                     Spacer()
 
                     VStack(alignment: .trailing, spacing: AppConstants.Spacing.xs) {
                         HStack(spacing: AppConstants.Spacing.xs) {
-                            Image(systemName: latest.mealContext.iconName)
+                            Image(systemName: settings.iconName(for: latest.sceneTagId))
                                 .font(.caption2)
-                            Text(latest.mealContext.displayName)
+                            Text(settings.displayName(for: latest.sceneTagId))
                                 .font(.caption)
                         }
                         .foregroundStyle(.secondary)
@@ -178,7 +220,7 @@ struct DashboardView: View {
         return HStack(spacing: 2) {
             ForEach(Array(recent.enumerated()), id: \.offset) { _, record in
                 RoundedRectangle(cornerRadius: 1)
-                    .fill(Color.forGlucoseLevel(record.glucoseLevel))
+                    .fill(Color.forGlucoseLevel(record.glucoseLevel(with: settings)))
                     .frame(width: 4, height: max(8, CGFloat(record.value / 15.0 * 30)))
             }
         }
@@ -190,29 +232,29 @@ struct DashboardView: View {
     private var todaySummaryGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: AppConstants.Spacing.md) {
             StatCardView(
-                title: "今日记录",
+                title: String(localized: "today.records"),
                 value: "\(todayRecords.count)",
-                subtitle: "目标 \(settings.dailyRecordGoal) 次"
+                subtitle: String(localized: "statistics.count")
             )
 
             StatCardView(
-                title: "今日均值",
+                title: String(localized: "today.average"),
                 value: todayAverage,
-                subtitle: unit.rawValue,
-                tintColor: todayAverageColor
+                tintColor: todayAverageColor,
+                metricType: .averageGlucose
             )
 
             StatCardView(
-                title: "达标率",
+                title: String(localized: "today.tir"),
                 value: todayTIR,
-                subtitle: "TIR",
-                tintColor: todayTIRColor
+                tintColor: todayTIRColor,
+                metricType: .timeInRange
             )
 
             StatCardView(
-                title: "今日用药",
+                title: String(localized: "today.medication"),
                 value: "\(todayMedications.count)",
-                subtitle: "次"
+                subtitle: String(localized: "statistics.count")
             )
         }
     }
@@ -233,20 +275,18 @@ struct DashboardView: View {
 
     private var todayTIR: String {
         guard !todayRecords.isEmpty else { return "--" }
-        let tir = GlucoseCalculator.timeInRange(
+        let tir = GlucoseCalculator.contextualTimeInRange(
             records: todayRecords,
-            low: settings.targetLow,
-            high: settings.targetHigh
+            settings: settings
         )
         return "\(Int(tir))%"
     }
 
     private var todayTIRColor: Color? {
         guard !todayRecords.isEmpty else { return nil }
-        let tir = GlucoseCalculator.timeInRange(
+        let tir = GlucoseCalculator.contextualTimeInRange(
             records: todayRecords,
-            low: settings.targetLow,
-            high: settings.targetHigh
+            settings: settings
         )
         return tir >= AppConstants.tirGoodThreshold ? Color("GlucoseNormal") : Color("GlucoseHigh")
     }
@@ -257,7 +297,7 @@ struct DashboardView: View {
         HStack(spacing: AppConstants.Spacing.xl) {
             quickActionButton(
                 icon: "drop.fill",
-                label: "记录血糖",
+                label: String(localized: "quick.glucose"),
                 color: Color.brandPrimary
             ) {
                 glucoseViewModel.resetInput()
@@ -266,7 +306,7 @@ struct DashboardView: View {
 
             quickActionButton(
                 icon: "syringe.fill",
-                label: "记录用药",
+                label: String(localized: "quick.medication"),
                 color: Color("GlucoseHigh")
             ) {
                 medicationViewModel.resetInput()
@@ -274,8 +314,8 @@ struct DashboardView: View {
             }
 
             quickActionButton(
-                icon: "camera.fill",
-                label: "拍照饮食",
+                icon: "fork.knife",
+                label: String(localized: "quick.meal"),
                 color: Color("GlucoseNormal")
             ) {
                 showMealInput = true
@@ -306,26 +346,33 @@ struct DashboardView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - 智能洞察卡片
+    // MARK: - 今日摘要卡片
 
     private var insightCard: some View {
-        let insight = generateSimpleInsight()
+        let summary = generateTodaySummary()
         return HStack(spacing: AppConstants.Spacing.md) {
-            Image(systemName: "lightbulb.fill")
+            Image(systemName: "chart.bar.doc.horizontal")
                 .font(.title3)
-                .foregroundStyle(.yellow)
+                .foregroundStyle(Color.brandPrimary)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("今日洞察")
+                Text(String(localized: "today.summary.card"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
-                Text(insight)
+                Text(summary)
                     .font(.subheadline)
                     .foregroundStyle(.primary)
                     .lineLimit(2)
             }
 
             Spacer()
+            
+            // 分享按钮
+            Button(action: shareTodaySummary) {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.title3)
+                    .foregroundStyle(Color.brandPrimary)
+            }
         }
         .padding(AppConstants.Spacing.lg)
         .background(
@@ -334,44 +381,17 @@ struct DashboardView: View {
         )
     }
 
-    private func generateSimpleInsight() -> String {
+    private func generateTodaySummary() -> String {
         let count = todayRecords.count
         if count == 0 {
-            return "今天还没有记录，记得按时测血糖"
+            return String(localized: "dashboard.no_records_today")
         }
         if let avg = GlucoseCalculator.estimatedAverageGlucose(records: todayRecords) {
-            let level = GlucoseLevel.from(value: avg)
-            switch level {
-            case .normal:
-                return "今日平均血糖在正常范围内，继续保持！"
-            case .high, .veryHigh:
-                return "今日血糖整体偏高，注意饮食控制和适量运动"
-            case .low:
-                return "今日有低血糖趋势，注意及时补充能量"
-            }
+            let avgStr = GlucoseUnitConverter.displayString(mmolLValue: avg, in: unit)
+            let tir = GlucoseCalculator.contextualTimeInRange(records: todayRecords, settings: settings)
+            return String(localized: "dashboard.today_summary", defaultValue: "今日 \(count) 次记录，均值 \(avgStr) \(unit.rawValue)，达标率 \(Int(tir))%")
         }
-        return "已记录 \(count) 次，保持规律监测的好习惯"
-    }
-
-    // MARK: - 活动数据
-
-    private var activitySection: some View {
-        HStack(spacing: AppConstants.Spacing.md) {
-            StatCardView(
-                title: "今日步数",
-                value: "\(healthKitManager.todaySteps)",
-                subtitle: "步"
-            )
-
-            StatCardView(
-                title: "运动时间",
-                value: "\(healthKitManager.todayExerciseMinutes)",
-                subtitle: "分钟"
-            )
-        }
-        .task {
-            await healthKitManager.refreshActivityData()
-        }
+        return String(localized: "dashboard.recorded_count", defaultValue: "今日已记录 \(count) 次")
     }
 
     // MARK: - 最近记录
@@ -379,30 +399,200 @@ struct DashboardView: View {
     private var recentRecordsSection: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
             HStack {
-                Text("最近记录")
+                Text(String(localized: "today.records"))
                     .font(.subheadline.weight(.semibold))
                 Spacer()
             }
-
-            VStack(spacing: 0) {
-                ForEach(Array(records.prefix(5))) { record in
-                    TimelineRowView(record: record, unit: unit)
-                    if record.id != records.prefix(5).last?.id {
-                        Divider()
-                            .padding(.horizontal, AppConstants.Spacing.lg)
+            
+            if todayTimelineItems.isEmpty {
+                Text(String(localized: "dashboard.no_records_today"))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, AppConstants.Spacing.lg)
+                    .background(
+                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                            .fill(Color.cardBackground)
+                    )
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(Array(todayTimelineItems.enumerated()), id: \.element.id) { index, item in
+                        Group {
+                            switch item {
+                            case .glucose(let record):
+                                NavigationLink(destination: GlucoseRecordDetailView(record: record)) {
+                                    TimelineRowView(record: record, unit: unit, settings: settings)
+                                }
+                                .buttonStyle(.plain)
+                            case .medication(let medication):
+                                MedicationRowView(record: medication)
+                            case .meal(let meal):
+                                MealRowView(record: meal)
+                            }
+                        }
+                        
+                        if index < todayTimelineItems.count - 1 {
+                            Divider()
+                                .padding(.horizontal, AppConstants.Spacing.lg)
+                        }
                     }
                 }
+                .background(
+                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                        .fill(Color.cardBackground)
+                )
             }
-            .background(
-                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
-                    .fill(Color.cardBackground)
-            )
         }
+    }
+    
+    // MARK: - 分享今日摘要
+    
+    private func shareTodaySummary() {
+        // 生成今日摘要卡片图片
+        guard let image = generateTodaySummaryImage() else {
+            return
+        }
+        
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("今日血糖摘要_\(Date.now.shortDateString).png")
+        
+        if let pngData = image.pngData() {
+            try? pngData.write(to: tempURL)
+            
+            let activityVC = UIActivityViewController(
+                activityItems: [tempURL],
+                applicationActivities: nil
+            )
+            
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let rootVC = windowScene.windows.first?.rootViewController {
+                rootVC.present(activityVC, animated: true)
+            }
+        }
+    }
+    
+    /// 生成今日摘要图片
+    private func generateTodaySummaryImage() -> UIImage? {
+        let cardWidth: CGFloat = 375
+        let cardHeight: CGFloat = 500
+        
+        let renderer = ImageRenderer(content: todaySummaryCardView)
+        renderer.scale = UIScreen.main.scale
+        renderer.proposedSize = ProposedViewSize(width: cardWidth, height: cardHeight)
+        
+        return renderer.uiImage
+    }
+    
+    /// 今日摘要卡片视图（用于生成图片）
+    private var todaySummaryCardView: some View {
+        VStack(spacing: 24) {
+            // 品牌标题
+            HStack {
+                Text(String(localized: "app.name"))
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(.white)
+                Spacer()
+                Image(systemName: "drop.fill")
+                    .font(.title2)
+                    .foregroundStyle(.white.opacity(0.8))
+            }
+            
+            // 日期
+            Text(String(localized: "share.today_summary", defaultValue: "今日血糖摘要 · \(Date.now.mediumDateString)"))
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.9))
+            
+            // 主要指标
+            VStack(spacing: 20) {
+                // 记录次数和均值
+                HStack(spacing: 32) {
+                    metricItem(
+                        title: String(localized: "statistics.count"),
+                        value: "\(todayRecords.count)",
+                        unit: String(localized: "dashboard.times")
+                    )
+                    
+                    if let avg = GlucoseCalculator.estimatedAverageGlucose(records: todayRecords) {
+                        metricItem(
+                            title: String(localized: "statistics.average"),
+                            value: GlucoseUnitConverter.displayString(mmolLValue: avg, in: unit),
+                            unit: unit.rawValue
+                        )
+                    }
+                }
+                
+                // 达标率和用药
+                HStack(spacing: 32) {
+                    if !todayRecords.isEmpty {
+                        let tir = GlucoseCalculator.contextualTimeInRange(records: todayRecords, settings: settings)
+                        metricItem(
+                            title: String(localized: "statistics.tir"),
+                            value: String(format: "%.0f", tir),
+                            unit: "%"
+                        )
+                    }
+                    
+                    metricItem(
+                        title: String(localized: "dashboard.medication_count"),
+                        value: "\(todayMedications.count)",
+                        unit: String(localized: "dashboard.times")
+                    )
+                }
+            }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.white)
+            )
+            
+            Spacer()
+            
+            // 底部提示
+            VStack(spacing: 8) {
+                Text("继续保持良好的记录习惯")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.8))
+                
+                Text("本摘要仅供参考，不构成医疗建议")
+                    .font(.system(size: 9))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+        }
+        .padding(32)
+        .frame(width: 375, height: 500)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color.brandPrimary,
+                    Color.brandPrimary.opacity(0.8)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+    }
+    
+    private func metricItem(title: String, value: String, unit: String) -> some View {
+        VStack(spacing: 4) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            
+            HStack(alignment: .lastTextBaseline, spacing: 2) {
+                Text(value)
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                Text(unit)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
 #Preview {
     DashboardView()
-        .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self], inMemory: true)
+        .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self, MealRecord.self], inMemory: true)
         .environment(HealthKitManager())
 }

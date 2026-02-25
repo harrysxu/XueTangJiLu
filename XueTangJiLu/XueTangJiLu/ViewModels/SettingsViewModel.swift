@@ -15,6 +15,9 @@ final class SettingsViewModel {
     /// PDF 导出日期范围
     var exportStartDate: Date = Date.daysAgo(30)
     var exportEndDate: Date = .now
+    
+    /// 导出记录类型
+    var exportRecordType: ExportRecordType = .all
 
     /// 导出日期范围字符串
     var exportDateRange: String {
@@ -22,22 +25,57 @@ final class SettingsViewModel {
     }
 
     /// 生成 PDF 数据
-    func generatePDF(records: [GlucoseRecord], unit: GlucoseUnit) -> Data {
-        let filtered = records.filter {
+    func generatePDF(
+        records: [GlucoseRecord], 
+        unit: GlucoseUnit, 
+        settings: UserSettings,
+        medications: [MedicationRecord] = [],
+        meals: [MealRecord] = []
+    ) -> Data {
+        let filteredRecords = records.filter {
+            $0.timestamp >= exportStartDate && $0.timestamp <= exportEndDate
+        }
+        let filteredMedications = medications.filter {
+            $0.timestamp >= exportStartDate && $0.timestamp <= exportEndDate
+        }
+        let filteredMeals = meals.filter {
             $0.timestamp >= exportStartDate && $0.timestamp <= exportEndDate
         }
         return PDFExportService.generateReport(
-            records: filtered,
+            records: filteredRecords,
             dateRange: exportDateRange,
-            unit: unit
+            unit: unit,
+            settings: settings,
+            medications: filteredMedications,
+            meals: filteredMeals,
+            recordType: exportRecordType
         )
     }
 
     /// 生成 CSV 数据
-    func generateCSV(records: [GlucoseRecord], unit: GlucoseUnit) -> String {
-        let filtered = records.filter {
+    func generateCSV(
+        records: [GlucoseRecord], 
+        unit: GlucoseUnit, 
+        settings: UserSettings,
+        medications: [MedicationRecord] = [],
+        meals: [MealRecord] = []
+    ) -> String {
+        let filteredRecords = records.filter {
             $0.timestamp >= exportStartDate && $0.timestamp <= exportEndDate
         }
-        return PDFExportService.generateCSV(records: filtered, unit: unit)
+        let filteredMedications = medications.filter {
+            $0.timestamp >= exportStartDate && $0.timestamp <= exportEndDate
+        }
+        let filteredMeals = meals.filter {
+            $0.timestamp >= exportStartDate && $0.timestamp <= exportEndDate
+        }
+        return PDFExportService.generateCSV(
+            records: filteredRecords, 
+            unit: unit, 
+            settings: settings,
+            medications: filteredMedications,
+            meals: filteredMeals,
+            recordType: exportRecordType
+        )
     }
 }

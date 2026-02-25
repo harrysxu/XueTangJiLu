@@ -18,8 +18,8 @@ struct GlucoseHomeWidget: Widget {
             GlucoseHomeWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("血糖记录")
-        .description("显示最新血糖读数、趋势和记录")
+        .configurationDisplayName(String(localized: "widget.glucose_home.name"))
+        .description(String(localized: "widget.glucose_home.description"))
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge])
     }
 }

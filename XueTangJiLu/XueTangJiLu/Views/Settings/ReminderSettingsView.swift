@@ -13,7 +13,7 @@ struct ReminderSettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var settingsArray: [UserSettings]
     @State private var notificationManager = NotificationManager()
-    @State private var reminders: [ReminderConfig] = ReminderConfig.defaults
+    @State private var reminders: [ReminderConfig] = ReminderConfig.localizedDefaults()
     @State private var inactivityHours: Int = 0
     @State private var showAuthAlert = false
 
@@ -26,14 +26,14 @@ struct ReminderSettingsView: View {
             // 授权状态
             Section {
                 HStack {
-                    Label("通知权限", systemImage: "bell.badge")
+                    Label(String(localized: "reminder.notification_permission"), systemImage: "bell.badge")
                     Spacer()
                     if notificationManager.isAuthorized {
-                        Text("已开启")
+                        Text(String(localized: "reminder.enabled"))
                             .font(.caption)
                             .foregroundStyle(.green)
                     } else {
-                        Button("开启") {
+                        Button(String(localized: "reminder.enable_button")) {
                             Task {
                                 let granted = await notificationManager.requestAuthorization()
                                 if !granted {
@@ -47,7 +47,7 @@ struct ReminderSettingsView: View {
             }
 
             // 测量提醒
-            Section("测量提醒") {
+            Section(String(localized: "reminder.measurement_reminders")) {
                 ForEach($reminders) { $reminder in
                     HStack {
                         Toggle(isOn: $reminder.isEnabled) {
@@ -64,20 +64,20 @@ struct ReminderSettingsView: View {
             }
 
             // 久未记录提醒
-            Section("久未记录提醒") {
-                Picker("提醒间隔", selection: $inactivityHours) {
-                    Text("关闭").tag(0)
-                    Text("4 小时").tag(4)
-                    Text("6 小时").tag(6)
-                    Text("8 小时").tag(8)
-                    Text("12 小时").tag(12)
+            Section(String(localized: "reminder.inactivity_reminder")) {
+                Picker(String(localized: "reminder.interval"), selection: $inactivityHours) {
+                    Text(String(localized: "reminder.off")).tag(0)
+                    Text(String(localized: "reminder.hours_4")).tag(4)
+                    Text(String(localized: "reminder.hours_6")).tag(6)
+                    Text(String(localized: "reminder.hours_8")).tag(8)
+                    Text(String(localized: "reminder.hours_12")).tag(12)
                 }
             }
 
             // 保存
             Section {
                 Button(action: saveReminders) {
-                    Text("保存提醒设置")
+                    Text(String(localized: "reminder.save"))
                         .font(.body.weight(.semibold))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -89,20 +89,20 @@ struct ReminderSettingsView: View {
                 .listRowBackground(Color.clear)
             }
         }
-        .navigationTitle("提醒设置")
+        .navigationTitle(String(localized: "reminder.title"))
         .task {
             await notificationManager.checkAuthorizationStatus()
             loadReminders()
         }
-        .alert("需要通知权限", isPresented: $showAuthAlert) {
-            Button("去设置") {
+        .alert(String(localized: "reminder.permission_alert"), isPresented: $showAuthAlert) {
+            Button(String(localized: "reminder.go_to_settings")) {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }
             }
-            Button("取消", role: .cancel) {}
+            Button(String(localized: "reminder.cancel"), role: .cancel) {}
         } message: {
-            Text("请在系统设置中开启通知权限")
+            Text(String(localized: "reminder.permission_message"))
         }
     }
 

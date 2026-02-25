@@ -1,0 +1,3 @@
+/* Health Permission Descriptions */
+"NSHealthShareUsageDescription" = "血糖記錄需要讀取您的血糖數據，以便在應用內展示完整的血糖記錄歷史。";
+"NSHealthUpdateUsageDescription" = "血糖記錄需要將您手動輸入的血糖數據同步到「健康」應用中，確保數據安全備份。";
