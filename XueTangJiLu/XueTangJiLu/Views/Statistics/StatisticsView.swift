@@ -10,6 +10,7 @@ import SwiftData
 
 /// 统计 Tab - 趋势图表 + 数据统计
 struct StatisticsView: View {
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
     @Query private var settingsArray: [UserSettings]
     @State private var chartViewModel = ChartViewModel()
@@ -22,13 +23,22 @@ struct StatisticsView: View {
     private var unit: GlucoseUnit {
         settings.preferredUnit
     }
+    
+    /// 根据付费状态过滤历史数据
+    private var displayRecords: [GlucoseRecord] {
+        if let daysLimit = FeatureManager.historyDaysLimit(isPremium: subscriptionManager.isPremiumUser) {
+            let cutoffDate = Calendar.current.date(byAdding: .day, value: -daysLimit, to: .now)!
+            return allRecords.filter { $0.timestamp >= cutoffDate }
+        }
+        return allRecords
+    }
 
     private var rangeRecords: [GlucoseRecord] {
-        chartViewModel.filteredRecords(from: allRecords, settings: settings)
+        chartViewModel.filteredRecords(from: displayRecords, settings: settings)
     }
 
     private var dataPoints: [ChartDataPoint] {
-        chartViewModel.dataPoints(from: allRecords, settings: settings)
+        chartViewModel.dataPoints(from: displayRecords, settings: settings)
     }
 
     /// 当前筛选的有效阈值
@@ -44,6 +54,13 @@ struct StatisticsView: View {
 
                 ScrollView {
                     VStack(spacing: AppConstants.Spacing.xl) {
+                        // 历史数据限制提示
+                        if !subscriptionManager.isPremiumUser, 
+                           let daysLimit = FeatureManager.historyDaysLimit(isPremium: false) {
+                            LimitationBanner(limitationType: .historyDays(days: daysLimit))
+                                .padding(.top)
+                        }
+                        
                         if allRecords.isEmpty {
                             EmptyStateView(
                                 icon: "chart.bar.xaxis",
@@ -77,19 +94,16 @@ struct StatisticsView: View {
                             // TAR / TBR 卡片
                             tarTbrCard
 
-                            // 按标签 TIR 对比图
-                            perTagTIRChart
-
-                            // 餐前餐后配对图
-                            mealPairChart
-                            
-                            // 周对比
-                            weeklyComparison
-                            
-                            // 单场景专属图表
-                            singleSceneHourlyDistribution
-                            singleSceneDailyTrend
-                            tagDistributionChart
+                            if FeatureManager.canAccessFeature(.advancedCharts, isPremium: subscriptionManager.isPremiumUser) {
+                                perTagTIRChart
+                                mealPairChart
+                                weeklyComparison
+                                singleSceneHourlyDistribution
+                                singleSceneDailyTrend
+                                tagDistributionChart
+                            } else {
+                                FeatureLockView(feature: .advancedCharts)
+                            }
                         }
                     }
                     .padding(.horizontal, AppConstants.Spacing.lg)
@@ -1255,4 +1269,5 @@ struct StatisticsView: View {
 #Preview {
     StatisticsView()
         .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self], inMemory: true)
+        .environment(SubscriptionManager())
 }

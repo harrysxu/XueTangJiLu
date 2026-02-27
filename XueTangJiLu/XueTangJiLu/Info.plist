@@ -2,10 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>控糖助手需要访问您的相机以拍摄饮食照片，帮助您记录饮食信息。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>控糖助手需要访问您的相册以选择饮食照片，帮助您记录饮食信息。</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>学糖记录需要读取您的血糖数据，以便在应用内展示完整的血糖记录历史。</string>
+	<string>控糖助手需要读取您的血糖数据，以便在应用内展示完整的血糖记录历史。</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>学糖记录需要将您手动输入的血糖数据同步到"健康"应用中，确保数据安全备份。</string>
+	<string>控糖助手需要将您手动输入的血糖数据同步到"健康"应用中，确保数据安全备份。</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

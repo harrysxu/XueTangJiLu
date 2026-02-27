@@ -288,7 +288,9 @@ struct FactoryResetView: View {
                 isResetting = false
                 resetComplete = true
             } catch {
+                #if DEBUG
                 print("重置失败: \(error)")
+                #endif
                 HapticManager.warning()
                 isResetting = false
             }

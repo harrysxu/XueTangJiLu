@@ -1,5 +1,5 @@
 /* Widget Strings */
-"app.name" = "Blood Glucose Record";
+"app.name" = "Glucose Control Assistant";
 "latest.glucose" = "Latest Glucose";
 "empty.no_records" = "No records yet";
 "widget.no_data" = "No Data";

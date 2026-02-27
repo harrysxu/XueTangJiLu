@@ -34,7 +34,7 @@ struct MealRowView: View {
                         .font(.subheadline)
                         .lineLimit(1)
                 } else {
-                    Text("饮食记录")
+                    Text("meal.record", bundle: .main)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -42,7 +42,7 @@ struct MealRowView: View {
                 HStack(spacing: AppConstants.Spacing.xs) {
                     Image(systemName: record.carbLevel.iconName)
                         .font(.caption2)
-                    Text(record.carbLevel.displayName)
+                    Text(record.carbLevel.localizedDisplayName)
                         .font(.caption)
                 }
                 .foregroundStyle(Color(record.carbLevel.colorName))
@@ -66,7 +66,7 @@ struct MealRowView: View {
         .padding(.vertical, AppConstants.Spacing.md)
         .padding(.horizontal, AppConstants.Spacing.lg)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(record.timestamp.timeString) \(record.carbLevel.displayName) \(record.mealDescription)")
+        .accessibilityLabel("\(record.timestamp.timeString) \(record.carbLevel.localizedDisplayName) \(record.mealDescription)")
         .accessibilityHint("轻点可编辑，右划可删除")
     }
 }

@@ -13,9 +13,13 @@ struct RecordInputView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(HealthKitManager.self) private var healthKitManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query private var settingsArray: [UserSettings]
-    @Binding var viewModel: GlucoseViewModel
+    @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
+    @Bindable var viewModel: GlucoseViewModel
     @State private var showDatePicker = false
+    @State private var showAllScenes = false
+    @State private var showUpgradeAlert = false
 
     private var settings: UserSettings {
         settingsArray.first ?? UserSettings()
@@ -23,6 +27,19 @@ struct RecordInputView: View {
 
     private var unit: GlucoseUnit {
         settings.preferredUnit
+    }
+    
+    /// 今日已有记录数
+    private var todayRecordsCount: Int {
+        allRecords.filter { $0.timestamp.isToday }.count
+    }
+    
+    /// 剩余可用记录数
+    private var remainingRecords: Int? {
+        FeatureManager.remainingRecordsToday(
+            todayRecordsCount: todayRecordsCount,
+            isPremium: subscriptionManager.isPremiumUser
+        )
     }
 
     /// 当前输入值对应的颜色（场景感知）
@@ -36,6 +53,13 @@ struct RecordInputView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                // 限制提示横幅
+                if !subscriptionManager.isPremiumUser, let remaining = remainingRecords {
+                    LimitationBanner(limitationType: .dailyRecords(remaining: remaining, total: 5))
+                        .padding(.horizontal, AppConstants.Spacing.lg)
+                        .padding(.top, AppConstants.Spacing.sm)
+                }
+                
                 // 数值预览区域（带渐变背景）
                 valuePreviewSection
                     .padding(.top, AppConstants.Spacing.sm)
@@ -88,6 +112,9 @@ struct RecordInputView: View {
                         }
                     }
                 }
+            }
+            .sheet(isPresented: $showAllScenes) {
+                allScenesSheet
             }
         }
     }
@@ -154,7 +181,7 @@ struct RecordInputView: View {
                 // "更多"按钮(如果有隐藏的场景)
                 if settings.visibleSceneTags.count > settings.recommendedSceneTags.count {
                     Button(action: {
-                        // TODO: 显示所有场景的弹窗
+                        showAllScenes = true
                     }) {
                         HStack(spacing: 4) {
                             Image(systemName: "ellipsis")
@@ -300,6 +327,15 @@ struct RecordInputView: View {
 
     private var saveButton: some View {
         Button(action: {
+            // 检查是否达到每日限制
+            if FeatureManager.hasReachedDailyLimit(
+                todayRecordsCount: todayRecordsCount,
+                isPremium: subscriptionManager.isPremiumUser
+            ) {
+                showUpgradeAlert = true
+                return
+            }
+            
             Task {
                 await viewModel.saveRecord(
                     modelContext: modelContext,
@@ -332,6 +368,68 @@ struct RecordInputView: View {
         .disabled(!viewModel.isSaveEnabled(unit: unit) || viewModel.isSaving)
         .accessibilityLabel("\(viewModel.isEditMode ? String(localized: "record.save_changes") : String(localized: "save.record")) \(viewModel.inputText) \(unit.rawValue) \(settings.displayName(for: viewModel.selectedSceneTagId))")
         .accessibilityIdentifier("saveRecord")
+        .featureLockAlert(isPresented: $showUpgradeAlert, feature: .unlimitedRecords)
+    }
+    
+    // MARK: - 所有场景选择Sheet
+    
+    private var allScenesSheet: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ], spacing: AppConstants.Spacing.md) {
+                    ForEach(settings.visibleSceneTags) { tag in
+                        Button(action: {
+                            viewModel.selectedSceneTagId = tag.id
+                            HapticManager.selection()
+                            showAllScenes = false
+                        }) {
+                            VStack(spacing: AppConstants.Spacing.xs) {
+                                Image(systemName: tag.icon)
+                                    .font(.title2)
+                                Text(tag.label)
+                                    .font(.caption)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, AppConstants.Spacing.md)
+                            .background(
+                                viewModel.selectedSceneTagId == tag.id
+                                    ? Color.brandPrimary.opacity(0.15)
+                                    : Color(.tertiarySystemGroupedBackground)
+                            )
+                            .foregroundStyle(
+                                viewModel.selectedSceneTagId == tag.id
+                                    ? Color.brandPrimary
+                                    : .primary
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                                    .stroke(
+                                        viewModel.selectedSceneTagId == tag.id ? Color.brandPrimary : Color.clear,
+                                        lineWidth: 1.5
+                                    )
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(AppConstants.Spacing.lg)
+            }
+            .navigationTitle(String(localized: "record.select_scene"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String(localized: "done")) {
+                        showAllScenes = false
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
     }
 }
 
@@ -363,7 +461,9 @@ private struct QuickTimeButton: View {
 }
 
 #Preview {
-    RecordInputView(viewModel: .constant(GlucoseViewModel()))
+    @Previewable @State var viewModel = GlucoseViewModel()
+    RecordInputView(viewModel: viewModel)
         .modelContainer(for: [GlucoseRecord.self, UserSettings.self], inMemory: true)
         .environment(HealthKitManager())
+        .environment(SubscriptionManager())
 }

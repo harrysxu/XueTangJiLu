@@ -12,8 +12,8 @@ import SwiftData
 
 /// 单条提醒配置
 struct ReminderConfig: Identifiable, Codable, Equatable {
-    let id: String
-    var label: String       // 如"早餐前"、"午餐后"
+    let id: String          // UUID 字符串
+    var sceneTagId: String  // 引用 SceneTag.id
     var hour: Int           // 0-23
     var minute: Int         // 0-59
     var isEnabled: Bool
@@ -22,28 +22,22 @@ struct ReminderConfig: Identifiable, Codable, Equatable {
     var timeString: String {
         String(format: "%02d:%02d", hour, minute)
     }
-
-    /// 默认提醒配置列表
-    static let defaults: [ReminderConfig] = [
-        ReminderConfig(id: "morning", label: "早餐前", hour: 7, minute: 0, isEnabled: false),
-        ReminderConfig(id: "after_breakfast", label: "早餐后", hour: 9, minute: 30, isEnabled: false),
-        ReminderConfig(id: "before_lunch", label: "午餐前", hour: 11, minute: 30, isEnabled: false),
-        ReminderConfig(id: "after_lunch", label: "午餐后", hour: 14, minute: 0, isEnabled: false),
-        ReminderConfig(id: "before_dinner", label: "晚餐前", hour: 17, minute: 30, isEnabled: false),
-        ReminderConfig(id: "after_dinner", label: "晚餐后", hour: 20, minute: 0, isEnabled: false),
-        ReminderConfig(id: "bedtime", label: "睡前", hour: 22, minute: 0, isEnabled: false),
-    ]
+    
+    /// 从场景标签列表获取标签名称
+    func label(from sceneTags: [SceneTag]) -> String {
+        sceneTags.first(where: { $0.id == sceneTagId })?.label ?? String(localized: "meal.other")
+    }
     
     /// 生成本地化的默认提醒配置列表
     static func localizedDefaults() -> [ReminderConfig] {
         return [
-            ReminderConfig(id: "morning", label: String(localized: "reminder.before_breakfast"), hour: 7, minute: 0, isEnabled: false),
-            ReminderConfig(id: "after_breakfast", label: String(localized: "reminder.after_breakfast"), hour: 9, minute: 30, isEnabled: false),
-            ReminderConfig(id: "before_lunch", label: String(localized: "reminder.before_lunch"), hour: 11, minute: 30, isEnabled: false),
-            ReminderConfig(id: "after_lunch", label: String(localized: "reminder.after_lunch"), hour: 14, minute: 0, isEnabled: false),
-            ReminderConfig(id: "before_dinner", label: String(localized: "reminder.before_dinner"), hour: 17, minute: 30, isEnabled: false),
-            ReminderConfig(id: "after_dinner", label: String(localized: "reminder.after_dinner"), hour: 20, minute: 0, isEnabled: false),
-            ReminderConfig(id: "bedtime", label: String(localized: "reminder.bedtime"), hour: 22, minute: 0, isEnabled: false),
+            ReminderConfig(id: UUID().uuidString, sceneTagId: MealContext.beforeBreakfast.rawValue, hour: 7, minute: 0, isEnabled: false),
+            ReminderConfig(id: UUID().uuidString, sceneTagId: MealContext.afterBreakfast.rawValue, hour: 9, minute: 30, isEnabled: false),
+            ReminderConfig(id: UUID().uuidString, sceneTagId: MealContext.beforeLunch.rawValue, hour: 11, minute: 30, isEnabled: false),
+            ReminderConfig(id: UUID().uuidString, sceneTagId: MealContext.afterLunch.rawValue, hour: 14, minute: 0, isEnabled: false),
+            ReminderConfig(id: UUID().uuidString, sceneTagId: MealContext.beforeDinner.rawValue, hour: 17, minute: 30, isEnabled: false),
+            ReminderConfig(id: UUID().uuidString, sceneTagId: MealContext.afterDinner.rawValue, hour: 20, minute: 0, isEnabled: false),
+            ReminderConfig(id: UUID().uuidString, sceneTagId: MealContext.bedtime.rawValue, hour: 22, minute: 0, isEnabled: false),
         ]
     }
 }
@@ -93,7 +87,7 @@ struct ThresholdConfig: Codable, Equatable, Sendable {
 // MARK: - 场景标签模型
 
 /// 场景标签（统一管理内置和自定义标签）
-struct SceneTag: Identifiable, Codable, Equatable {
+struct SceneTag: Identifiable, Codable, Equatable, Hashable {
     let id: String                     // 内置: MealContext.rawValue; 自定义: UUID
     var label: String                  // 显示名称
     var icon: String                   // SF Symbol 名称
@@ -101,6 +95,11 @@ struct SceneTag: Identifiable, Codable, Equatable {
     var isBuiltIn: Bool               // 是否内置标签
     var isVisible: Bool               // 是否可见
     var sortOrder: Int                // 排序序号
+    
+    // 提醒配置（默认关闭）
+    var reminderEnabled: Bool = false  // 是否启用提醒
+    var reminderHour: Int = 12         // 提醒小时 (0-23)
+    var reminderMinute: Int = 0        // 提醒分钟 (0-59)
 
     /// 所属阈值分组
     var thresholdGroup: ThresholdGroup {
@@ -111,6 +110,11 @@ struct SceneTag: Identifiable, Codable, Equatable {
     var builtInMealContext: MealContext? {
         guard isBuiltIn else { return nil }
         return MealContext(rawValue: id)
+    }
+    
+    /// 格式化的提醒时间显示
+    var reminderTimeString: String {
+        String(format: "%02d:%02d", reminderHour, reminderMinute)
     }
 
     /// 从 MealContext 创建内置标签
@@ -233,20 +237,11 @@ final class UserSettings {
     /// 首选血糖单位
     var preferredUnitRawValue: String = GlucoseUnit.systemDefault.rawValue
 
-    /// [已废弃] 全局目标范围已被分场景阈值替代，保留属性仅为 SwiftData schema 兼容
-    var targetLow: Double = 3.9
-
-    /// [已废弃] 全局目标范围已被分场景阈值替代，保留属性仅为 SwiftData schema 兼容
-    var targetHigh: Double = 10.0
-
     /// 是否已完成引导
     var hasCompletedOnboarding: Bool = false
 
     /// 是否启用 HealthKit 同步
     var healthKitSyncEnabled: Bool = false
-
-    /// [已废弃] 是否启用智能标签 - 保留属性仅为 SwiftData schema 兼容，实际始终启用自动推荐
-    var autoTagEnabled: Bool = true
 
     // MARK: - 提醒设置
 
@@ -255,11 +250,6 @@ final class UserSettings {
 
     /// 久未记录提醒间隔（小时），0 表示关闭
     var inactivityReminderHours: Int = 0
-
-    // MARK: - 目标设置
-
-    /// [已废弃] 每日记录目标已移除，保留属性仅为 SwiftData schema 兼容
-    var dailyRecordGoal: Int = 4
 
     // MARK: - 标签配置
 
@@ -302,7 +292,7 @@ final class UserSettings {
     var reminderConfigs: [ReminderConfig] {
         guard let data = remindersData,
               let decoded = try? JSONDecoder().decode([ReminderConfig].self, from: data) else {
-            return ReminderConfig.defaults
+            return ReminderConfig.localizedDefaults()
         }
         return decoded
     }
@@ -458,9 +448,9 @@ final class UserSettings {
         if healthKitSyncEnabled { score += 2 }
         // 比较 thresholdConfigData 是否存在且不是默认值
         if let data = thresholdConfigData,
-           let defaultData = try? JSONEncoder().encode(ThresholdConfig.defaults),
-           data != defaultData { 
-            score += 3 
+           let config = try? JSONDecoder().decode(ThresholdConfig.self, from: data),
+           config != ThresholdConfig.defaults {
+            score += 3
         }
         return score
     }

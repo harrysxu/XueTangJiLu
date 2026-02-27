@@ -69,7 +69,7 @@ struct ChartSnapshotService {
     static func renderPerTagTIRChart(
         records: [GlucoseRecord],
         settings: UserSettings,
-        size: CGSize = CGSize(width: 515, height: 180)
+        size: CGSize = CGSize(width: 515, height: 260)
     ) -> UIImage? {
         let byTag = Dictionary(grouping: records) { $0.sceneTagId }
         let sortedTags = byTag.sorted { $0.value.count > $1.value.count }
@@ -91,7 +91,7 @@ struct ChartSnapshotService {
         }
         
         return snapshot(content: {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
                 ForEach(data) { item in
                     HStack(spacing: 8) {
                         Text(item.tagName)
@@ -115,7 +115,7 @@ struct ChartSnapshotService {
                             .font(.system(size: 11, weight: .medium))
                             .frame(width: 45, alignment: .trailing)
                     }
-                    .frame(height: 18)
+                    .frame(height: 20)
                 }
             }
             .padding(16)
@@ -141,7 +141,7 @@ struct ChartSnapshotService {
         
         return snapshot(content: {
             VStack(spacing: 12) {
-                Text("血糖分布")
+                Text(String(localized: "statistics.glucose_distribution"))
                     .font(.system(size: 13, weight: .semibold))
                 
                 HStack(spacing: 0) {
@@ -191,7 +191,7 @@ struct ChartSnapshotService {
     static func renderBoxPlotChart(
         records: [GlucoseRecord],
         settings: UserSettings,
-        size: CGSize = CGSize(width: 515, height: 200)
+        size: CGSize = CGSize(width: 515, height: 220)
     ) -> UIImage? {
         let byTag = Dictionary(grouping: records) { $0.sceneTagId }
         let sortedTags = byTag.sorted { $0.value.count > $1.value.count }
@@ -251,7 +251,7 @@ struct ChartSnapshotService {
         let valueRange = globalMax - globalMin
         
         return snapshot(content: {
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 ForEach(data) { item in
                     HStack(spacing: 8) {
                         Text(item.tagName)
@@ -297,7 +297,7 @@ struct ChartSnapshotService {
                                     .offset(x: width * (item.median - globalMin) / valueRange)
                             }
                         }
-                        .frame(height: 20)
+                        .frame(height: 22)
                         
                         Text(String(format: "%.1f", item.median))
                             .font(.system(size: 9))

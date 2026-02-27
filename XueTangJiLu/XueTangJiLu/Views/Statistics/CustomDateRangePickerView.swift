@@ -28,7 +28,7 @@ struct CustomDateRangePickerView: View {
             Form {
                 Section {
                     DatePicker(
-                        "开始日期",
+                        String(localized: "date_range.start_date"),
                         selection: $tempStartDate,
                         in: ...tempEndDate,
                         displayedComponents: [.date]
@@ -36,30 +36,30 @@ struct CustomDateRangePickerView: View {
                     .datePickerStyle(.compact)
                     
                     DatePicker(
-                        "结束日期",
+                        String(localized: "date_range.end_date"),
                         selection: $tempEndDate,
                         in: tempStartDate...Date.now,
                         displayedComponents: [.date]
                     )
                     .datePickerStyle(.compact)
                 } header: {
-                    Text("选择日期范围")
+                    Text("date_range.select_range")
                 } footer: {
-                    Text("选择要查看的起止日期")
+                    Text("date_range.select_range_footer")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
-            .navigationTitle("自定义时间范围")
+            .navigationTitle("date_range.custom")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") {
+                    Button("cancel") {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("确定") {
+                    Button("date_range.confirm") {
                         startDate = tempStartDate
                         endDate = tempEndDate
                         dismiss()

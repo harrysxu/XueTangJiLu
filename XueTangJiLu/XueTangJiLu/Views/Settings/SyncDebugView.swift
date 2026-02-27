@@ -8,11 +8,17 @@
 #if DEBUG
 import SwiftUI
 import CloudKit
+import SwiftData
 
 /// 同步调试工具视图（仅 DEBUG 模式）
 struct SyncDebugView: View {
     @Environment(CloudKitSyncManager.self) private var syncManager
+    @Environment(\.modelContext) private var modelContext
     @State private var simulatedError: SimulatedError?
+    @State private var glucoseCount: Int = 0
+    @State private var medicationCount: Int = 0
+    @State private var mealCount: Int = 0
+    @State private var userSettingsCount: Int = 0
     
     enum SimulatedError: String, CaseIterable, Identifiable {
         case notAuthenticated = "未登录 iCloud"
@@ -38,6 +44,9 @@ struct SyncDebugView: View {
     
     var body: some View {
         Form {
+            // 数据统计
+            dataStatisticsSection
+            
             Section("同步状态模拟") {
                 Button("模拟同步开始") {
                     syncManager.currentState = .syncing
@@ -64,15 +73,16 @@ struct SyncDebugView: View {
             Section("同步历史模拟") {
                 Button("添加成功记录") {
                     let event = CloudKitSyncManager.SyncEvent(
-                        type: .importData,
-                        isSuccess: true
+                        type: .downloadFromCloud,
+                        isSuccess: true,
+                        glucoseCount: 3
                     )
                     syncManager.syncHistory.insert(event, at: 0)
                 }
                 
                 Button("添加失败记录") {
                     let event = CloudKitSyncManager.SyncEvent(
-                        type: .exportData,
+                        type: .uploadToCloud,
                         isSuccess: false,
                         errorMessage: "模拟的同步错误"
                     )
@@ -121,6 +131,10 @@ struct SyncDebugView: View {
                     print("容器 ID: \(AppConstants.cloudKitContainerID)")
                     print("App Group: \(AppConstants.appGroupID)")
                 }
+                
+                Button("刷新数据统计") {
+                    refreshDataCounts()
+                }
             }
             
             Section("当前状态信息") {
@@ -131,12 +145,80 @@ struct SyncDebugView: View {
                     InfoRow(label: "历史记录", value: "\(syncManager.syncHistory.count)")
                     InfoRow(label: "同步开关", value: syncManager.isSyncEnabled ? "开启" : "关闭")
                     InfoRow(label: "WiFi限制", value: syncManager.wifiOnlySync ? "是" : "否")
+                    InfoRow(label: "初始导入", value: syncManager.isPerformingInitialImport ? "进行中" : "否")
                 }
                 .font(.caption)
             }
         }
         .navigationTitle("同步调试工具")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            refreshDataCounts()
+        }
+    }
+    
+    // MARK: - Data Statistics Section
+    
+    private var dataStatisticsSection: some View {
+        Section("本地数据统计") {
+            HStack {
+                Label("血糖记录", systemImage: "heart.text.square")
+                Spacer()
+                Text("\(glucoseCount) 条")
+                    .foregroundStyle(.secondary)
+            }
+            
+            HStack {
+                Label("用药记录", systemImage: "pills")
+                Spacer()
+                Text("\(medicationCount) 条")
+                    .foregroundStyle(.secondary)
+            }
+            
+            HStack {
+                Label("饮食记录", systemImage: "fork.knife")
+                Spacer()
+                Text("\(mealCount) 条")
+                    .foregroundStyle(.secondary)
+            }
+            
+            HStack {
+                Label("用户设置", systemImage: "gearshape")
+                Spacer()
+                Text("\(userSettingsCount) 个")
+                    .foregroundStyle(userSettingsCount == 1 ? Color.secondary : Color.red)
+            }
+            
+            if glucoseCount == 0 && medicationCount == 0 && mealCount == 0 {
+                Text("⚠️ 本地没有任何数据！如果刚删除重装，检查 iCloud 是否正在同步。")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func refreshDataCounts() {
+        Task { @MainActor in
+            do {
+                let glucoseDescriptor = FetchDescriptor<GlucoseRecord>()
+                glucoseCount = try modelContext.fetchCount(glucoseDescriptor)
+                
+                let medicationDescriptor = FetchDescriptor<MedicationRecord>()
+                medicationCount = try modelContext.fetchCount(medicationDescriptor)
+                
+                let mealDescriptor = FetchDescriptor<MealRecord>()
+                mealCount = try modelContext.fetchCount(mealDescriptor)
+                
+                let settingsDescriptor = FetchDescriptor<UserSettings>()
+                userSettingsCount = try modelContext.fetchCount(settingsDescriptor)
+                
+                print("📊 [数据统计] 血糖:\(glucoseCount) 用药:\(medicationCount) 饮食:\(mealCount) 设置:\(userSettingsCount)")
+            } catch {
+                print("❌ 统计数据失败: \(error)")
+            }
+        }
     }
     
     private var stateDescription: String {
@@ -145,6 +227,10 @@ struct SyncDebugView: View {
             return "空闲"
         case .syncing:
             return "同步中"
+        case .importing:
+            return "从 iCloud 导入中"
+        case .exporting:
+            return "上传到 iCloud 中"
         case .success(let date):
             return "成功 (\(date.formatted(.relative(presentation: .named))))"
         case .failed(let error):

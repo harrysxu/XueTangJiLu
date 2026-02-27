@@ -1,5 +1,5 @@
 /* Widget Strings */
-"app.name" = "血糖记录";
+"app.name" = "控糖助手";
 "latest.glucose" = "最新血糖";
 "empty.no_records" = "还没有任何记录";
 "widget.no_data" = "暂无数据";
@@ -15,7 +15,7 @@
 "level.high" = "偏高";
 
 /* Widget Configuration */
-"widget.glucose_home.name" = "血糖记录";
+"widget.glucose_home.name" = "控糖助手";
 "widget.glucose_home.description" = "显示最新血糖读数、趋势和记录";
 "widget.lockscreen.name" = "达标率";
 "widget.lockscreen.description" = "在锁屏显示血糖达标率 (TIR)";

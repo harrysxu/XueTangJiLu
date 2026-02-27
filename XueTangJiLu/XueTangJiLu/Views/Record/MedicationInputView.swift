@@ -12,7 +12,7 @@ import SwiftData
 struct MedicationInputView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @Binding var viewModel: MedicationViewModel
+    @Bindable var viewModel: MedicationViewModel
     @State private var showDatePicker = false
 
     var body: some View {
@@ -178,6 +178,7 @@ struct MedicationInputView: View {
 }
 
 #Preview {
-    MedicationInputView(viewModel: .constant(MedicationViewModel()))
+    @Previewable @State var viewModel = MedicationViewModel()
+    MedicationInputView(viewModel: viewModel)
         .modelContainer(for: [MedicationRecord.self], inMemory: true)
 }

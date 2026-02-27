@@ -145,8 +145,8 @@ struct PDFExportService {
             
             // 5. 图表部分（如果数据足够）
             if let settings, records.count >= 10 {
-                // 检查是否需要新页
-                if yOffset > pageHeight - 400 {
+                // 检查是否需要新页（图表部分需要至少700pt空间）
+                if yOffset > pageHeight - 700 {
                     drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
                     context.beginPage()
                     yOffset = margin
@@ -165,7 +165,7 @@ struct PDFExportService {
                     settings: settings
                 ) {
                     rangeImage.draw(in: CGRect(x: margin, y: yOffset, width: 250, height: 100))
-                    yOffset += 110
+                    yOffset += 120  // 增加间距，避免重叠
                 }
                 
                 // 渲染各场景 TIR 条形图
@@ -173,8 +173,8 @@ struct PDFExportService {
                     records: records,
                     settings: settings
                 ) {
-                    tirChartImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 180))
-                    yOffset += 190
+                    tirChartImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 260))
+                    yOffset += 280  // 增加间距，避免重叠
                 }
                 
                 // 渲染箱线图
@@ -182,8 +182,8 @@ struct PDFExportService {
                     records: records,
                     settings: settings
                 ) {
-                    boxPlotImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 200))
-                    yOffset += 210
+                    boxPlotImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 220))
+                    yOffset += 240  // 增加间距，避免重叠
                 }
                 
                 yOffset += 12
@@ -399,7 +399,7 @@ struct PDFExportService {
                 .font: UIFont.systemFont(ofSize: 11),
                 .foregroundColor: UIColor.secondaryLabel
             ]
-            let generatedDate = "生成日期：\(Date.now.fullDateTimeString)"
+            let generatedDate = String(localized: "pdf.generated_date", defaultValue: "生成日期：\(Date.now.fullDateTimeString)")
             generatedDate.draw(at: CGPoint(x: margin, y: yOffset), withAttributes: subtitleAttrs)
             yOffset += 24
 
@@ -435,14 +435,14 @@ struct PDFExportService {
                 let avgPerDay = daysWithRecords > 0 ? Double(monthRecords.count) / Double(daysWithRecords) : 0
 
                 let metrics: [(String, String)] = [
-                    ("总记录次数", "\(monthRecords.count) 次（\(daysWithRecords) 天有记录，日均 \(String(format: "%.1f", avgPerDay)) 次）"),
-                    ("平均血糖", "\(GlucoseUnitConverter.displayString(mmolLValue: avg, in: unit)) \(unit.rawValue)"),
-                    ("预估 A1C", String(format: "%.1f%%", a1c)),
-                    ("达标率 (TIR)", String(format: "%.1f%%（目标 > 70%%）", tir)),
-                    ("高于范围 (TAR)", String(format: "%.1f%%（目标 < 25%%）", tar)),
-                    ("低于范围 (TBR)", String(format: "%.1f%%（目标 < 4%%）", tbr)),
-                    ("波动系数 (CV%)", cv != nil ? String(format: "%.1f%%（目标 < 36%%）", cv!) : "数据不足"),
-                    ("用药天数", "\(Set(monthMedications.map { calendar.startOfDay(for: $0.timestamp) }).count) 天")
+                    (String(localized: "pdf.total_records"), "\(monthRecords.count) 次（\(daysWithRecords) 天有记录，日均 \(String(format: "%.1f", avgPerDay)) 次）"),
+                    (String(localized: "statistics.average"), "\(GlucoseUnitConverter.displayString(mmolLValue: avg, in: unit)) \(unit.rawValue)"),
+                    (String(localized: "statistics.eA1C"), String(format: "%.1f%%", a1c)),
+                    (String(localized: "statistics.tir"), String(format: "%.1f%%（目标 > 70%%）", tir)),
+                    ("TAR", String(format: "%.1f%%（目标 < 25%%）", tar)),
+                    ("TBR", String(format: "%.1f%%（目标 < 4%%）", tbr)),
+                    (String(localized: "statistics.cv"), cv != nil ? String(format: "%.1f%%（目标 < 36%%）", cv!) : String(localized: "common.insufficient_data")),
+                    (String(localized: "pdf.medication_days").replacingOccurrences(of: "：%d 天", with: ""), "\(Set(monthMedications.map { calendar.startOfDay(for: $0.timestamp) }).count) 天")
                 ]
 
                 for (label, value) in metrics {
@@ -451,7 +451,7 @@ struct PDFExportService {
                     yOffset += 18
                 }
             } else {
-                "本月暂无记录数据".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: metricAttrs)
+                String(localized: "pdf.no_records").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: metricAttrs)
                 yOffset += 18
             }
 
@@ -460,13 +460,14 @@ struct PDFExportService {
             yOffset += 16
             
             // -- 图表部分 --
-            if yOffset > pageHeight - 400 {
+            // 检查空间，确保至少有700pt的空间来绘制图表，避免被免责声明遮挡
+            if yOffset > pageHeight - 700 {
                 drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
                 context.beginPage()
                 yOffset = margin
             }
             
-            "趋势图表".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
+            String(localized: "pdf.trend_chart").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
             yOffset += 24
             
             // 渲染 TAR/TIR/TBR 分布图
@@ -475,7 +476,7 @@ struct PDFExportService {
                 settings: settings
             ) {
                 rangeImage.draw(in: CGRect(x: margin, y: yOffset, width: 250, height: 100))
-                yOffset += 110
+                yOffset += 120  // 增加间距，避免重叠
             }
             
             // 渲染各场景 TIR 条形图
@@ -483,8 +484,8 @@ struct PDFExportService {
                 records: monthRecords,
                 settings: settings
             ) {
-                tirChartImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 180))
-                yOffset += 190
+                tirChartImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 260))
+                yOffset += 280  // 增加间距，避免重叠
             }
             
             // 渲染箱线图
@@ -492,8 +493,8 @@ struct PDFExportService {
                 records: monthRecords,
                 settings: settings
             ) {
-                boxPlotImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 200))
-                yOffset += 210
+                boxPlotImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 220))
+                yOffset += 240  // 增加间距，避免重叠
             }
             
             yOffset += 12
@@ -501,7 +502,14 @@ struct PDFExportService {
             yOffset += 16
 
             // -- 各场景达标率 --
-            "各场景达标率（按独立阈值）".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
+            // 检查空间，确保至少有300pt的空间
+            if yOffset > pageHeight - 300 {
+                drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
+                context.beginPage()
+                yOffset = margin
+            }
+            
+            String(localized: "pdf.scene_compliance").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
             yOffset += 24
 
             let headerAttrs: [NSAttributedString.Key: Any] = [
@@ -513,7 +521,13 @@ struct PDFExportService {
                 .foregroundColor: UIColor.label
             ]
 
-            let tagHeaders = ["场景", "记录数", "平均值", "达标率", "阈值范围"]
+            let tagHeaders = [
+                String(localized: "pdf.scene_header"),
+                String(localized: "pdf.record_count_header"),
+                String(localized: "pdf.average_header"),
+                String(localized: "pdf.compliance_rate_header"),
+                String(localized: "pdf.threshold_range_header")
+            ]
             let tagColWidths: [CGFloat] = [70, 50, 70, 60, contentWidth - 250]
             var xOff = margin
             for (i, h) in tagHeaders.enumerated() {
@@ -562,16 +576,24 @@ struct PDFExportService {
             yOffset += 16
 
             // -- 各场景血糖分布 --
-            if yOffset > pageHeight - 160 {
+            // 检查空间，确保至少有250pt的空间
+            if yOffset > pageHeight - 250 {
                 drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
                 context.beginPage()
                 yOffset = margin
             }
 
-            "各场景血糖分布".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
+            String(localized: "pdf.scene_distribution").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
             yOffset += 24
 
-            let sceneHeaders = ["场景", "记录数", "中位数", "Q1–Q3 范围", "最低", "最高"]
+            let sceneHeaders = [
+                String(localized: "pdf.scene_header"),
+                String(localized: "pdf.record_count_header"),
+                String(localized: "pdf.median_header"),
+                String(localized: "pdf.q1q3_range_header"),
+                String(localized: "pdf.min_header"),
+                String(localized: "pdf.max_header")
+            ]
             let sceneColWidths: [CGFloat] = [70, 50, 60, 100, 60, contentWidth - 340]
             xOff = margin
             for (i, h) in sceneHeaders.enumerated() {
@@ -641,13 +663,14 @@ struct PDFExportService {
             yOffset += 16
 
             // -- 餐前餐后配对分析 --
-            if yOffset > pageHeight - 120 {
+            // 检查空间，确保至少有250pt的空间
+            if yOffset > pageHeight - 250 {
                 drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
                 context.beginPage()
                 yOffset = margin
             }
 
-            "餐前餐后配对分析".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
+            String(localized: "pdf.meal_pairing").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
             yOffset += 24
 
             let fastingRecords = monthRecords.filter { $0.thresholdGroup(from: settings) == .fasting }
@@ -668,10 +691,16 @@ struct PDFExportService {
             }
 
             if pairSpikes.isEmpty {
-                "本月暂无可配对的餐前餐后数据".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: metricAttrs)
+                String(localized: "pdf.no_pairing_data").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: metricAttrs)
                 yOffset += 18
             } else {
-                let pairHeaders = ["餐次", "配对数", "平均升幅", "最大升幅", "超标次数(>3.0)"]
+                let pairHeaders = [
+                    String(localized: "pdf.meal_time"),
+                    String(localized: "pdf.pair_count"),
+                    String(localized: "pdf.avg_rise"),
+                    String(localized: "pdf.max_rise"),
+                    String(localized: "pdf.over_3_count")
+                ]
                 let pairColWidths: [CGFloat] = [60, 50, 70, 70, contentWidth - 250]
                 xOff = margin
                 for (i, h) in pairHeaders.enumerated() {
@@ -850,10 +879,6 @@ struct PDFExportService {
         let calendar = Calendar.current
         let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart)!
         
-        // 上周数据用于对比（预留给未来的周对比功能）
-        // let lastWeekStart = calendar.date(byAdding: .weekOfYear, value: -1, to: weekStart)!
-        // let lastWeekEnd = weekStart
-        
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "zh_CN")
         dateFormatter.dateFormat = "M月d日"
@@ -868,7 +893,7 @@ struct PDFExportService {
             var yOffset: CGFloat = margin
             
             // 标题
-            let title = "周报告 - \(weekString)"
+            let title = String(localized: "pdf.weekly_title", defaultValue: "周报告 - \(weekString)")
             let titleAttrs: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: 20, weight: .bold),
                 .foregroundColor: UIColor.label
@@ -880,7 +905,7 @@ struct PDFExportService {
                 .font: UIFont.systemFont(ofSize: 11),
                 .foregroundColor: UIColor.secondaryLabel
             ]
-            let generatedDate = "生成日期：\(Date.now.fullDateTimeString)"
+            let generatedDate = String(localized: "pdf.generated_date", defaultValue: "生成日期：\(Date.now.fullDateTimeString)")
             generatedDate.draw(at: CGPoint(x: margin, y: yOffset), withAttributes: subtitleAttrs)
             yOffset += 24
             
@@ -892,7 +917,7 @@ struct PDFExportService {
                 .font: UIFont.systemFont(ofSize: 15, weight: .semibold),
                 .foregroundColor: UIColor.label
             ]
-            "本周概况".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
+            String(localized: "pdf.weekly_overview").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
             yOffset += 24
             
             let metricAttrs: [NSAttributedString.Key: Any] = [
@@ -911,12 +936,12 @@ struct PDFExportService {
                 let mealDays = Set(meals.map { calendar.startOfDay(for: $0.timestamp) }).count
                 
                 let metrics: [(String, String)] = [
-                    ("记录天数", "\(daysWithRecords) 天（日均 \(String(format: "%.1f", avgPerDay)) 次）"),
-                    ("平均血糖", "\(GlucoseUnitConverter.displayString(mmolLValue: avg, in: unit)) \(unit.rawValue)"),
-                    ("达标率 (TIR)", String(format: "%.1f%%", tir)),
-                    ("波动系数 (CV%)", cv != nil ? String(format: "%.1f%%", cv!) : "数据不足"),
-                    ("用药天数", "\(medicationDays) 天"),
-                    ("饮食记录", "\(mealDays) 天")
+                    (String(localized: "pdf.record_days"), "\(daysWithRecords) 天（日均 \(String(format: "%.1f", avgPerDay)) 次）"),
+                    (String(localized: "statistics.average"), "\(GlucoseUnitConverter.displayString(mmolLValue: avg, in: unit)) \(unit.rawValue)"),
+                    (String(localized: "statistics.tir"), String(format: "%.1f%%", tir)),
+                    (String(localized: "statistics.cv"), cv != nil ? String(format: "%.1f%%", cv!) : String(localized: "common.insufficient_data")),
+                    (String(localized: "pdf.medication_days").replacingOccurrences(of: "：%d 天", with: ""), "\(medicationDays) 天"),
+                    (String(localized: "pdf.meal_records"), "\(mealDays) 天")
                 ]
                 
                 for (label, value) in metrics {
@@ -925,7 +950,7 @@ struct PDFExportService {
                     yOffset += 18
                 }
             } else {
-                "本周暂无记录数据".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: metricAttrs)
+                String(localized: "pdf.no_records").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: metricAttrs)
                 yOffset += 18
             }
             
@@ -934,19 +959,68 @@ struct PDFExportService {
             yOffset += 16
             
             // 周对比（如果有上周数据）
-            "本周 vs 上周对比".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
+            String(localized: "pdf.weekly_comparison").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
             yOffset += 24
             
             // 这里需要传入所有记录以便筛选上周数据
             // 由于当前方法签名只传入本周数据，这里显示提示
-            "需要完整历史数据进行对比分析".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: metricAttrs)
+            String(localized: "pdf.need_full_history").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: metricAttrs)
             yOffset += 24
             
             drawLine(context: context, y: yOffset, x: margin, width: contentWidth)
             yOffset += 16
             
+            // -- 图表部分 --
+            // 检查空间，确保至少有700pt的空间来绘制图表，避免被免责声明遮挡
+            if yOffset > pageHeight - 700 {
+                drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
+                context.beginPage()
+                yOffset = margin
+            }
+            
+            String(localized: "pdf.trend_chart").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
+            yOffset += 24
+            
+            // 渲染 TAR/TIR/TBR 分布图
+            if let rangeImage = ChartSnapshotService.renderRangeDistributionBar(
+                records: records,
+                settings: settings
+            ) {
+                rangeImage.draw(in: CGRect(x: margin, y: yOffset, width: 250, height: 100))
+                yOffset += 120  // 增加间距，避免重叠
+            }
+            
+            // 渲染各场景 TIR 条形图
+            if records.count >= 10, let tirChartImage = ChartSnapshotService.renderPerTagTIRChart(
+                records: records,
+                settings: settings
+            ) {
+                tirChartImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 260))
+                yOffset += 280  // 增加间距，避免重叠
+            }
+            
+            // 渲染箱线图
+            if records.count >= 20, let boxPlotImage = ChartSnapshotService.renderBoxPlotChart(
+                records: records,
+                settings: settings
+            ) {
+                boxPlotImage.draw(in: CGRect(x: margin, y: yOffset, width: contentWidth, height: 220))
+                yOffset += 240  // 增加间距，避免重叠
+            }
+            
+            yOffset += 12
+            drawLine(context: context, y: yOffset, x: margin, width: contentWidth)
+            yOffset += 16
+            
             // 各场景达标率
-            "各场景达标率".draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
+            // 检查空间，确保至少有300pt的空间
+            if yOffset > pageHeight - 300 {
+                drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
+                context.beginPage()
+                yOffset = margin
+            }
+            
+            String(localized: "pdf.scene_compliance_short").draw(at: CGPoint(x: margin, y: yOffset), withAttributes: sectionAttrs)
             yOffset += 24
             
             let headerAttrs: [NSAttributedString.Key: Any] = [
@@ -958,7 +1032,12 @@ struct PDFExportService {
                 .foregroundColor: UIColor.label
             ]
             
-            let tagHeaders = ["场景", "记录数", "平均值", "达标率"]
+            let tagHeaders = [
+                String(localized: "pdf.scene_header"),
+                String(localized: "pdf.record_count_header"),
+                String(localized: "pdf.average_header"),
+                String(localized: "pdf.compliance_rate_header")
+            ]
             let tagColWidths: [CGFloat] = [80, 60, 90, contentWidth - 230]
             var xOff = margin
             for (i, h) in tagHeaders.enumerated() {

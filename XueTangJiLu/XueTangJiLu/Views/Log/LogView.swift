@@ -12,6 +12,7 @@ import SwiftData
 struct LogView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(HealthKitManager.self) private var healthKitManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var records: [GlucoseRecord]
     @Query(sort: \MedicationRecord.timestamp, order: .reverse) private var medications: [MedicationRecord]
     @Query(sort: \MealRecord.timestamp, order: .reverse) private var meals: [MealRecord]
@@ -29,6 +30,7 @@ struct LogView: View {
     @State private var recordToEdit: GlucoseRecord? = nil
     @State private var medicationToEdit: MedicationRecord? = nil
     @State private var mealToEdit: MealRecord? = nil
+    @State private var showMealPaywall = false
     
     enum RecordType: String, CaseIterable, Identifiable {
         case glucose = "血糖"
@@ -179,11 +181,11 @@ struct LogView: View {
                 }
             }
             .sheet(isPresented: $showRecordInput) {
-                RecordInputView(viewModel: $glucoseViewModel)
+                RecordInputView(viewModel: glucoseViewModel)
                     .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showMedicationInput) {
-                MedicationInputView(viewModel: $medicationViewModel)
+                MedicationInputView(viewModel: medicationViewModel)
                     .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showMealInput) {
@@ -222,6 +224,9 @@ struct LogView: View {
                 if !newValue {
                     mealToEdit = nil
                 }
+            }
+            .sheet(isPresented: $showMealPaywall) {
+                PaywallView()
             }
         }
     }
@@ -349,9 +354,9 @@ struct LogView: View {
     // MARK: - 统一时间轴
 
     private var unifiedTimeline: some View {
-        ScrollView {
-            LazyVStack(spacing: AppConstants.Spacing.md) {
-                if filteredTimelineItems.isEmpty {
+        Group {
+            if filteredTimelineItems.isEmpty {
+                ScrollView {
                     EmptyStateView(
                         icon: "line.3.horizontal.decrease.circle",
                         title: emptyStateTitle,
@@ -359,18 +364,14 @@ struct LogView: View {
                     )
                     .frame(maxWidth: .infinity)
                     .padding(.top, 60)
-                } else {
+                }
+                .background(Color.pageBackground)
+            } else {
+                List {
                     ForEach(groupedTimelineItems, id: \.0) { sectionTitle, sectionItems in
-                        VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-                            // 日期标题
-                            Text(sectionTitle)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, AppConstants.Spacing.lg)
-                            
-                            // 记录卡片组
-                            VStack(spacing: 0) {
-                                ForEach(Array(sectionItems.enumerated()), id: \.element.id) { index, item in
+                        Section {
+                            ForEach(Array(sectionItems.enumerated()), id: \.element.id) { index, item in
+                                VStack(spacing: 0) {
                                     Group {
                                         switch item {
                                         case .glucose(let record):
@@ -380,13 +381,6 @@ struct LogView: View {
                                                 TimelineRowView(record: record, unit: unit, settings: settings)
                                             }
                                             .buttonStyle(.plain)
-                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                                Button(role: .destructive) {
-                                                    glucoseViewModel.deleteRecord(record, modelContext: modelContext)
-                                                } label: {
-                                                    Label(String(localized: "log.delete"), systemImage: "trash")
-                                                }
-                                            }
                                         case .medication(let record):
                                             Button(action: {
                                                 medicationToEdit = record
@@ -394,28 +388,18 @@ struct LogView: View {
                                                 MedicationRowView(record: record)
                                             }
                                             .buttonStyle(.plain)
-                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                                Button(role: .destructive) {
-                                                    medicationViewModel.deleteRecord(record, modelContext: modelContext)
-                                                } label: {
-                                                    Label(String(localized: "log.delete"), systemImage: "trash")
-                                                }
-                                            }
                                         case .meal(let record):
                                             Button(action: {
-                                                mealToEdit = record
-                                                showMealInput = true
+                                                if FeatureManager.canAccessFeature(.mealPhotoTracking, isPremium: subscriptionManager.isPremiumUser) {
+                                                    mealToEdit = record
+                                                    showMealInput = true
+                                                } else {
+                                                    showMealPaywall = true
+                                                }
                                             }) {
                                                 MealRowView(record: record)
                                             }
                                             .buttonStyle(.plain)
-                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                                Button(role: .destructive) {
-                                                    modelContext.delete(record)
-                                                } label: {
-                                                    Label(String(localized: "log.delete"), systemImage: "trash")
-                                                }
-                                            }
                                         }
                                     }
                                     
@@ -424,20 +408,48 @@ struct LogView: View {
                                             .padding(.horizontal, AppConstants.Spacing.lg)
                                     }
                                 }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    Button(role: .destructive) {
+                                        switch item {
+                                        case .glucose(let record):
+                                            glucoseViewModel.deleteRecord(record, modelContext: modelContext)
+                                        case .medication(let record):
+                                            medicationViewModel.deleteRecord(record, modelContext: modelContext)
+                                        case .meal(let record):
+                                            modelContext.delete(record)
+                                        }
+                                    } label: {
+                                        Label(String(localized: "log.delete"), systemImage: "trash")
+                                    }
+                                }
+                                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(
+                                    // 根据位置决定圆角
+                                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                                        .fill(Color.cardBackground)
+                                )
                             }
-                            .background(
-                                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
-                                    .fill(Color.cardBackground)
-                            )
+                        } header: {
+                            Text(sectionTitle)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .textCase(nil)
+                                .padding(.bottom, AppConstants.Spacing.xs)
                         }
-                        .padding(.horizontal, AppConstants.Spacing.lg)
+                        .listSectionSeparator(.hidden)
                     }
+                    .listSectionSpacing(AppConstants.Spacing.md)
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .background(Color.pageBackground)
+                .contentMargins(.top, AppConstants.Spacing.md, for: .scrollContent)
+                .contentMargins(.bottom, 100, for: .scrollContent)
+                .contentMargins(.horizontal, AppConstants.Spacing.lg, for: .scrollContent)
+                .environment(\.defaultMinListRowHeight, 0)
             }
-            .padding(.top, AppConstants.Spacing.md)
-            .padding(.bottom, 100)
         }
-        .background(Color.pageBackground)
     }
 
     // MARK: - FAB Menu
@@ -462,7 +474,11 @@ struct LogView: View {
             
             Button {
                 HapticManager.light()
-                showMealInput = true
+                if FeatureManager.canAccessFeature(.mealPhotoTracking, isPremium: subscriptionManager.isPremiumUser) {
+                    showMealInput = true
+                } else {
+                    showMealPaywall = true
+                }
             } label: {
                 Label(String(localized: "meal.record"), systemImage: "fork.knife")
             }
@@ -485,4 +501,5 @@ struct LogView: View {
     LogView()
         .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self, MealRecord.self], inMemory: true)
         .environment(HealthKitManager())
+        .environment(SubscriptionManager())
 }

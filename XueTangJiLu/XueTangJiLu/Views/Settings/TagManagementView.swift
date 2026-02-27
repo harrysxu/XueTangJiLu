@@ -16,8 +16,9 @@ struct TagManagementView: View {
     @State private var editingAnnotation: AnnotationTag?
     @State private var showAddSceneTag = false
     @State private var editingSceneTag: SceneTag?
-    @State private var editingThresholdTag: SceneTag?
     @State private var showAllSceneTags = false  // 是否显示全部场景标签
+    @State private var showHideWarning = false
+    @State private var tagToHide: SceneTag?
 
     private var settings: UserSettings {
         settingsArray.first ?? UserSettings()
@@ -46,14 +47,24 @@ struct TagManagementView: View {
             annotationTagSection
         }
         .navigationTitle(String(localized: "tag_management"))
+        .alert(String(localized: "tag.hide_warning_title"), isPresented: $showHideWarning) {
+            Button(String(localized: "cancel"), role: .cancel) {
+                tagToHide = nil
+            }
+            Button(String(localized: "tag.hide_anyway")) {
+                if let tag = tagToHide {
+                    performToggleSceneTag(tag, visible: false)
+                }
+                tagToHide = nil
+            }
+        } message: {
+            Text(String(localized: "tag.hide_warning_message"))
+        }
         .sheet(isPresented: $showAddSceneTag) {
             SceneTagEditSheet(settings: settings, existingTag: nil)
         }
         .sheet(item: $editingSceneTag) { tag in
             SceneTagEditSheet(settings: settings, existingTag: tag)
-        }
-        .sheet(item: $editingThresholdTag) { tag in
-            SceneTagThresholdEditSheet(tag: tag, settings: settings, unit: settings.preferredUnit)
         }
         .alert(String(localized: "tag.add_alert_title"), isPresented: $showAddAnnotation) {
             TextField(String(localized: "tag.label_name"), text: $newAnnotationLabel)
@@ -180,12 +191,22 @@ struct TagManagementView: View {
                             .background(Color.orange.opacity(0.12))
                             .clipShape(Capsule())
                     }
+                    if tag.reminderEnabled {
+                        HStack(spacing: 2) {
+                            Image(systemName: "bell.fill")
+                                .font(.system(size: 10))
+                            Text(tag.reminderTimeString)
+                                .font(.system(size: 11, design: .monospaced))
+                        }
+                        .foregroundStyle(.blue)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.blue.opacity(0.12))
+                        .clipShape(Capsule())
+                    }
                 }
                 // 阈值范围（可点击编辑）
                 thresholdLabel(for: tag)
-                    .onTapGesture {
-                        editingThresholdTag = tag
-                    }
             }
 
             Spacer()
@@ -287,11 +308,50 @@ struct TagManagementView: View {
     // MARK: - 场景标签操作
 
     private func toggleSceneTag(_ tag: SceneTag, visible: Bool) {
+        // 如果是隐藏操作，检查是否有关联的启用提醒
+        if !visible && tag.isVisible {
+            if tag.reminderEnabled {
+                tagToHide = tag
+                showHideWarning = true
+                return
+            }
+        }
+        
+        // 执行切换
+        performToggleSceneTag(tag, visible: visible)
+    }
+    
+    private func performToggleSceneTag(_ tag: SceneTag, visible: Bool) {
         var tags = settings.sceneTags
         if let index = tags.firstIndex(where: { $0.id == tag.id }) {
             tags[index].isVisible = visible
+            // 如果隐藏标签，同时关闭提醒
+            if !visible {
+                tags[index].reminderEnabled = false
+            }
             settings.sceneTags = tags
         }
+        
+        // 重新调度提醒
+        scheduleRemindersFromSceneTags()
+    }
+    
+    private func scheduleRemindersFromSceneTags() {
+        let notificationManager = NotificationManager()
+        let enabledTags = settings.sceneTags.filter { $0.reminderEnabled && $0.isVisible }
+        
+        // 转换为 ReminderConfig 格式用于通知调度
+        let reminders = enabledTags.map { tag in
+            ReminderConfig(
+                id: tag.id,
+                sceneTagId: tag.id,
+                hour: tag.reminderHour,
+                minute: tag.reminderMinute,
+                isEnabled: true
+            )
+        }
+        
+        notificationManager.scheduleReminders(reminders, sceneTags: settings.sceneTags)
     }
 
     private func moveSceneTags(from source: IndexSet, to destination: Int) {
@@ -388,8 +448,14 @@ struct SceneTagEditSheet: View {
     @State private var label: String
     @State private var icon: String
     @State private var selectedGroup: ThresholdGroup
+    @State private var reminderEnabled: Bool
+    @State private var reminderHour: Int
+    @State private var reminderMinute: Int
+    @State private var lowValue: Double
+    @State private var highValue: Double
 
     private var isEditing: Bool { existingTag != nil }
+    private var unit: GlucoseUnit { settings.preferredUnit }
 
     private static let availableIcons = [
         "sunrise", "sun.max", "sunset", "moon.zzz", "bed.double", "clock",
@@ -405,6 +471,14 @@ struct SceneTagEditSheet: View {
         _label = State(initialValue: existingTag?.label ?? "")
         _icon = State(initialValue: existingTag?.icon ?? "tag.fill")
         _selectedGroup = State(initialValue: existingTag?.thresholdGroup ?? .fasting)
+        _reminderEnabled = State(initialValue: existingTag?.reminderEnabled ?? false)
+        _reminderHour = State(initialValue: existingTag?.reminderHour ?? 12)
+        _reminderMinute = State(initialValue: existingTag?.reminderMinute ?? 0)
+        
+        // 初始化阈值范围
+        let range = settings.thresholdRange(for: existingTag?.id ?? "")
+        _lowValue = State(initialValue: range.low)
+        _highValue = State(initialValue: range.high)
     }
 
     var body: some View {
@@ -440,6 +514,67 @@ struct SceneTagEditSheet: View {
                     }
                     .padding(.vertical, AppConstants.Spacing.sm)
                 }
+                
+                // 提醒设置
+                Section {
+                    Toggle(isOn: $reminderEnabled) {
+                        Label(String(localized: "reminder.enable_reminder"), systemImage: "bell")
+                    }
+                    
+                    if reminderEnabled {
+                        HStack {
+                            Text(String(localized: "reminder.time"))
+                            Spacer()
+                            HStack(spacing: 0) {
+                                Picker("", selection: $reminderHour) {
+                                    ForEach(0..<24) { hour in
+                                        Text("\(hour)").tag(hour)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .frame(width: 60)
+                                
+                                Text(":")
+                                
+                                Picker("", selection: $reminderMinute) {
+                                    ForEach(0..<60) { minute in
+                                        Text(String(format: "%02d", minute)).tag(minute)
+                                    }
+                                }
+                                .pickerStyle(.menu)
+                                .frame(width: 60)
+                            }
+                        }
+                    }
+                } header: {
+                    Text(String(localized: "reminder.settings"))
+                } footer: {
+                    if reminderEnabled {
+                        Text(String(localized: "reminder.tag_footer"))
+                    }
+                }
+                
+                // 阈值范围设置
+                Section(String(localized: "tag.target_range")) {
+                    HStack {
+                        Text(String(localized: "tag.lower_limit"))
+                        Spacer()
+                        Text(GlucoseUnitConverter.displayString(mmolLValue: lowValue, in: unit))
+                            .foregroundStyle(.secondary)
+                            .font(.body.monospacedDigit())
+                        Stepper("", value: $lowValue, in: 2.0...6.0, step: 0.1)
+                            .labelsHidden()
+                    }
+                    HStack {
+                        Text(String(localized: "tag.upper_limit"))
+                        Spacer()
+                        Text(GlucoseUnitConverter.displayString(mmolLValue: highValue, in: unit))
+                            .foregroundStyle(.secondary)
+                            .font(.body.monospacedDigit())
+                        Stepper("", value: $highValue, in: 4.0...15.0, step: 0.1)
+                            .labelsHidden()
+                    }
+                }
 
                 if isEditing, let tag = existingTag, tag.isBuiltIn {
                     Section {
@@ -457,7 +592,7 @@ struct SceneTagEditSheet: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } header: {
-                    Text(String(localized: "tag.group_description"))
+                    Text(String(localized: "tag.reference_advice"))
                 } footer: {
                     Text(String(localized: "tag.group_footer"))
                 }
@@ -493,11 +628,17 @@ struct SceneTagEditSheet: View {
                 tags[index].label = trimmedLabel
                 tags[index].icon = icon
                 tags[index].thresholdGroupRawValue = selectedGroup.rawValue
+                tags[index].reminderEnabled = reminderEnabled
+                tags[index].reminderHour = reminderHour
+                tags[index].reminderMinute = reminderMinute
+                
+                // 保存阈值范围
+                settings.setThreshold(for: existing.id, low: lowValue, high: highValue)
             }
         } else {
             // 新增自定义标签
             let maxOrder = tags.map(\.sortOrder).max() ?? -1
-            let newTag = SceneTag(
+            var newTag = SceneTag(
                 id: UUID().uuidString,
                 label: trimmedLabel,
                 icon: icon,
@@ -506,96 +647,37 @@ struct SceneTagEditSheet: View {
                 isVisible: true,
                 sortOrder: maxOrder + 1
             )
+            newTag.reminderEnabled = reminderEnabled
+            newTag.reminderHour = reminderHour
+            newTag.reminderMinute = reminderMinute
             tags.append(newTag)
+            
+            // 为新标签设置阈值范围
+            settings.setThreshold(for: newTag.id, low: lowValue, high: highValue)
         }
 
         settings.sceneTags = tags
+        
+        // 保存后重新调度提醒
+        scheduleReminders()
     }
-}
-
-// MARK: - 场景标签阈值编辑 Sheet
-
-struct SceneTagThresholdEditSheet: View {
-    let tag: SceneTag
-    let settings: UserSettings
-    let unit: GlucoseUnit
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var lowValue: Double
-    @State private var highValue: Double
-
-    init(tag: SceneTag, settings: UserSettings, unit: GlucoseUnit) {
-        self.tag = tag
-        self.settings = settings
-        self.unit = unit
-
-        let range = settings.thresholdRange(for: tag.id)
-        _lowValue = State(initialValue: range.low)
-        _highValue = State(initialValue: range.high)
-    }
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                // 标签信息
-                Section {
-                    HStack(spacing: AppConstants.Spacing.md) {
-                        Image(systemName: tag.icon)
-                            .font(.title3)
-                            .foregroundStyle(Color.brandPrimary)
-                            .frame(width: 32)
-                        Text(tag.label)
-                            .font(.headline)
-                    }
-                }
-
-                // 阈值范围
-                Section(String(localized: "tag.target_range")) {
-                    HStack {
-                        Text(String(localized: "tag.lower_limit"))
-                        Spacer()
-                        Text(GlucoseUnitConverter.displayString(mmolLValue: lowValue, in: unit))
-                            .foregroundStyle(.secondary)
-                            .font(.body.monospacedDigit())
-                        Stepper("", value: $lowValue, in: 2.0...6.0, step: 0.1)
-                            .labelsHidden()
-                    }
-                    HStack {
-                        Text(String(localized: "tag.upper_limit"))
-                        Spacer()
-                        Text(GlucoseUnitConverter.displayString(mmolLValue: highValue, in: unit))
-                            .foregroundStyle(.secondary)
-                            .font(.body.monospacedDigit())
-                        Stepper("", value: $highValue, in: 4.0...15.0, step: 0.1)
-                            .labelsHidden()
-                    }
-                }
-
-                // ADA 参考
-                Section {
-                    Text(tag.thresholdGroup.localizedAdaRecommendation)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } header: {
-                    Text(String(localized: "tag.reference_advice"))
-                }
-            }
-            .navigationTitle(String(localized: "tag.edit_threshold"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "cancel")) { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(String(localized: "save")) {
-                        settings.setThreshold(for: tag.id, low: lowValue, high: highValue)
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                }
-            }
+    
+    private func scheduleReminders() {
+        let notificationManager = NotificationManager()
+        let enabledTags = settings.sceneTags.filter { $0.reminderEnabled && $0.isVisible }
+        
+        // 转换为 ReminderConfig 格式用于通知调度
+        let reminders = enabledTags.map { tag in
+            ReminderConfig(
+                id: tag.id,
+                sceneTagId: tag.id,
+                hour: tag.reminderHour,
+                minute: tag.reminderMinute,
+                isEnabled: true
+            )
         }
-        .presentationDetents([.medium, .large])
+        
+        notificationManager.scheduleReminders(reminders, sceneTags: settings.sceneTags)
     }
 }
 

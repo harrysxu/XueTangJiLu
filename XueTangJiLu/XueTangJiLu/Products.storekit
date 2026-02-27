@@ -1,0 +1,195 @@
+{
+  "identifier" : "8A3F1B2E-4D5C-6E7F-8A9B-0C1D2E3F4A5B",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "68",
+      "familyShareable" : false,
+      "internalID" : "LIFETIME001",
+      "localizations" : [
+        {
+          "description" : "一次付费，永久使用所有高级功能",
+          "displayName" : "终身买断",
+          "locale" : "zh_CN"
+        },
+        {
+          "description" : "One-time payment, use all premium features forever",
+          "displayName" : "Lifetime",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.xxl.xuetang.lifetime",
+      "referenceName" : "Lifetime Purchase",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "APP001",
+    "_developerTeamID" : "TEAM001",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : "2026-02-27T00:00:00Z",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "premium_group",
+      "localizations" : [
+        {
+          "description" : "控糖助手高级订阅",
+          "displayName" : "控糖助手 Pro",
+          "locale" : "zh_CN"
+        },
+        {
+          "description" : "Glucose Control Premium Subscription",
+          "displayName" : "Glucose Control Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "30",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "YEARLY001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "每年自动续订，最优惠",
+              "displayName" : "年订阅",
+              "locale" : "zh_CN"
+            },
+            {
+              "description" : "Auto-renew yearly, best value",
+              "displayName" : "Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.xxl.xuetang.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Yearly Subscription",
+          "subscriptionGroupID" : "premium_group",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "15",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "QUARTERLY001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "每三个月自动续订",
+              "displayName" : "季订阅",
+              "locale" : "zh_CN"
+            },
+            {
+              "description" : "Auto-renew every 3 months",
+              "displayName" : "Quarterly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.xxl.xuetang.quarterly",
+          "recurringSubscriptionPeriod" : "P3M",
+          "referenceName" : "Quarterly Subscription",
+          "subscriptionGroupID" : "premium_group",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "6",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "MONTHLY001",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "每月自动续订",
+              "displayName" : "月订阅",
+              "locale" : "zh_CN"
+            },
+            {
+              "description" : "Auto-renew monthly",
+              "displayName" : "Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.xxl.xuetang.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly Subscription",
+          "subscriptionGroupID" : "premium_group",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

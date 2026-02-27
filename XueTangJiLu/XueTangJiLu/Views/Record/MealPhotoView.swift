@@ -174,6 +174,9 @@ struct MealPhotoView: View {
                         .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
                     }
                     .buttonStyle(.plain)
+                    .fullScreenCover(isPresented: $showCamera) {
+                        ImagePicker(sourceType: .camera, selectedImageData: $selectedImageData)
+                    }
 
                     // 相册选择
                     PhotosPicker(selection: $selectedItem, matching: .images) {
@@ -326,12 +329,7 @@ struct MealPhotoView: View {
         
         isSaving = true
 
-        // 压缩照片
-        var compressedData: Data?
-        if let imageData = selectedImageData,
-           let uiImage = UIImage(data: imageData) {
-            compressedData = uiImage.jpegData(compressionQuality: 0.6)
-        }
+        let compressedData = selectedImageData
 
         if let existingRecord = editingRecord {
             // 编辑模式：更新现有记录

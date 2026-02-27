@@ -27,7 +27,7 @@ enum ThresholdGroup: String, Codable, CaseIterable, Identifiable {
     }
     
     /// 本地化的显示名称
-    var localizedDisplayName: String {
+    nonisolated var localizedDisplayName: String {
         switch self {
         case .fasting:       return String(localized: "threshold.fasting_premeal")
         case .postprandial:  return String(localized: "threshold.postmeal")
@@ -45,7 +45,7 @@ enum ThresholdGroup: String, Codable, CaseIterable, Identifiable {
     }
     
     /// 本地化的ADA推荐范围描述
-    var localizedAdaRecommendation: String {
+    nonisolated var localizedAdaRecommendation: String {
         switch self {
         case .fasting:       return String(localized: "threshold.ada_fasting")
         case .postprandial:  return String(localized: "threshold.ada_postmeal")
@@ -84,7 +84,7 @@ enum MealContext: String, Codable, CaseIterable, Identifiable {
     }
     
     /// 本地化的显示名称
-    var localizedDisplayName: String {
+    nonisolated var localizedDisplayName: String {
         switch self {
         case .beforeBreakfast: return String(localized: "meal.before_breakfast")
         case .afterBreakfast:  return String(localized: "meal.after_breakfast")

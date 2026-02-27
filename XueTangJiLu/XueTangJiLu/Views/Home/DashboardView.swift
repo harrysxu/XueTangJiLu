@@ -127,11 +127,11 @@ struct DashboardView: View {
             .navigationTitle(greetingText)
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showRecordInput) {
-                RecordInputView(viewModel: $glucoseViewModel)
+                RecordInputView(viewModel: glucoseViewModel)
                     .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showMedicationInput) {
-                MedicationInputView(viewModel: $medicationViewModel)
+                MedicationInputView(viewModel: medicationViewModel)
                     .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showMealInput) {

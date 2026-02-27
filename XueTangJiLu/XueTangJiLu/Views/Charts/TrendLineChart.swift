@@ -25,88 +25,128 @@ struct TrendLineChart: View {
     }
 
     var body: some View {
-        Chart {
-            // 目标范围背景带
-            RectangleMark(
-                yStart: .value("Low", targetLow),
-                yEnd: .value("High", targetHigh)
-            )
-            .foregroundStyle(Color.glucoseNormal.opacity(0.1))
-
-            // 数据折线
-            ForEach(dataPoints) { point in
-                LineMark(
-                    x: .value("时间", point.date),
-                    y: .value("血糖", displayValue(point.value))
-                )
-                .interpolationMethod(.catmullRom)
-                .foregroundStyle(Color.brandPrimary)
-                .lineStyle(StrokeStyle(lineWidth: 2))
-
-                PointMark(
-                    x: .value("时间", point.date),
-                    y: .value("血糖", displayValue(point.value))
-                )
-                .foregroundStyle(Color.forGlucoseLevel(point.level))
-                .symbolSize(30)
-            }
-
-            // 选中指示线
-            if let selected = selectedPoint {
-                RuleMark(x: .value("选中", selected.date))
-                    .foregroundStyle(.secondary.opacity(0.3))
-                    .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
-
-                PointMark(
-                    x: .value("选中", selected.date),
-                    y: .value("血糖", displayValue(selected.value))
-                )
-                .foregroundStyle(Color.forGlucoseLevel(selected.level))
-                .symbolSize(80)
-                .annotation(position: .top, spacing: 8) {
-                    selectedAnnotation(for: selected)
+        Group {
+            if dataPoints.isEmpty {
+                // 空状态提示
+                VStack(spacing: AppConstants.Spacing.md) {
+                    Image(systemName: "chart.line.uptrend.xyaxis")
+                        .font(.largeTitle)
+                        .foregroundStyle(.tertiary)
+                    Text(String(localized: "empty.no_data_in_range"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-            }
-        }
-        .chartYScale(domain: yDomain)
-        .chartXAxis {
-            AxisMarks(values: .automatic) { value in
-                AxisGridLine()
-                AxisValueLabel(format: .dateTime.day().month(.abbreviated))
-            }
-        }
-        .chartYAxis {
-            AxisMarks(position: .leading) { value in
-                AxisGridLine()
-                AxisValueLabel()
-            }
-        }
-        .chartOverlay { proxy in
-            GeometryReader { geometry in
-                Rectangle()
-                    .fill(.clear)
-                    .contentShape(Rectangle())
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                let xPosition = value.location.x
-                                guard let date: Date = proxy.value(atX: xPosition) else { return }
-                                // 找到最近的数据点
-                                if let closest = findClosestPoint(to: date) {
-                                    if selectedPoint?.id != closest.id {
-                                        HapticManager.medium()
-                                    }
-                                    selectedPoint = closest
-                                }
-                            }
-                            .onEnded { _ in
-                                selectedPoint = nil
-                            }
+                .frame(height: 200)
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                        .fill(Color.cardBackground)
+                )
+            } else if dataPoints.count == 1 {
+                // 单个数据点提示
+                VStack(spacing: AppConstants.Spacing.md) {
+                    Image(systemName: "chart.line.flattrend.xyaxis")
+                        .font(.largeTitle)
+                        .foregroundStyle(.tertiary)
+                    Text(String(localized: "chart.single_data_point"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Text(String(localized: "chart.single_data_point_hint"))
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(height: 200)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, AppConstants.Spacing.xl)
+                .background(
+                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                        .fill(Color.cardBackground)
+                )
+            } else {
+                Chart {
+                    // 目标范围背景带
+                    RectangleMark(
+                        yStart: .value("Low", targetLow),
+                        yEnd: .value("High", targetHigh)
                     )
+                    .foregroundStyle(Color.glucoseNormal.opacity(0.1))
+
+                    // 数据折线
+                    ForEach(dataPoints) { point in
+                        LineMark(
+                            x: .value(String(localized: "common.time"), point.date),
+                            y: .value(String(localized: "common.glucose"), displayValue(point.value))
+                        )
+                        .interpolationMethod(.catmullRom)
+                        .foregroundStyle(Color.brandPrimary)
+                        .lineStyle(StrokeStyle(lineWidth: 2))
+
+                        PointMark(
+                            x: .value(String(localized: "common.time"), point.date),
+                            y: .value(String(localized: "common.glucose"), displayValue(point.value))
+                        )
+                        .foregroundStyle(Color.forGlucoseLevel(point.level))
+                        .symbolSize(30)
+                    }
+
+                    // 选中指示线
+                    if let selected = selectedPoint {
+                        RuleMark(x: .value(String(localized: "common.selected"), selected.date))
+                            .foregroundStyle(.secondary.opacity(0.3))
+                            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
+
+                        PointMark(
+                            x: .value(String(localized: "common.selected"), selected.date),
+                            y: .value(String(localized: "common.glucose"), displayValue(selected.value))
+                        )
+                        .foregroundStyle(Color.forGlucoseLevel(selected.level))
+                        .symbolSize(80)
+                        .annotation(position: .top, spacing: 8) {
+                            selectedAnnotation(for: selected)
+                        }
+                    }
+                }
+                .chartYScale(domain: yDomain)
+                .chartXAxis {
+                    AxisMarks(values: .automatic) { value in
+                        AxisGridLine()
+                        AxisValueLabel(format: .dateTime.day().month(.abbreviated))
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks(position: .leading) { value in
+                        AxisGridLine()
+                        AxisValueLabel()
+                    }
+                }
+                .chartOverlay { proxy in
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .fill(.clear)
+                            .contentShape(Rectangle())
+                            .gesture(
+                                DragGesture(minimumDistance: 0)
+                                    .onChanged { value in
+                                        let xPosition = value.location.x
+                                        guard let date: Date = proxy.value(atX: xPosition) else { return }
+                                        if let closest = findClosestPoint(to: date) {
+                                            if selectedPoint?.id != closest.id {
+                                                HapticManager.medium()
+                                            }
+                                            selectedPoint = closest
+                                        }
+                                    }
+                                    .onEnded { _ in
+                                        selectedPoint = nil
+                                    }
+                            )
+                    }
+                }
+                .frame(height: 200)
+                .accessibilityLabel(chartAccessibilityLabel)
             }
         }
-        .frame(height: 200)
-        .accessibilityLabel(chartAccessibilityLabel)
     }
 
     // MARK: - 辅助方法
@@ -140,12 +180,12 @@ struct TrendLineChart: View {
     }
 
     private var chartAccessibilityLabel: String {
-        guard !dataPoints.isEmpty else { return "暂无趋势数据" }
+        guard !dataPoints.isEmpty else { return String(localized: "chart.no_trend_data") }
         let values = dataPoints.map(\.value)
         let maxVal = values.max() ?? 0
         let minVal = values.min() ?? 0
         let avgVal = values.reduce(0, +) / Double(values.count)
-        return "血糖趋势图，共\(dataPoints.count)个数据点，最高\(String(format: "%.1f", maxVal))，最低\(String(format: "%.1f", minVal))，平均\(String(format: "%.1f", avgVal))"
+        return String(localized: "chart.trend_summary", defaultValue: "血糖趋势图，共\(dataPoints.count)个数据点，最高\(String(format: "%.1f", maxVal))，最低\(String(format: "%.1f", minVal))，平均\(String(format: "%.1f", avgVal))")
     }
 }
 

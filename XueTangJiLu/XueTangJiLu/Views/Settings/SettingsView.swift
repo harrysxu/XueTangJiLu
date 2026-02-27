@@ -13,6 +13,7 @@ import StoreKit
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(HealthKitManager.self) private var healthKitManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query private var settingsArray: [UserSettings]
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
     @State private var showExportPDF = false
@@ -30,6 +31,9 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                // 订阅状态
+                subscriptionSection
+                
                 // 显示偏好
                 displayPreferencesSection
                 
@@ -46,6 +50,14 @@ struct SettingsView: View {
                 aboutSection
             }
             .navigationTitle(String(localized: "settings.title"))
+        }
+    }
+    
+    // MARK: - 订阅状态
+    
+    private var subscriptionSection: some View {
+        Section {
+            SubscriptionStatusCard()
         }
     }
 
@@ -224,4 +236,5 @@ struct SettingsView: View {
     SettingsView()
         .modelContainer(for: [GlucoseRecord.self, UserSettings.self], inMemory: true)
         .environment(HealthKitManager())
+        .environment(SubscriptionManager())
 }

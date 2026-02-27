@@ -40,16 +40,57 @@ final class NotificationManager {
     /// 设置每日测量提醒
     /// - Parameters:
     ///   - reminders: 提醒配置列表
-    func scheduleReminders(_ reminders: [ReminderConfig]) {
-        // 先移除旧的提醒
+    ///   - sceneTags: 场景标签列表（用于获取标签名称）
+    func scheduleReminders(_ reminders: [ReminderConfig], sceneTags: [SceneTag] = []) {
         removeAllReminders()
-
-        for reminder in reminders where reminder.isEnabled {
+        
+        let enabledReminders = reminders.filter { $0.isEnabled }
+        guard !enabledReminders.isEmpty else {
+            print("🔔 没有启用的提醒，跳过调度")
+            return
+        }
+        
+        print("🔔 开始调度提醒，共 \(enabledReminders.count) 个")
+        
+        let center = UNUserNotificationCenter.current()
+        center.getNotificationSettings { [weak self] settings in
+            guard let self else { return }
+            
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                print("🔔 通知权限未请求，自动请求授权...")
+                center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    if granted {
+                        print("✅ 用户已授权通知")
+                        self.isAuthorized = true
+                        self.doScheduleReminders(enabledReminders, sceneTags: sceneTags)
+                    } else {
+                        print("❌ 用户拒绝了通知权限: \(error?.localizedDescription ?? "无")")
+                    }
+                }
+                return
+            case .denied:
+                print("⚠️ 通知权限已被拒绝，请到 设置 > 通知 中手动开启")
+                return
+            case .authorized, .provisional, .ephemeral:
+                break
+            @unknown default:
+                break
+            }
+            
+            self.doScheduleReminders(enabledReminders, sceneTags: sceneTags)
+        }
+    }
+    
+    /// 实际执行调度逻辑
+    private func doScheduleReminders(_ reminders: [ReminderConfig], sceneTags: [SceneTag]) {
+        for reminder in reminders {
             let content = UNMutableNotificationContent()
             content.title = String(localized: "notification.glucose_reminder_title")
-            content.body = reminder.label.isEmpty ? 
-                String(localized: "notification.glucose_reminder_body") : 
-                String(localized: "notification.glucose_reminder_labeled", defaultValue: "\(reminder.label) - 记得记录血糖")
+            
+            // 从场景标签获取名称
+            let label = reminder.label(from: sceneTags)
+            content.body = String(localized: "notification.glucose_reminder_labeled", defaultValue: "\(label) - 记得记录血糖")
             content.sound = .default
             content.categoryIdentifier = "GLUCOSE_REMINDER"
 
@@ -70,7 +111,12 @@ final class NotificationManager {
 
             UNUserNotificationCenter.current().add(request) { error in
                 if let error {
-                    print("设置提醒失败: \(error)")
+                    print("❌ 设置提醒失败: \(error)")
+                } else {
+                    print("✅ 已调度提醒: \(label) at \(reminder.hour):\(String(format: "%02d", reminder.minute))")
+                    if let nextDate = trigger.nextTriggerDate() {
+                        print("   下次触发: \(nextDate)")
+                    }
                 }
             }
         }
@@ -116,6 +162,68 @@ final class NotificationManager {
     /// 移除所有提醒
     func removeAllReminders() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    }
+    
+    // MARK: - 调试功能
+    
+    /// 获取所有待处理的通知（用于调试）
+    func getPendingNotifications() async -> [UNNotificationRequest] {
+        return await UNUserNotificationCenter.current().pendingNotificationRequests()
+    }
+    
+    /// 发送测试通知（立即触发，用于调试）
+    func sendTestNotification(label: String) {
+        let center = UNUserNotificationCenter.current()
+        
+        center.getNotificationSettings { [weak self] settings in
+            print("🔍 通知权限状态: \(settings.authorizationStatus.rawValue) (0=未请求, 1=拒绝, 2=已授权, 3=临时)")
+            print("   横幅设置: \(settings.alertSetting.rawValue) (0=不支持, 1=禁用, 2=启用)")
+            print("   声音设置: \(settings.soundSetting.rawValue)")
+            
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                print("🔔 通知权限未请求，自动请求授权...")
+                center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+                    if granted {
+                        self?.isAuthorized = true
+                        self?.doSendTestNotification(label: label)
+                    } else {
+                        print("❌ 用户拒绝了通知权限")
+                    }
+                }
+            case .denied:
+                print("❌ 通知权限已被拒绝！请到 设置 > 通知 中手动开启")
+            case .authorized, .provisional, .ephemeral:
+                self?.doSendTestNotification(label: label)
+            @unknown default:
+                break
+            }
+        }
+    }
+    
+    private func doSendTestNotification(label: String) {
+        let content = UNMutableNotificationContent()
+        content.title = "🧪 " + String(localized: "notification.glucose_reminder_title")
+        content.body = String(localized: "notification.glucose_reminder_labeled", defaultValue: "\(label) - 记得记录血糖")
+        content.sound = .default
+        content.categoryIdentifier = "GLUCOSE_REMINDER"
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 3, repeats: false)
+        
+        let request = UNNotificationRequest(
+            identifier: "test_reminder_\(UUID().uuidString)",
+            content: content,
+            trigger: trigger
+        )
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error {
+                print("❌ 发送测试通知失败: \(error)")
+            } else {
+                print("✅ 测试通知已调度，3秒后触发")
+                print("   提示：保持应用在前台即可看到通知横幅")
+            }
+        }
     }
 }
 

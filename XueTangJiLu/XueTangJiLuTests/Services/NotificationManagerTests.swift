@@ -41,17 +41,38 @@ struct NotificationManagerTests {
     func testScheduleReminders() {
         let manager = NotificationManager()
         
+        let sceneTags = [
+            SceneTag(
+                id: MealContext.beforeBreakfast.rawValue,
+                label: "早餐前",
+                icon: "sunrise",
+                thresholdGroupRawValue: ThresholdGroup.fasting.rawValue,
+                isBuiltIn: true,
+                isVisible: true,
+                sortOrder: 0
+            ),
+            SceneTag(
+                id: MealContext.beforeLunch.rawValue,
+                label: "午餐前",
+                icon: "sun.max",
+                thresholdGroupRawValue: ThresholdGroup.fasting.rawValue,
+                isBuiltIn: true,
+                isVisible: true,
+                sortOrder: 1
+            )
+        ]
+        
         let reminders = [
             ReminderConfig(
-                id: "breakfast",
-                label: "早餐前",
+                id: UUID().uuidString,
+                sceneTagId: MealContext.beforeBreakfast.rawValue,
                 hour: 8,
                 minute: 0,
                 isEnabled: true
             ),
             ReminderConfig(
-                id: "lunch",
-                label: "午餐前",
+                id: UUID().uuidString,
+                sceneTagId: MealContext.beforeLunch.rawValue,
                 hour: 12,
                 minute: 0,
                 isEnabled: true
@@ -59,7 +80,7 @@ struct NotificationManagerTests {
         ]
         
         // 调用方法（实际会添加到通知中心）
-        manager.scheduleReminders(reminders)
+        manager.scheduleReminders(reminders, sceneTags: sceneTags)
         
         // 在真实测试中，我们无法直接验证UNUserNotificationCenter的状态
         // 但方法应该执行无误

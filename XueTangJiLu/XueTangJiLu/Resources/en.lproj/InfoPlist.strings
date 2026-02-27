@@ -1,3 +1,5 @@
-/* Health Permission Descriptions */
-"NSHealthShareUsageDescription" = "Blood Glucose Record needs to read your glucose data to display your complete glucose history in the app.";
-"NSHealthUpdateUsageDescription" = "Blood Glucose Record needs to sync your manually entered glucose data to the Health app for secure backup.";
+/* Privacy Permission Descriptions */
+"NSCameraUsageDescription" = "Glucose Control Assistant needs camera access to take meal photos for your records.";
+"NSPhotoLibraryUsageDescription" = "Glucose Control Assistant needs photo library access to select meal photos for your records.";
+"NSHealthShareUsageDescription" = "Glucose Control Assistant needs to read your glucose data to display your complete glucose history in the app.";
+"NSHealthUpdateUsageDescription" = "Glucose Control Assistant needs to sync your manually entered glucose data to the Health app for secure backup.";

@@ -13,6 +13,7 @@ import StoreKit
 struct ProfileView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(HealthKitManager.self) private var healthKitManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query private var settingsArray: [UserSettings]
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
     @State private var showExportPDF = false
@@ -62,6 +63,9 @@ struct ProfileView: View {
                     // 顶部概要
                     profileHeader
 
+                    // 订阅状态
+                    SubscriptionStatusCard()
+
                     // 成就概览
                     achievementSection
 
@@ -102,8 +106,11 @@ struct ProfileView: View {
                 #endif
 
             VStack(alignment: .leading, spacing: AppConstants.Spacing.xs) {
-                Text(String(localized: "profile.nickname"))
-                    .font(.title3.weight(.semibold))
+                HStack(spacing: AppConstants.Spacing.sm) {
+                    Text(String(localized: "profile.nickname"))
+                        .font(.title3.weight(.semibold))
+                    SubscriptionBadge()
+                }
 
                 HStack(spacing: AppConstants.Spacing.lg) {
                     VStack(alignment: .leading) {
@@ -277,7 +284,7 @@ struct ProfileView: View {
     }
 
     private var reminderSummary: String {
-        let enabledCount = settings.reminderConfigs.filter(\.isEnabled).count
+        let enabledCount = settings.sceneTags.filter { $0.reminderEnabled && $0.isVisible }.count
         return enabledCount > 0 ? String(format: String(localized: "profile.reminders_count"), enabledCount) : String(localized: "reminder.not_set")
     }
 
@@ -530,4 +537,5 @@ struct ProfileView: View {
     ProfileView()
         .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self], inMemory: true)
         .environment(HealthKitManager())
+        .environment(SubscriptionManager())
 }

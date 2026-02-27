@@ -11,6 +11,7 @@ import PDFKit
 
 /// 周报告视图
 struct WeeklyReportView: View {
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
     @Query(sort: \MedicationRecord.timestamp, order: .reverse) private var allMedications: [MedicationRecord]
     @Query(sort: \MealRecord.timestamp, order: .reverse) private var allMeals: [MealRecord]
@@ -19,6 +20,7 @@ struct WeeklyReportView: View {
     @State private var selectedWeek: Date = Date.now
     @State private var pdfData: Data?
     @State private var showShareSheet = false
+    @State private var showPaywall = false
     
     private var settings: UserSettings {
         settingsArray.first ?? UserSettings()
@@ -42,14 +44,35 @@ struct WeeklyReportView: View {
         let weekEnd = calendar.date(byAdding: .day, value: 6, to: weekStart)!
         
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "M月d日"
+        formatter.dateFormat = String(localized: "weekly.date_format")
         
         let year = calendar.component(.year, from: weekStart)
-        return "\(year)年 \(formatter.string(from: weekStart)) - \(formatter.string(from: weekEnd))"
+        let weekFormatString = String(localized: "weekly.week_format")
+        return String(format: weekFormatString, year, formatter.string(from: weekStart), formatter.string(from: weekEnd))
     }
     
     var body: some View {
+        Group {
+            if !FeatureManager.canAccessFeature(.pdfExport, isPremium: subscriptionManager.isPremiumUser) {
+                // 显示功能锁定视图
+                ScrollView {
+                    VStack {
+                        Spacer()
+                        FeatureLockView(feature: .pdfExport)
+                        Spacer()
+                    }
+                }
+                .navigationTitle(String(localized: "weekly.title"))
+                .navigationBarTitleDisplayMode(.inline)
+                .background(Color.pageBackground)
+            } else {
+                // 原有的PDF视图
+                pdfContentView
+            }
+        }
+    }
+    
+    private var pdfContentView: some View {
         VStack(spacing: AppConstants.Spacing.lg) {
             // 周选择
             weekSelectionSection
@@ -63,7 +86,7 @@ struct WeeklyReportView: View {
             } else {
                 VStack {
                     Spacer()
-                    ProgressView("生成周报告中...")
+                    ProgressView(String(localized: "weekly.generating"))
                     Spacer()
                 }
             }
@@ -71,7 +94,7 @@ struct WeeklyReportView: View {
             // 分享按钮
             if pdfData != nil {
                 Button(action: sharePDF) {
-                    Label("分享周报告", systemImage: "square.and.arrow.up")
+                    Label(String(localized: "weekly.share_button"), systemImage: "square.and.arrow.up")
                         .font(.body.weight(.semibold))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -83,7 +106,7 @@ struct WeeklyReportView: View {
                 .padding(.bottom, AppConstants.Spacing.sm)
             }
         }
-        .navigationTitle("周报告")
+        .navigationTitle(String(localized: "weekly.title"))
         .navigationBarTitleDisplayMode(.inline)
         .background(Color.pageBackground)
         .onAppear {
@@ -99,12 +122,12 @@ struct WeeklyReportView: View {
     private var weekSelectionSection: some View {
         VStack(spacing: AppConstants.Spacing.sm) {
             HStack {
-                Text("选择周")
+                Text(String(localized: "weekly.select_week"))
                     .font(.subheadline.weight(.semibold))
                 Spacer()
             }
             
-            Picker("周", selection: $selectedWeek) {
+            Picker(String(localized: "weekly.week_label"), selection: $selectedWeek) {
                 ForEach(recentWeeks, id: \.self) { week in
                     Text(weekString(for: week)).tag(week)
                 }
@@ -140,8 +163,9 @@ struct WeeklyReportView: View {
     private func sharePDF() {
         guard let pdfData else { return }
         
+        let filenamePrefix = String(localized: "weekly.filename_prefix")
         let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("周报告_\(weekString(for: selectedWeek)).pdf")
+            .appendingPathComponent("\(filenamePrefix)_\(weekString(for: selectedWeek)).pdf")
         try? pdfData.write(to: tempURL)
         
         let activityVC = UIActivityViewController(

@@ -38,6 +38,8 @@
 
 /* Record Input */
 "save.record" = "Save Record";
+"save" = "Save";
+"add" = "Add";
 "cancel" = "Cancel";
 "note" = "Note";
 "hide.note" = "Hide Note";
@@ -86,6 +88,12 @@
 "sync.history.empty" = "No sync history";
 "sync.reset.title" = "Reset Sync State";
 "sync.reset.message" = "This will clear local sync cache and re-fetch data from iCloud. Your data will not be deleted.";
+"sync.event.download" = "Downloaded from iCloud";
+"sync.event.upload" = "Uploaded to iCloud";
+"sync.event.setup" = "Setup";
+"sync.count.glucose" = "%d glucose records";
+"sync.count.medication" = "%d medication records";
+"sync.count.meal" = "%d meal records";
 
 /* Glucose Level */
 "level.low" = "Low";
@@ -171,7 +179,7 @@
 "reminder.save" = "Save Reminders";
 
 /* App Name */
-"app.name" = "Blood Glucose Record";
+"app.name" = "Glucose Control Assistant";
 
 /* Share Card */
 "share.today_summary" = "Today's Glucose Summary · %@";
@@ -184,7 +192,7 @@
 "disclaimer.item2" = "All data analysis is for reference only and does not constitute medical advice";
 "disclaimer.item3" = "Seek medical attention immediately if glucose levels are abnormal, follow doctor's advice";
 "disclaimer.item4" = "Immediately consume sugar if experiencing hypoglycemia, call emergency services if necessary";
-"disclaimer.description" = "Blood Glucose Record helps you track and understand your glucose data, but should not be the sole basis for medical decisions. Regular check-ups and professional medical guidance are essential.";
+"disclaimer.description" = "Glucose Control Assistant helps you track and understand your glucose data, but should not be the sole basis for medical decisions. Regular check-ups and professional medical guidance are essential.";
 "disclaimer.navigation_title" = "Usage Notice";
 "disclaimer.accept" = "I Understand";
 "disclaimer.banner" = "Data is for reference only, does not constitute medical advice, please follow doctor's orders";
@@ -192,11 +200,11 @@
 /* About - Privacy & Disclaimer */
 "about.privacy.title" = "Privacy Policy";
 "about.disclaimer.title" = "Disclaimer";
-"about.privacy.content" = "Blood Glucose Record Privacy Policy\n\nLast Updated: February 12, 2026\n\n1. Data Collection\nThis app does not collect any personal information to developer servers. All glucose records are stored only on your device locally and in your private iCloud account.\n\n2. Data Storage\n• Local Storage: Glucose records are saved in your device's local database\n• iCloud Sync: If you enable iCloud, data will sync across your devices through your private iCloud account\n• Apple Health: If you authorize, glucose data will sync to the Apple Health app\n\n3. Data Security\n• All local data is protected by iOS system-level encryption\n• iCloud transmission uses TLS encryption\n• Developers cannot access any of your data\n\n4. Third-Party Services\nThis app does not integrate any third-party analytics, advertising, or tracking SDKs.\n\n5. Data Export & Deletion\n• You can export all data at any time through the settings page (PDF or CSV format)\n• You can delete any record at any time\n• Deleting the app will remove all local data (data in iCloud and Health needs to be managed separately)\n\n6. Contact Us\nFor privacy-related questions, please contact us through the App Store page.";
-"about.disclaimer.content" = "Disclaimer\n\nImportant Notice: Please read the following carefully before using this application.\n\n1. Not a Medical Device\nBlood Glucose Record (XueTangJiLu) is a personal health data recording tool, not a medical device, and does not have medical diagnostic capabilities.\n\n2. No Medical Advice\nThis app does not provide any form of medical diagnosis, treatment advice, or medication guidance. Statistical data shown in the app (such as average glucose, time in range, etc.) are for reference only and should not be used as a basis for medical decisions.\n\n3. Consult Your Doctor\nBefore making any medical decisions, always consult your doctor or professional healthcare provider. Do not adjust medication dosages or treatment plans based solely on data from this app.\n\n4. Data Accuracy\nData recorded in this app is based on user manual input, and data accuracy is the user's responsibility. Please ensure that the glucose values you enter match your glucose meter readings.\n\n5. Emergency Situations\nIf you experience severe hypoglycemia, hyperglycemia, or other medical emergencies, immediately call emergency services or go to the nearest medical facility.\n\n6. Limitation of Liability\nTo the maximum extent permitted by law, the developer is not responsible for any direct or indirect damages arising from the use of this app.";
+"about.privacy.content" = "Glucose Control Assistant Privacy Policy\n\nLast Updated: February 12, 2026\n\n1. Data Collection\nThis app does not collect any personal information to developer servers. All glucose records are stored only on your device locally and in your private iCloud account.\n\n2. Data Storage\n• Local Storage: Glucose records are saved in your device's local database\n• iCloud Sync: If you enable iCloud, data will sync across your devices through your private iCloud account\n• Apple Health: If you authorize, glucose data will sync to the Apple Health app\n\n3. Data Security\n• All local data is protected by iOS system-level encryption\n• iCloud transmission uses TLS encryption\n• Developers cannot access any of your data\n\n4. Third-Party Services\nThis app does not integrate any third-party analytics, advertising, or tracking SDKs.\n\n5. Data Export & Deletion\n• You can export all data at any time through the settings page (PDF or CSV format)\n• You can delete any record at any time\n• Deleting the app will remove all local data (data in iCloud and Health needs to be managed separately)\n\n6. Contact Us\nFor privacy-related questions, please contact us through the App Store page.";
+"about.disclaimer.content" = "Disclaimer\n\nImportant Notice: Please read the following carefully before using this application.\n\n1. Not a Medical Device\nGlucose Control Assistant (XueTangJiLu) is a personal health data recording tool, not a medical device, and does not have medical diagnostic capabilities.\n\n2. No Medical Advice\nThis app does not provide any form of medical diagnosis, treatment advice, or medication guidance. Statistical data shown in the app (such as average glucose, time in range, etc.) are for reference only and should not be used as a basis for medical decisions.\n\n3. Consult Your Doctor\nBefore making any medical decisions, always consult your doctor or professional healthcare provider. Do not adjust medication dosages or treatment plans based solely on data from this app.\n\n4. Data Accuracy\nData recorded in this app is based on user manual input, and data accuracy is the user's responsibility. Please ensure that the glucose values you enter match your glucose meter readings.\n\n5. Emergency Situations\nIf you experience severe hypoglycemia, hyperglycemia, or other medical emergencies, immediately call emergency services or go to the nearest medical facility.\n\n6. Limitation of Liability\nTo the maximum extent permitted by law, the developer is not responsible for any direct or indirect damages arising from the use of this app.";
 
 /* Onboarding */
-"onboarding.welcome" = "Blood Glucose Record";
+"onboarding.welcome" = "Glucose Control Assistant";
 "onboarding.slogan" = "Simple Glucose Management";
 "onboarding.start" = "Get Started";
 "onboarding.next" = "Next";
@@ -328,6 +336,7 @@
 "record.edit" = "Edit Record";
 "record.save_changes" = "Save Changes";
 "record.more" = "More";
+"record.select_scene" = "Select Scene";
 "record.quick_select" = "Quick Select";
 "record.time.now" = "Now";
 "record.time.1h_ago" = "1 hour ago";
@@ -433,6 +442,9 @@
 "tag.lower_limit" = "Lower Limit";
 "tag.upper_limit" = "Upper Limit";
 "tag.reference_advice" = "Reference";
+"tag.hide_warning_title" = "Hide Scene Tag";
+"tag.hide_warning_message" = "This scene has enabled reminders. Hiding it will also hide the reminders.";
+"tag.hide_anyway" = "Hide Anyway";
 
 /* Sync Settings */
 "sync.title" = "iCloud Sync";
@@ -450,7 +462,7 @@
 "sync.wifi_only" = "WiFi Only";
 "sync.sync_now" = "Sync Now";
 "sync.last_sync" = "Last Sync";
-"sync.footer" = "When enabled, data will sync to your iCloud account. WiFi only sync saves cellular data.";
+"sync.footer" = "When enabled, data will sync to your iCloud account automatically. Sync Now checks sync status and updates timestamp. WiFi only sync saves cellular data.";
 "sync.history" = "Sync History";
 "sync.no_history" = "No sync history";
 "sync.history_footer" = "Shows recent sync activity";
@@ -584,12 +596,9 @@
 "sync.status.syncing" = "Syncing";
 "sync.status.synced" = "Synced";
 "sync.status.failed" = "Failed";
-"sync.last_sync" = "Last sync: %@";
 "sync.pending_items" = "%d items pending";
 "sync.never_synced" = "Never Synced";
-"sync.event.import" = "Import";
-"sync.event.export" = "Export";
-"sync.event.setup" = "Initialize";
+"sync.event.manual_sync" = "Manual Sync";
 "sync.error.disabled" = "Sync Disabled";
 "sync.error.no_network" = "No Network Connection";
 "sync.error.wifi_required" = "WiFi Required";
@@ -620,12 +629,37 @@
 "reminder.before_dinner" = "Before Dinner";
 "reminder.after_dinner" = "After Dinner";
 "reminder.bedtime" = "Bedtime";
+"reminder.add_reminder" = "Add Reminder";
+"reminder.select_scene" = "Select Scene";
+"reminder.scene" = "Scene";
+"reminder.please_select" = "Please Select";
+"reminder.select_time" = "Select Time";
+"reminder.hour" = "Hour";
+"reminder.minute" = "Minute";
+"reminder.add" = "Add";
+"reminder.settings" = "Reminder Settings";
+"reminder.enable_reminder" = "Enable Reminder";
+"reminder.time" = "Reminder Time";
+"reminder.tag_footer" = "When enabled, you will receive a notification at the specified time";
+"reminder.no_reminders" = "No reminders";
+"reminder.manage_in_tags" = "Manage in Tags";
+"reminder.manage_footer" = "Reminder settings have been moved to the tag management page. You can configure individual reminder times for each scene tag.";
 
 /* Monthly Report */
 "monthly.title" = "Monthly Summary";
 "monthly.generating" = "Generating monthly report...";
 "monthly.share_button" = "Share Monthly Report";
 "monthly.filename_prefix" = "Glucose Monthly Summary";
+
+/* Weekly Report */
+"weekly.title" = "Weekly Report";
+"weekly.generating" = "Generating weekly report...";
+"weekly.share_button" = "Share Weekly Report";
+"weekly.select_week" = "Select Week";
+"weekly.week_label" = "Week";
+"weekly.filename_prefix" = "Weekly Report";
+"weekly.week_format" = "%d %@ - %@";
+"weekly.date_format" = "MMM d";
 
 /* CSV Export */
 "csv.title" = "Export CSV Data";
@@ -714,3 +748,115 @@
 "pdf.weekly_comparison" = "This Week vs Last Week";
 "pdf.need_full_history" = "Full history needed for comparison";
 "pdf.scene_compliance_short" = "Scene Compliance";
+
+/* Common */
+"common.insufficient_data" = "Insufficient Data";
+"common.time" = "Time";
+"common.glucose" = "Glucose";
+"common.selected" = "Selected";
+
+/* Chart Accessibility */
+"chart.no_trend_data" = "No trend data";
+"chart.trend_summary" = "Glucose trend chart, %d data points, max %.1f, min %.1f, avg %.1f";
+
+/* Date Range Picker */
+"date_range.start_date" = "Start Date";
+"date_range.end_date" = "End Date";
+"date_range.select_range" = "Select Date Range";
+"date_range.select_range_footer" = "Select the start and end dates to view";
+"date_range.custom" = "Custom Date Range";
+"date_range.confirm" = "Confirm";
+
+/* Empty States */
+"empty.no_data_in_range" = "No data in selected time range";
+
+/* Chart */
+"chart.single_data_point" = "Insufficient data points";
+"chart.single_data_point_hint" = "Line charts require at least 2 data points to show trends. Try selecting a shorter time range or adding more records";
+
+/* Subscription */
+"subscription.title" = "Unlock Full Features";
+"subscription.monthly" = "Monthly";
+"subscription.quarterly" = "Quarterly";
+"subscription.yearly" = "Yearly";
+"subscription.lifetime" = "Lifetime";
+"subscription.monthly.description" = "Auto-renew monthly";
+"subscription.quarterly.description" = "Auto-renew quarterly";
+"subscription.yearly.description" = "Auto-renew yearly";
+"subscription.lifetime.description" = "One-time payment, use forever";
+"subscription.duration.monthly" = "per month";
+"subscription.duration.quarterly" = "per quarter";
+"subscription.duration.yearly" = "per year";
+"subscription.duration.lifetime" = "Forever";
+"subscription.label.recommended" = "Recommended";
+"subscription.label.per_period" = "per period";
+"subscription.label.per_month" = "%@/mo";
+"subscription.header.title" = "Unlock Full Features";
+"subscription.header.subtitle" = "Unlimited records, iCloud sync, professional reports and more";
+"subscription.button.subscribe" = "Subscribe Now";
+"subscription.button.price_info" = "Price includes all taxes. Subscription auto-renews";
+"subscription.button.restore" = "Restore Purchases";
+"subscription.button.manage" = "Manage Subscription";
+"subscription.link.privacy" = "Privacy Policy";
+"subscription.link.terms" = "Terms of Service";
+"subscription.status.free" = "Free";
+"subscription.status.active" = "Subscribed";
+"subscription.status.premium" = "Premium Member";
+"subscription.summary.free" = "Currently using free version";
+"subscription.summary.lifetime" = "Lifetime member";
+"subscription.summary.expires" = "Expires";
+"subscription.summary.early_bird" = "Early bird";
+"subscription.upgrade.title" = "Unlock Premium Features";
+"subscription.upgrade.subtitle" = "Unlimited records • iCloud sync • PDF export";
+"subscription.badge.pro" = "Pro";
+
+/* Features */
+"feature.unlimited_records" = "Unlimited Records";
+"feature.icloud_sync" = "iCloud Sync";
+"feature.pdf_export" = "PDF Export";
+"feature.csv_export" = "CSV Export";
+"feature.apple_watch" = "Apple Watch";
+"feature.advanced_charts" = "Advanced Charts";
+"feature.medication_tracking" = "Medication Tracking";
+"feature.meal_photo_tracking" = "Meal Photo Tracking";
+"feature.description.unlimited_records" = "No daily limit on glucose records";
+"feature.description.icloud_sync" = "Sync data across all your devices";
+"feature.description.pdf_export" = "Generate professional reports for medical visits";
+"feature.description.csv_export" = "Export raw data for further analysis";
+"feature.description.apple_watch" = "Quick glucose logging on your wrist";
+"feature.description.advanced_charts" = "View meal pairing, weekly comparison and more";
+"feature.description.medication_tracking" = "Track and manage medications";
+"feature.description.meal_photo_tracking" = "Capture every meal with photos";
+"feature.button.unlock" = "Unlock Feature";
+"feature.button.unlock_short" = "Unlock";
+"feature.button.upgrade" = "Upgrade";
+"feature.alert.title" = "Upgrade Required";
+"feature.unlock.unlimited_records" = "Upgrade to record unlimited glucose data";
+"feature.unlock.icloud_sync" = "Upgrade to sync data across devices";
+"feature.unlock.pdf_export" = "Upgrade to export professional PDF reports";
+"feature.unlock.csv_export" = "Upgrade to export CSV data";
+"feature.unlock.apple_watch" = "Upgrade to use Apple Watch";
+"feature.unlock.advanced_charts" = "Upgrade to view advanced charts";
+"feature.unlock.meal_photo_tracking" = "Upgrade to take meal photos";
+
+/* Limitations */
+"limit.daily_records" = "Daily record limit reached";
+"limit.upgrade_prompt" = "Upgrade for unlimited records";
+"limit.history_restricted" = "Free version shows last 7 days only";
+"limit.banner.daily_records" = "%d/%d records remaining";
+"limit.banner.history_days" = "Free version shows last %d days only";
+
+/* Store */
+"store.error.title" = "Purchase Failed";
+"store.error.load_failed" = "Unable to load products";
+"store.error.purchase_failed" = "Purchase failed, please try again";
+"store.error.restore_failed" = "Restore failed";
+"store.error.verification_failed" = "Transaction verification failed";
+"store.error.pending" = "Purchase pending, awaiting parental approval";
+"store.button.retry" = "Retry";
+"store.restore.success" = "Restore Successful";
+"store.restore.success.message" = "Your purchases have been restored";
+
+/* Common */
+"common.ok" = "OK";
+"common.cancel" = "Cancel";

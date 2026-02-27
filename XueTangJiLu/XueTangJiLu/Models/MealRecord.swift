@@ -64,6 +64,7 @@ final class MealRecord {
     var mealDescription: String = ""
 
     /// 照片数据（JPEG compressed）
+    @Attribute(.externalStorage)
     var photoData: Data?
 
     /// 记录时间

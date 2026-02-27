@@ -10,6 +10,7 @@ import SwiftData
 
 /// CSV 导出视图，支持日期范围选择
 struct CSVExportView: View {
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(sort: \GlucoseRecord.timestamp, order: .reverse) private var allRecords: [GlucoseRecord]
     @Query(sort: \MedicationRecord.timestamp, order: .reverse) private var allMedications: [MedicationRecord]
     @Query(sort: \MealRecord.timestamp, order: .reverse) private var allMeals: [MealRecord]
@@ -51,18 +52,30 @@ struct CSVExportView: View {
     }
     
     var body: some View {
+        Group {
+            if !FeatureManager.canAccessFeature(.csvExport, isPremium: subscriptionManager.isPremiumUser) {
+                ScrollView {
+                    VStack {
+                        Spacer()
+                        FeatureLockView(feature: .csvExport)
+                        Spacer()
+                    }
+                }
+                .navigationTitle(String(localized: "csv.title"))
+                .navigationBarTitleDisplayMode(.inline)
+                .background(Color.pageBackground)
+            } else {
+                csvContentView
+            }
+        }
+    }
+    
+    private var csvContentView: some View {
         ScrollView {
             VStack(spacing: AppConstants.Spacing.xl) {
-                // 日期范围选择
                 dateRangeSection
-                
-                // 记录类型选择
                 recordTypeSection
-                
-                // 统计信息
                 statsSection
-                
-                // 导出按钮
                 exportButton
             }
             .padding(.horizontal, AppConstants.Spacing.lg)
@@ -210,4 +223,5 @@ struct CSVExportView: View {
         CSVExportView()
     }
     .modelContainer(for: [GlucoseRecord.self, UserSettings.self, MedicationRecord.self, MealRecord.self], inMemory: true)
+    .environment(SubscriptionManager())
 }

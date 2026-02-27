@@ -37,6 +37,14 @@ struct SyncStatusBadge: View {
                 Image(systemName: "icloud.and.arrow.up")
                     .symbolEffect(.pulse)
                 
+            case .importing:
+                Image(systemName: "icloud.and.arrow.down")
+                    .symbolEffect(.pulse)
+                
+            case .exporting:
+                Image(systemName: "icloud.and.arrow.up")
+                    .symbolEffect(.pulse)
+                
             case .success:
                 Image(systemName: "checkmark.icloud")
                 
@@ -55,7 +63,7 @@ struct SyncStatusBadge: View {
         switch syncManager.currentState {
         case .idle:
             return .secondary
-        case .syncing:
+        case .syncing, .importing, .exporting:
             return .blue
         case .success:
             return .green
@@ -74,6 +82,10 @@ struct SyncStatusBadge: View {
             return ""
         case .syncing:
             return "同步中"
+        case .importing:
+            return "下载中"
+        case .exporting:
+            return "上传中"
         case .success:
             return "已同步"
         case .failed:
@@ -157,6 +169,10 @@ struct SyncStatusDetailView: View {
             return "就绪"
         case .syncing:
             return "正在同步"
+        case .importing:
+            return "正在下载"
+        case .exporting:
+            return "正在上传"
         case .success:
             return "同步成功"
         case .failed(let error):

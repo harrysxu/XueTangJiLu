@@ -123,10 +123,21 @@ final class ChartViewModel {
 
         return grouped.map { (date, dayRecords) in
             let avg = dayRecords.reduce(0.0) { $0 + $1.value } / Double(dayRecords.count)
+            
+            // 使用场景感知的血糖水平判定
+            let level: GlucoseLevel
+            if let settings {
+                // 如果有多个场景的记录，使用包络范围
+                let range = effectiveThresholdRange(settings: settings)
+                level = GlucoseLevel.from(value: avg, low: range.low, high: range.high)
+            } else {
+                level = GlucoseLevel.from(value: avg)
+            }
+            
             return ChartDataPoint(
                 date: date,
                 value: avg,
-                level: GlucoseLevel.from(value: avg)
+                level: level
             )
         }
         .sorted { $0.date < $1.date }

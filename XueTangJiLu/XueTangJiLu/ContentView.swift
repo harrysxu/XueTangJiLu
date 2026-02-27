@@ -21,6 +21,9 @@ struct ContentView: View {
             for dup in result.toDelete {
                 modelContext.delete(dup)
             }
+            // 保存去重结果
+            try? modelContext.save()
+            print("⚠️ 检测到\(settingsArray.count)个UserSettings实例，已去重保留1个")
             return result.keep
         }
 
@@ -29,10 +32,13 @@ struct ContentView: View {
             existing.initializeLocalizedDefaultTagsIfNeeded()
             return existing
         }
+        
+        // 创建新的设置实例
         let newSettings = UserSettings()
         modelContext.insert(newSettings)
         // 初始化本地化的默认标签
         newSettings.initializeLocalizedDefaultTagsIfNeeded()
+        print("✅ 创建新的UserSettings实例")
         return newSettings
     }
 

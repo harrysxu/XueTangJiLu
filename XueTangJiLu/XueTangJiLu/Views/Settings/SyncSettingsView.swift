@@ -12,21 +12,37 @@ import CloudKit
 /// iCloud 同步设置页面
 struct SyncSettingsView: View {
     @Environment(CloudKitSyncManager.self) private var syncManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.modelContext) private var modelContext
     
     @State private var showError: Error?
     @State private var isSyncing = false
+    @State private var showRestartAlert = false
+    @State private var pendingSyncEnabled: Bool?
+    @State private var showPaywall = false
     
     var body: some View {
         Form {
+            // 功能锁定提示（免费用户）
+            if !FeatureManager.canAccessFeature(.iCloudSync, isPremium: subscriptionManager.isPremiumUser) {
+                Section {
+                    FeatureLockBanner(feature: .iCloudSync)
+                }
+            }
+            
             // 账户状态
             accountStatusSection
             
             // 同步控制
             syncControlSection
             
-            // 同步历史
-            syncHistorySection
+            // 诊断工具
+            diagnosticsSection
+            
+            // 同步历史 - 只在账户可用时显示
+            if syncManager.iCloudAccountStatus == .available {
+                syncHistorySection
+            }
         }
         .navigationTitle(String(localized: "sync.title"))
         .navigationBarTitleDisplayMode(.inline)
@@ -35,6 +51,29 @@ struct SyncSettingsView: View {
             set: { showError = $0?.error }
         )) { wrapper in
             SyncErrorView(error: wrapper.error)
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+        }
+        .alert("需要重启应用", isPresented: $showRestartAlert) {
+            Button("稍后重启", role: .cancel) {
+                // 恢复原来的设置
+                if let pending = pendingSyncEnabled {
+                    syncManager.isSyncEnabled = !pending
+                    pendingSyncEnabled = nil
+                }
+            }
+            Button("立即重启") {
+                // 应用更改并退出应用
+                if let pending = pendingSyncEnabled {
+                    syncManager.isSyncEnabled = pending
+                    pendingSyncEnabled = nil
+                }
+                // 退出应用，iOS 会自动重启
+                exit(0)
+            }
+        } message: {
+            Text("更改同步设置需要重启应用才能生效。\n\n当前设置：\(syncManager.isSyncEnabled ? "已启用" : "已禁用")\n新设置：\(pendingSyncEnabled == true ? "启用" : "禁用")")
         }
     }
     
@@ -147,8 +186,21 @@ struct SyncSettingsView: View {
         Section {
             Toggle(String(localized: "sync.enable"), isOn: Binding(
                 get: { syncManager.isSyncEnabled },
-                set: { syncManager.isSyncEnabled = $0 }
+                set: { newValue in
+                    // 检查付费权限
+                    if !FeatureManager.canAccessFeature(.iCloudSync, isPremium: subscriptionManager.isPremiumUser) {
+                        showPaywall = true
+                        return
+                    }
+                    
+                    // 检测到同步开关变化
+                    if newValue != syncManager.isSyncEnabled {
+                        pendingSyncEnabled = newValue
+                        showRestartAlert = true
+                    }
+                }
             ))
+            .disabled(!FeatureManager.canAccessFeature(.iCloudSync, isPremium: subscriptionManager.isPremiumUser))
             
             Toggle(String(localized: "sync.wifi_only"), isOn: Binding(
                 get: { syncManager.wifiOnlySync },
@@ -169,7 +221,37 @@ struct SyncSettingsView: View {
             }
             .disabled(!canManualSync || isSyncing)
             
-            if syncManager.lastSyncDate != nil {
+            // 同步状态实时显示
+            if syncManager.isPerformingInitialImport {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("正在从 iCloud 下载数据...")
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                }
+                .padding(.vertical, 4)
+            } else if case .importing = syncManager.currentState {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("正在从 iCloud 导入...")
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                }
+                .padding(.vertical, 4)
+            } else if case .exporting = syncManager.currentState {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("正在上传到 iCloud...")
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                }
+                .padding(.vertical, 4)
+            }
+            
+            if syncManager.iCloudAccountStatus == .available && syncManager.lastSyncDate != nil {
                 HStack {
                     Text(String(localized: "sync.last_sync"))
                         .foregroundStyle(.secondary)
@@ -184,7 +266,35 @@ struct SyncSettingsView: View {
         } header: {
             Text(String(localized: "sync.settings"))
         } footer: {
-            Text(String(localized: "sync.footer"))
+            VStack(alignment: .leading, spacing: 8) {
+                Text(String(localized: "sync.footer"))
+                
+                Text("⚠️ 更改同步设置需要重启应用才能生效")
+                    .foregroundStyle(.orange)
+                    .font(.caption)
+                
+                Text("💡 重新安装后首次同步可能需要几分钟，请保持应用在前台并确保网络畅通")
+                    .foregroundStyle(.secondary)
+                    .font(.caption)
+            }
+        }
+    }
+    
+    // MARK: - Diagnostics Section
+    
+    private var diagnosticsSection: some View {
+        Section {
+            NavigationLink(destination: CloudKitDiagnosticsView()) {
+                Label("CloudKit 诊断", systemImage: "stethoscope")
+            }
+            
+            NavigationLink(destination: SyncDebugView()) {
+                Label("同步调试", systemImage: "wrench.and.screwdriver")
+            }
+        } header: {
+            Text("诊断工具")
+        } footer: {
+            Text("使用诊断工具检查 CloudKit 配置和同步问题")
         }
     }
     
@@ -199,8 +309,7 @@ struct SyncSettingsView: View {
         isSyncing = true
         Task {
             do {
-                try await syncManager.manualSync()
-                try await Task.sleep(for: .seconds(2))
+                try await syncManager.manualSync(modelContext: modelContext)
             } catch {
                 showError = error
             }
@@ -219,18 +328,34 @@ struct SyncSettingsView: View {
                     .padding()
             } else {
                 ForEach(syncManager.syncHistory.prefix(10)) { event in
-                    HStack {
+                    HStack(spacing: AppConstants.Spacing.md) {
+                        // 成功/失败图标
                         Image(systemName: event.isSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
                             .foregroundStyle(event.isSuccess ? .green : .red)
                         
+                        // 方向图标
+                        Image(systemName: syncDirectionIcon(for: event.type))
+                            .foregroundStyle(.blue)
+                            .font(.caption)
+                        
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(event.type.rawValue)
+                            // 事件类型
+                            Text(String(localized: LocalizedStringResource(stringLiteral: event.type.localizedKey)))
                                 .font(.subheadline)
                             
+                            // 数据统计
+                            if let countString = event.formattedCountString() {
+                                Text(countString)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            
+                            // 时间
                             Text(event.timestamp, style: .relative)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             
+                            // 错误信息
                             if let error = event.errorMessage {
                                 Text(error)
                                     .font(.caption2)
@@ -241,12 +366,26 @@ struct SyncSettingsView: View {
                         
                         Spacer()
                     }
+                    .padding(.vertical, 2)
                 }
             }
         } header: {
             Text(String(localized: "sync.history"))
         } footer: {
             Text(String(localized: "sync.history_footer"))
+        }
+    }
+    
+    private func syncDirectionIcon(for type: CloudKitSyncManager.SyncEvent.EventType) -> String {
+        switch type {
+        case .downloadFromCloud:
+            return "icloud.and.arrow.down"
+        case .uploadToCloud:
+            return "icloud.and.arrow.up"
+        case .setup:
+            return "gearshape"
+        case .manualSync:
+            return "arrow.triangle.2.circlepath"
         }
     }
 }

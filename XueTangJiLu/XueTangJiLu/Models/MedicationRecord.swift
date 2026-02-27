@@ -110,9 +110,9 @@ final class MedicationRecord {
     /// 格式化显示剂量
     var displayDosage: String {
         if dosage == Double(Int(dosage)) {
-            return "\(Int(dosage)) \(medicationType.unitLabel)"
+            return "\(Int(dosage)) \(medicationType.localizedUnitLabel)"
         }
-        return String(format: "%.1f %@", dosage, medicationType.unitLabel)
+        return String(format: "%.1f %@", dosage, medicationType.localizedUnitLabel)
     }
 
     // MARK: - 初始化

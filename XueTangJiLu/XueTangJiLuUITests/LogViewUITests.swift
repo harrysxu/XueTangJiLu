@@ -131,10 +131,8 @@ final class LogViewUITests: XCTestCase {
             let deleteButton = app.buttons.matching(NSPredicate(format: "label CONTAINS '删除' OR label CONTAINS 'Delete'")).firstMatch
             
             if waitForElement(deleteButton, timeout: 2) {
-                // 注意：这里不实际删除，避免影响其他测试
-                // deleteButton.tap()
-                
-                // 取消删除
+                // 测试策略：验证删除按钮可访问，但不执行删除以保护测试数据
+                // 取消删除操作
                 firstRecord.swipeRight()
             }
         }

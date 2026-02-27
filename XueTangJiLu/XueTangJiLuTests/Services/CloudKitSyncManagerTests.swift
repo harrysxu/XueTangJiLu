@@ -97,7 +97,7 @@ struct CloudKitSyncManagerTests {
         let manager = CloudKitSyncManager()
         
         let event = CloudKitSyncManager.SyncEvent(
-            type: .importData,
+            type: .downloadFromCloud,
             isSuccess: true
         )
         
@@ -111,14 +111,68 @@ struct CloudKitSyncManagerTests {
     func testClearSyncHistory() {
         let manager = CloudKitSyncManager()
         
-        manager.syncHistory.append(CloudKitSyncManager.SyncEvent(type: .importData, isSuccess: true))
-        manager.syncHistory.append(CloudKitSyncManager.SyncEvent(type: .exportData, isSuccess: true))
+        manager.syncHistory.append(CloudKitSyncManager.SyncEvent(type: .downloadFromCloud, isSuccess: true))
+        manager.syncHistory.append(CloudKitSyncManager.SyncEvent(type: .uploadToCloud, isSuccess: true))
+        manager.lastSyncDate = Date.now
         
         #expect(manager.syncHistory.count == 2)
+        #expect(manager.lastSyncDate != nil)
         
         manager.clearSyncHistory()
         
         #expect(manager.syncHistory.isEmpty)
+        #expect(manager.lastSyncDate == nil)
+    }
+    
+    @Test("账户不可用时清除同步数据")
+    func testClearSyncDataWhenAccountUnavailable() {
+        let manager = CloudKitSyncManager()
+        
+        // 添加同步数据
+        manager.syncHistory.append(CloudKitSyncManager.SyncEvent(type: .downloadFromCloud, isSuccess: true))
+        manager.lastSyncDate = Date.now
+        
+        #expect(manager.syncHistory.count == 1)
+        #expect(manager.lastSyncDate != nil)
+        
+        // 设置账户状态为不可用
+        manager.iCloudAccountStatus = .noAccount
+        
+        // 验证数据被清除
+        #expect(manager.syncHistory.isEmpty)
+        #expect(manager.lastSyncDate == nil)
+    }
+    
+    @Test("账户受限时清除同步数据")
+    func testClearSyncDataWhenAccountRestricted() {
+        let manager = CloudKitSyncManager()
+        
+        // 添加同步数据
+        manager.syncHistory.append(CloudKitSyncManager.SyncEvent(type: .downloadFromCloud, isSuccess: true))
+        manager.lastSyncDate = Date.now
+        
+        // 设置账户状态为受限
+        manager.iCloudAccountStatus = .restricted
+        
+        // 验证数据被清除
+        #expect(manager.syncHistory.isEmpty)
+        #expect(manager.lastSyncDate == nil)
+    }
+    
+    @Test("账户状态不确定时不清除数据")
+    func testKeepSyncDataWhenStatusUndetermined() {
+        let manager = CloudKitSyncManager()
+        
+        // 添加同步数据
+        manager.syncHistory.append(CloudKitSyncManager.SyncEvent(type: .downloadFromCloud, isSuccess: true))
+        manager.lastSyncDate = Date.now
+        
+        // 设置账户状态为不确定
+        manager.iCloudAccountStatus = .couldNotDetermine
+        
+        // 验证数据未被清除
+        #expect(manager.syncHistory.count == 1)
+        #expect(manager.lastSyncDate != nil)
     }
     
     // MARK: - 最后同步时间测试

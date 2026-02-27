@@ -57,6 +57,7 @@ enum TestDataTimeSpan: Int, CaseIterable, Identifiable {
 struct TestDataGeneratorView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Query(filter: #Predicate<GlucoseRecord> { $0.source == "test_data" })
     private var existingTestGlucoseRecords: [GlucoseRecord]
     @Query(filter: #Predicate<MedicationRecord> { $0.note == "test_data" })
@@ -102,6 +103,7 @@ struct TestDataGeneratorView: View {
                 previewSection
                 generateButtonSection
                 deleteSection
+                subscriptionSimulationSection
             }
             .navigationTitle("测试数据生成器")
             .navigationBarTitleDisplayMode(.inline)
@@ -280,6 +282,107 @@ struct TestDataGeneratorView: View {
                     .font(.caption2)
             }
         }
+    }
+
+    // MARK: - 订阅模拟
+    
+    private var subscriptionSimulationSection: some View {
+        Section {
+            HStack {
+                Text("当前订阅")
+                Spacer()
+                if subscriptionManager.isPremiumUser {
+                    HStack(spacing: 4) {
+                        Image(systemName: "crown.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.yellow)
+                        Text(subscriptionManager.subscriptionType?.localizedName ?? "未知")
+                            .font(.subheadline)
+                            .foregroundStyle(.green)
+                    }
+                } else {
+                    Text("免费用户")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            
+            if let expiry = subscriptionManager.expiryDate {
+                HStack {
+                    Text("到期时间")
+                    Spacer()
+                    Text(expiry.formatted(.dateTime.year().month().day()))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            
+            Button {
+                simulateSubscription(.monthly)
+            } label: {
+                Label("开通月度订阅", systemImage: "calendar")
+            }
+            
+            Button {
+                simulateSubscription(.quarterly)
+            } label: {
+                Label("开通季度订阅", systemImage: "calendar.badge.clock")
+            }
+            
+            Button {
+                simulateSubscription(.yearly)
+            } label: {
+                Label("开通年度订阅", systemImage: "star.fill")
+            }
+            
+            Button {
+                simulateSubscription(.lifetime)
+            } label: {
+                Label("开通终身买断", systemImage: "crown.fill")
+            }
+            
+            Button {
+                simulateExpiredSubscription()
+            } label: {
+                Label("模拟订阅过期", systemImage: "clock.badge.xmark")
+                    .foregroundStyle(.orange)
+            }
+            
+            Button(role: .destructive) {
+                subscriptionManager.clearSubscriptionStatus()
+            } label: {
+                Label("重置为免费用户", systemImage: "arrow.counterclockwise")
+            }
+        } header: {
+            Text("订阅模拟")
+        } footer: {
+            Text("模拟不同订阅状态，用于测试付费墙、功能锁和订阅卡片的展示效果")
+                .font(.caption2)
+        }
+    }
+    
+    private func simulateSubscription(_ type: SubscriptionType) {
+        subscriptionManager.isPremiumUser = true
+        subscriptionManager.subscriptionType = type
+        
+        switch type {
+        case .monthly:
+            subscriptionManager.setExpiryDate(Calendar.current.date(byAdding: .month, value: 1, to: .now))
+        case .quarterly:
+            subscriptionManager.setExpiryDate(Calendar.current.date(byAdding: .month, value: 3, to: .now))
+        case .yearly:
+            subscriptionManager.setExpiryDate(Calendar.current.date(byAdding: .year, value: 1, to: .now))
+        case .lifetime:
+            subscriptionManager.setExpiryDate(nil)
+        }
+        
+        subscriptionManager.recordFirstPurchase()
+    }
+    
+    private func simulateExpiredSubscription() {
+        subscriptionManager.isPremiumUser = false
+        subscriptionManager.subscriptionType = .monthly
+        subscriptionManager.setExpiryDate(Calendar.current.date(byAdding: .day, value: -1, to: .now))
     }
 
     // MARK: - 数据生成
@@ -848,6 +951,7 @@ enum TestDataGenerator {
 #Preview {
     TestDataGeneratorView()
         .modelContainer(for: [GlucoseRecord.self, MedicationRecord.self, MealRecord.self, UserSettings.self], inMemory: true)
+        .environment(SubscriptionManager())
 }
 
 #endif

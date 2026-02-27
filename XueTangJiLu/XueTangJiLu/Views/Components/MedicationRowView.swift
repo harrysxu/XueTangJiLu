@@ -23,7 +23,7 @@ struct MedicationRowView: View {
 
             // 中间：类型 + 名称
             VStack(alignment: .leading, spacing: 2) {
-                Text(record.medicationType.displayName)
+                Text(record.medicationType.localizedDisplayName)
                     .font(.subheadline)
                 if !record.name.isEmpty {
                     Text(record.name)
@@ -47,7 +47,7 @@ struct MedicationRowView: View {
         .padding(.vertical, AppConstants.Spacing.md)
         .padding(.horizontal, AppConstants.Spacing.lg)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(record.timestamp.timeString) \(record.medicationType.displayName) \(record.displayDosage)")
+        .accessibilityLabel("\(record.timestamp.timeString) \(record.medicationType.localizedDisplayName) \(record.displayDosage)")
         .accessibilityHint("轻点可编辑，右划可删除")
     }
 }

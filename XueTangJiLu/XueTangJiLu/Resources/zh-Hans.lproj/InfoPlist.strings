@@ -1,3 +1,5 @@
-/* Health Permission Descriptions */
-"NSHealthShareUsageDescription" = "血糖记录需要读取您的血糖数据，以便在应用内展示完整的血糖记录历史。";
-"NSHealthUpdateUsageDescription" = "血糖记录需要将您手动输入的血糖数据同步到\"健康\"应用中，确保数据安全备份。";
+/* 隐私权限描述 */
+"NSCameraUsageDescription" = "控糖助手需要访问您的相机以拍摄饮食照片，帮助您记录饮食信息。";
+"NSPhotoLibraryUsageDescription" = "控糖助手需要访问您的相册以选择饮食照片，帮助您记录饮食信息。";
+"NSHealthShareUsageDescription" = "控糖助手需要读取您的血糖数据，以便在应用内展示完整的血糖记录历史。";
+"NSHealthUpdateUsageDescription" = "控糖助手需要将您手动输入的血糖数据同步到\"健康\"应用中，确保数据安全备份。";

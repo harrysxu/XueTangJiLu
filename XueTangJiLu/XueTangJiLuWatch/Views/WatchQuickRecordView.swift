@@ -14,7 +14,7 @@ struct WatchQuickRecordView: View {
     @Environment(\.dismiss) private var dismiss
     @Query private var settingsArray: [UserSettings]
     @State private var glucoseValue: Double = 6.0
-    @State private var selectedMealContext: MealContext = TagEngine.suggestContext()
+    @State private var selectedSceneTagId: String = TagEngine.suggestTagId()
 
     private var settings: UserSettings {
         settingsArray.first ?? UserSettings()
@@ -65,10 +65,10 @@ struct WatchQuickRecordView: View {
 
                 // 餐点选择（简化版，只显示常用的）
                 HStack(spacing: 4) {
-                    watchMealButton(.beforeBreakfast, icon: "sunrise")
-                    watchMealButton(.afterLunch, icon: "sun.max")
-                    watchMealButton(.afterDinner, icon: "sunset")
-                    watchMealButton(.fasting, icon: "moon.zzz")
+                    watchMealButton(MealContext.beforeBreakfast.rawValue, icon: "sunrise")
+                    watchMealButton(MealContext.afterLunch.rawValue, icon: "sun.max")
+                    watchMealButton(MealContext.afterDinner.rawValue, icon: "sunset")
+                    watchMealButton(MealContext.fasting.rawValue, icon: "moon.zzz")
                 }
 
                 // 保存
@@ -85,19 +85,19 @@ struct WatchQuickRecordView: View {
         .navigationTitle("记录血糖")
     }
 
-    private func watchMealButton(_ context: MealContext, icon: String) -> some View {
+    private func watchMealButton(_ sceneTagId: String, icon: String) -> some View {
         Button(action: {
-            selectedMealContext = context
+            selectedSceneTagId = sceneTagId
         }) {
             Image(systemName: icon)
                 .font(.caption2)
                 .frame(width: 28, height: 28)
                 .background(
-                    selectedMealContext == context
+                    selectedSceneTagId == sceneTagId
                         ? Color("BrandPrimary")
                         : Color(.darkGray).opacity(0.3)
                 )
-                .foregroundStyle(selectedMealContext == context ? .white : .secondary)
+                .foregroundStyle(selectedSceneTagId == sceneTagId ? .white : .secondary)
                 .clipShape(Circle())
         }
         .buttonStyle(.plain)
@@ -108,7 +108,7 @@ struct WatchQuickRecordView: View {
         let record = GlucoseRecord(
             value: mmolLValue,
             timestamp: .now,
-            mealContext: selectedMealContext
+            sceneTagId: selectedSceneTagId
         )
         modelContext.insert(record)
         dismiss()

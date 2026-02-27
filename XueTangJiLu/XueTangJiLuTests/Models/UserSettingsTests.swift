@@ -127,6 +127,112 @@ struct UserSettingsTests {
         #expect(reminders.count >= 0)
     }
     
+    @Test("场景标签提醒功能 - 默认关闭")
+    func testSceneTagReminderDefaultOff() {
+        let settings = UserSettings()
+        
+        // 默认所有场景标签的提醒应该是关闭的
+        let tags = settings.sceneTags
+        for tag in tags {
+            #expect(tag.reminderEnabled == false)
+        }
+    }
+    
+    @Test("场景标签提醒功能 - 启用提醒")
+    func testSceneTagEnableReminder() {
+        let settings = UserSettings()
+        
+        var tags = settings.sceneTags
+        guard var firstTag = tags.first else { return }
+        
+        // 启用提醒
+        firstTag.reminderEnabled = true
+        firstTag.reminderHour = 8
+        firstTag.reminderMinute = 30
+        
+        tags[0] = firstTag
+        settings.sceneTags = tags
+        
+        // 验证提醒已启用
+        let updatedTag = settings.sceneTags.first
+        #expect(updatedTag?.reminderEnabled == true)
+        #expect(updatedTag?.reminderHour == 8)
+        #expect(updatedTag?.reminderMinute == 30)
+        #expect(updatedTag?.reminderTimeString == "08:30")
+    }
+    
+    @Test("场景标签提醒功能 - 提醒时间格式化")
+    func testSceneTagReminderTimeString() {
+        let settings = UserSettings()
+        
+        var tags = settings.sceneTags
+        guard var firstTag = tags.first else { return }
+        
+        firstTag.reminderHour = 7
+        firstTag.reminderMinute = 5
+        tags[0] = firstTag
+        settings.sceneTags = tags
+        
+        let updatedTag = settings.sceneTags.first
+        #expect(updatedTag?.reminderTimeString == "07:05")
+    }
+    
+    @Test("场景标签提醒功能 - 多个标签独立配置")
+    func testMultipleSceneTagsWithReminders() {
+        let settings = UserSettings()
+        
+        var tags = settings.sceneTags
+        
+        // 启用前3个标签的提醒，设置不同时间
+        if tags.count >= 3 {
+            tags[0].reminderEnabled = true
+            tags[0].reminderHour = 7
+            tags[0].reminderMinute = 0
+            
+            tags[1].reminderEnabled = true
+            tags[1].reminderHour = 12
+            tags[1].reminderMinute = 30
+            
+            tags[2].reminderEnabled = false // 第三个不启用
+            
+            settings.sceneTags = tags
+            
+            // 验证配置
+            let updatedTags = settings.sceneTags
+            #expect(updatedTags[0].reminderEnabled == true)
+            #expect(updatedTags[0].reminderTimeString == "07:00")
+            
+            #expect(updatedTags[1].reminderEnabled == true)
+            #expect(updatedTags[1].reminderTimeString == "12:30")
+            
+            #expect(updatedTags[2].reminderEnabled == false)
+        }
+    }
+    
+    @Test("场景标签提醒功能 - 隐藏标签时提醒应关闭")
+    func testHiddenSceneTagDisablesReminder() {
+        let settings = UserSettings()
+        
+        var tags = settings.sceneTags
+        guard var firstTag = tags.first else { return }
+        
+        // 先启用提醒
+        firstTag.reminderEnabled = true
+        firstTag.reminderHour = 8
+        firstTag.reminderMinute = 0
+        
+        // 然后隐藏标签（模拟 toggleSceneTag 的行为）
+        firstTag.isVisible = false
+        firstTag.reminderEnabled = false
+        
+        tags[0] = firstTag
+        settings.sceneTags = tags
+        
+        let updatedTag = settings.sceneTags.first
+        #expect(updatedTag?.isVisible == false)
+        #expect(updatedTag?.reminderEnabled == false)
+    }
+    
     // MARK: - 设置合并测试
     
     @Test("合并其他设备设置")
