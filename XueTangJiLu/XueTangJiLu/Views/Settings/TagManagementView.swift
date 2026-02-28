@@ -337,10 +337,9 @@ struct TagManagementView: View {
     }
     
     private func scheduleRemindersFromSceneTags() {
-        let notificationManager = NotificationManager()
         let enabledTags = settings.sceneTags.filter { $0.reminderEnabled && $0.isVisible }
+        let allTags = settings.sceneTags
         
-        // 转换为 ReminderConfig 格式用于通知调度
         let reminders = enabledTags.map { tag in
             ReminderConfig(
                 id: tag.id,
@@ -351,7 +350,10 @@ struct TagManagementView: View {
             )
         }
         
-        notificationManager.scheduleReminders(reminders, sceneTags: settings.sceneTags)
+        Task {
+            let manager = NotificationManager()
+            await manager.scheduleReminders(reminders, sceneTags: allTags)
+        }
     }
 
     private func moveSceneTags(from source: IndexSet, to destination: Int) {
@@ -663,10 +665,9 @@ struct SceneTagEditSheet: View {
     }
     
     private func scheduleReminders() {
-        let notificationManager = NotificationManager()
         let enabledTags = settings.sceneTags.filter { $0.reminderEnabled && $0.isVisible }
+        let allTags = settings.sceneTags
         
-        // 转换为 ReminderConfig 格式用于通知调度
         let reminders = enabledTags.map { tag in
             ReminderConfig(
                 id: tag.id,
@@ -677,7 +678,10 @@ struct SceneTagEditSheet: View {
             )
         }
         
-        notificationManager.scheduleReminders(reminders, sceneTags: settings.sceneTags)
+        Task {
+            let manager = NotificationManager()
+            await manager.scheduleReminders(reminders, sceneTags: allTags)
+        }
     }
 }
 

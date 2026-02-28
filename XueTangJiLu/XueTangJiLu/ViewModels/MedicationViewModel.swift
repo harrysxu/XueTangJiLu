@@ -57,7 +57,30 @@ final class MedicationViewModel {
         return value > 0
     }
 
-    // MARK: - 键盘输入处理
+    // MARK: - 系统键盘输入校验
+
+    func validateDosageInput(_ newValue: String) {
+        var cleaned = newValue.filter { $0.isNumber || $0 == "." }
+
+        let dots = cleaned.filter { $0 == "." }
+        if dots.count > 1, let firstDot = cleaned.firstIndex(of: ".") {
+            let afterDot = cleaned[cleaned.index(after: firstDot)...].filter { $0 != "." }
+            cleaned = String(cleaned[...firstDot]) + afterDot
+        }
+
+        if let dotIndex = cleaned.firstIndex(of: ".") {
+            let decimalPart = cleaned[cleaned.index(after: dotIndex)...]
+            if decimalPart.count > 1 {
+                cleaned = String(cleaned[...dotIndex]) + String(decimalPart.prefix(1))
+            }
+        }
+
+        if cleaned != dosageText {
+            dosageText = cleaned
+        }
+    }
+
+    // MARK: - 键盘输入处理（保留供测试使用）
 
     func handleKeyPress(_ key: KeypadKey) {
         switch key {

@@ -101,7 +101,6 @@ enum Feature: String, CaseIterable {
     case appleWatch
     case advancedCharts
     case medicationTracking
-    case mealPhotoTracking
     
     /// 功能本地化名称
     var localizedName: String {
@@ -120,8 +119,6 @@ enum Feature: String, CaseIterable {
             return String(localized: "feature.advanced_charts")
         case .medicationTracking:
             return String(localized: "feature.medication_tracking")
-        case .mealPhotoTracking:
-            return String(localized: "feature.meal_photo_tracking")
         }
     }
     
@@ -142,8 +139,6 @@ enum Feature: String, CaseIterable {
             return "chart.xyaxis.line"
         case .medicationTracking:
             return "pill.fill"
-        case .mealPhotoTracking:
-            return "camera.fill"
         }
     }
 }

@@ -42,6 +42,30 @@ final class CloudKitSyncManager {
         }
     }
     
+    /// 变更计数（区分新增/更新和删除）
+    struct ChangeCounts {
+        var glucose: Int = 0
+        var medication: Int = 0
+        var meal: Int = 0
+        var deletedGlucose: Int = 0
+        var deletedMedication: Int = 0
+        var deletedMeal: Int = 0
+        
+        var syncedTotal: Int { glucose + medication + meal }
+        var deletedTotal: Int { deletedGlucose + deletedMedication + deletedMeal }
+        var total: Int { syncedTotal + deletedTotal }
+        var isEmpty: Bool { total == 0 }
+        
+        mutating func merge(_ other: ChangeCounts) {
+            glucose += other.glucose
+            medication += other.medication
+            meal += other.meal
+            deletedGlucose += other.deletedGlucose
+            deletedMedication += other.deletedMedication
+            deletedMeal += other.deletedMeal
+        }
+    }
+    
     /// 同步事件记录
     struct SyncEvent: Identifiable, Codable {
         let id: UUID
@@ -54,32 +78,39 @@ final class CloudKitSyncManager {
         let medicationCount: Int?
         let mealCount: Int?
         
+        let deletedGlucoseCount: Int?
+        let deletedMedicationCount: Int?
+        let deletedMealCount: Int?
+        
         enum EventType: String, Codable {
             case downloadFromCloud = "download"
             case uploadToCloud = "upload"
             case setup = "setup"
             case manualSync = "manual"
             
-            var localizedKey: String {
+            var localizedString: String {
                 switch self {
                 case .downloadFromCloud:
-                    return "sync.event.download"
+                    return String(localized: "sync.event.download")
                 case .uploadToCloud:
-                    return "sync.event.upload"
+                    return String(localized: "sync.event.upload")
                 case .setup:
-                    return "sync.event.setup"
+                    return String(localized: "sync.event.setup")
                 case .manualSync:
-                    return "sync.event.manual_sync"
+                    return String(localized: "sync.event.manual_sync")
                 }
             }
         }
         
-        init(type: EventType, 
-             isSuccess: Bool, 
+        init(type: EventType,
+             isSuccess: Bool,
              errorMessage: String? = nil,
              glucoseCount: Int? = nil,
              medicationCount: Int? = nil,
-             mealCount: Int? = nil) {
+             mealCount: Int? = nil,
+             deletedGlucoseCount: Int? = nil,
+             deletedMedicationCount: Int? = nil,
+             deletedMealCount: Int? = nil) {
             self.id = UUID()
             self.timestamp = Date()
             self.type = type
@@ -88,31 +119,54 @@ final class CloudKitSyncManager {
             self.glucoseCount = glucoseCount
             self.medicationCount = medicationCount
             self.mealCount = mealCount
+            self.deletedGlucoseCount = deletedGlucoseCount
+            self.deletedMedicationCount = deletedMedicationCount
+            self.deletedMealCount = deletedMealCount
         }
         
         var totalCount: Int {
             (glucoseCount ?? 0) + (medicationCount ?? 0) + (mealCount ?? 0)
         }
         
+        var totalDeletedCount: Int {
+            (deletedGlucoseCount ?? 0) + (deletedMedicationCount ?? 0) + (deletedMealCount ?? 0)
+        }
+        
         var hasCountData: Bool {
-            totalCount > 0
+            totalCount > 0 || totalDeletedCount > 0
         }
         
         func formattedCountString() -> String? {
-            guard hasCountData else { return nil }
-            
             var parts: [String] = []
             
             if let count = glucoseCount, count > 0 {
-                parts.append(String(localized: "sync.count.glucose", defaultValue: "\(count)条血糖"))
+                parts.append(String(format: NSLocalizedString("sync.count.glucose", comment: ""), count))
             }
             if let count = medicationCount, count > 0 {
-                parts.append(String(localized: "sync.count.medication", defaultValue: "\(count)条用药"))
+                parts.append(String(format: NSLocalizedString("sync.count.medication", comment: ""), count))
             }
             if let count = mealCount, count > 0 {
-                parts.append(String(localized: "sync.count.meal", defaultValue: "\(count)条饮食"))
+                parts.append(String(format: NSLocalizedString("sync.count.meal", comment: ""), count))
             }
             
+            guard !parts.isEmpty else { return nil }
+            return parts.joined(separator: "，")
+        }
+        
+        func formattedDeletedCountString() -> String? {
+            var parts: [String] = []
+            
+            if let count = deletedGlucoseCount, count > 0 {
+                parts.append(String(format: NSLocalizedString("sync.count.deleted_glucose", comment: ""), count))
+            }
+            if let count = deletedMedicationCount, count > 0 {
+                parts.append(String(format: NSLocalizedString("sync.count.deleted_medication", comment: ""), count))
+            }
+            if let count = deletedMealCount, count > 0 {
+                parts.append(String(format: NSLocalizedString("sync.count.deleted_meal", comment: ""), count))
+            }
+            
+            guard !parts.isEmpty else { return nil }
             return parts.joined(separator: "，")
         }
     }
@@ -136,7 +190,6 @@ final class CloudKitSyncManager {
     /// iCloud 账户状态
     var iCloudAccountStatus: CKAccountStatus = .couldNotDetermine {
         didSet {
-            // 如果账户不可用，清除同步数据
             if iCloudAccountStatus != .available {
                 clearSyncDataIfNeeded()
             }
@@ -157,8 +210,11 @@ final class CloudKitSyncManager {
         }
     }
     
-    /// 待同步操作数量（估算）
-    var pendingOperations: Int = 0
+    /// iCloud 存储配额是否超限（供 UI 显示引导）
+    var isQuotaExceeded: Bool = false
+    
+    /// 是否有待同步的变更
+    var hasPendingChanges: Bool = false
     
     /// 同步历史记录（最多保留20条）
     var syncHistory: [SyncEvent] = []
@@ -180,8 +236,21 @@ final class CloudKitSyncManager {
     private var lastImportEventDate: Date?
     private var lastExportEventDate: Date?
     
-    /// 缓存最近一次本地保存的变更计数（供 CloudKit 事件完成时使用）
-    private var pendingExportCounts: (glucose: Int?, medication: Int?, meal: Int?)?
+    /// 缓存本地保存的变更计数（供 CloudKit export 事件完成时使用）
+    private var pendingExportCounts: ChangeCounts?
+    
+    /// 缓存远程导入的变更计数（供 CloudKit import 事件完成时使用）
+    private var pendingImportCounts: ChangeCounts?
+    
+    /// CloudKit 容器事件级别的导入标记，用于准确区分 import/export 上下文
+    private var isImporting = false
+    
+    /// import 开始前的记录快照（用于通过前后差值计算导入数量）
+    private var preImportRecordCounts: (glucose: Int, medication: Int, meal: Int)?
+    
+    /// 手动同步期间的状态与累计计数
+    private var isManualSyncing = false
+    private var manualSyncCounts = ChangeCounts()
     
     // MARK: - Initialization
     
@@ -189,27 +258,22 @@ final class CloudKitSyncManager {
         self.networkMonitor = networkMonitor
         self.container = CKContainer(identifier: AppConstants.cloudKitContainerID)
         
-        // 读取用户偏好
         self.isSyncEnabled = UserDefaults.standard.bool(forKey: "cloudkit_sync_enabled")
         if UserDefaults.standard.object(forKey: "cloudkit_sync_enabled") == nil {
-            self.isSyncEnabled = true // 默认启用
+            self.isSyncEnabled = true
         }
         self.wifiOnlySync = UserDefaults.standard.bool(forKey: "cloudkit_wifi_only")
         
-        // 加载最后同步时间
         if let savedDate = UserDefaults.standard.object(forKey: "cloudkit_last_sync_date") as? Date {
             self.lastSyncDate = savedDate
         }
         
-        // 加载同步历史
         loadSyncHistory()
         
-        // 检查账户状态
         Task {
             await checkAccountStatus()
         }
         
-        // 监听同步事件
         setupNotifications()
     }
     
@@ -244,7 +308,6 @@ final class CloudKitSyncManager {
             }
             #endif
             
-            // 如果账户可用，进行更详细的诊断
             if status == .available {
                 await performCloudKitDiagnostics()
             }
@@ -261,10 +324,8 @@ final class CloudKitSyncManager {
         #if DEBUG
         let database = container.privateCloudDatabase
         
-        // 测试基本的 CloudKit 连接
         print("🔍 正在测试 CloudKit 连接...")
         
-        // 尝试获取用户记录
         do {
             let userRecordID = try await container.userRecordID()
             print("   ✓ 成功获取用户记录 ID: \(userRecordID.recordName)")
@@ -272,7 +333,6 @@ final class CloudKitSyncManager {
             print("   ⚠️ 获取用户记录 ID 失败: \(error.localizedDescription)")
         }
         
-        // 检查默认 Zone（SwiftData 使用的 Zone）
         let defaultZoneID = CKRecordZone.ID(zoneName: "com.apple.coredata.cloudkit.zone", ownerName: CKCurrentUserDefaultName)
         
         do {
@@ -283,8 +343,6 @@ final class CloudKitSyncManager {
             print("      错误代码: \(error.errorCode)")
             print("      错误描述: \(error.localizedDescription)")
             
-            // CKError Code 15 = ServerRejectedRequest
-            // 这通常意味着 Zone 需要由 CoreData 首次创建
             if error.errorCode == 15 {
                 print("      提示: 这是正常的首次启动行为，CoreData 会自动创建 Zone")
             }
@@ -318,7 +376,9 @@ final class CloudKitSyncManager {
         currentState = .syncing
         let syncStartDate = Date()
         
-        // 1. 保存本地未提交的变更（触发上传）
+        isManualSyncing = true
+        manualSyncCounts = ChangeCounts()
+        
         if let context = modelContext, context.hasChanges {
             do {
                 try context.save()
@@ -332,18 +392,15 @@ final class CloudKitSyncManager {
             }
         }
         
-        // 2. 触发 CoreData 底层持久化存储刷新，促使 NSPersistentCloudKitContainer 检查远程变化
         if let container = modelContainer {
             let bgContext = ModelContext(container)
             bgContext.autosaveEnabled = false
-            // 执行一次 fetch 促使底层存储协调器与 CloudKit 交互
             let descriptor = FetchDescriptor<GlucoseRecord>(
                 sortBy: [SortDescriptor(\GlucoseRecord.timestamp, order: .reverse)]
             )
             _ = try? bgContext.fetch(descriptor)
         }
         
-        // 3. 等待足够时间让 CloudKit 同步响应（最多等待 10 秒，每秒检查一次）
         var receivedSyncEvent = false
         for _ in 0..<10 {
             try await Task.sleep(for: .seconds(1))
@@ -359,22 +416,24 @@ final class CloudKitSyncManager {
         
         let now = Date()
         lastSyncDate = now
+        isManualSyncing = false
+        currentState = .success(now)
         
-        if receivedSyncEvent {
-            currentState = .success(now)
-        } else {
-            // 即使没收到同步事件，也标记为完成（可能没有新数据需要同步）
-            currentState = .success(now)
+        if !manualSyncCounts.isEmpty {
+            let counts = manualSyncCounts
+            let event = SyncEvent(
+                type: .manualSync,
+                isSuccess: true,
+                glucoseCount: counts.glucose > 0 ? counts.glucose : nil,
+                medicationCount: counts.medication > 0 ? counts.medication : nil,
+                mealCount: counts.meal > 0 ? counts.meal : nil,
+                deletedGlucoseCount: counts.deletedGlucose > 0 ? counts.deletedGlucose : nil,
+                deletedMedicationCount: counts.deletedMedication > 0 ? counts.deletedMedication : nil,
+                deletedMealCount: counts.deletedMeal > 0 ? counts.deletedMeal : nil
+            )
+            addSyncEvent(event)
         }
-        
-        let event = SyncEvent(
-            type: .manualSync,
-            isSuccess: true,
-            glucoseCount: nil,
-            medicationCount: nil,
-            mealCount: nil
-        )
-        addSyncEvent(event)
+        manualSyncCounts = ChangeCounts()
         
         #if DEBUG
         print(receivedSyncEvent
@@ -386,6 +445,24 @@ final class CloudKitSyncManager {
         if case .success(let date) = currentState, date == now {
             currentState = .idle
         }
+    }
+    
+    /// 等待 CloudKit export 完成（用于删除后确保数据同步到 iCloud）
+    @MainActor
+    func waitForExportCompletion(timeout: TimeInterval = 15) async -> Bool {
+        let startDate = Date()
+        let checkIntervalMs = 500
+        let maxChecks = Int(timeout * 1000) / checkIntervalMs
+        
+        for _ in 0..<maxChecks {
+            try? await Task.sleep(for: .milliseconds(checkIntervalMs))
+            
+            if let lastExport = lastExportEventDate, lastExport > startDate {
+                return true
+            }
+        }
+        
+        return false
     }
     
     /// 获取格式化的最后同步时间
@@ -409,13 +486,11 @@ final class CloudKitSyncManager {
     
     /// 当账户不可用时清除同步数据
     private func clearSyncDataIfNeeded() {
-        // 只在账户明确不可用时清除，不确定状态不清除
-        guard iCloudAccountStatus == .noAccount || 
+        guard iCloudAccountStatus == .noAccount ||
               iCloudAccountStatus == .restricted else {
             return
         }
         
-        // 清除同步相关数据
         syncHistory.removeAll()
         lastSyncDate = nil
         saveSyncHistory()
@@ -425,7 +500,6 @@ final class CloudKitSyncManager {
     
     /// 设置通知监听
     private func setupNotifications() {
-        // 监听 SwiftData + CloudKit 的同步事件（从 iCloud 下载数据）
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleStoreRemoteChange(_:)),
@@ -433,7 +507,6 @@ final class CloudKitSyncManager {
             object: nil
         )
         
-        // 监听本地数据保存事件（可能上传到 iCloud）
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleContextDidSave(_:)),
@@ -441,7 +514,6 @@ final class CloudKitSyncManager {
             object: nil
         )
         
-        // 监听 NSPersistentCloudKitContainer 同步事件（setup/import/export）
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleCloudKitContainerEvent(_:)),
@@ -453,7 +525,6 @@ final class CloudKitSyncManager {
     /// 处理远程数据变化通知（从 iCloud 下载）
     @objc private func handleStoreRemoteChange(_ notification: Notification) {
         Task { @MainActor in
-            // 只在同步启用且账户可用时记录
             guard isSyncEnabled,
                   iCloudAccountStatus == .available else {
                 return
@@ -461,7 +532,6 @@ final class CloudKitSyncManager {
             
             let now = Date()
             
-            // 防止短时间内重复记录
             if let lastDate = lastImportEventDate, now.timeIntervalSince(lastDate) < 2 {
                 return
             }
@@ -470,19 +540,6 @@ final class CloudKitSyncManager {
             lastSyncDate = now
             currentState = .success(now)
             
-            // 统计变更数据
-            let counts = extractChangeCounts(from: notification)
-            
-            let event = SyncEvent(
-                type: .downloadFromCloud,
-                isSuccess: true,
-                glucoseCount: counts.glucose,
-                medicationCount: counts.medication,
-                mealCount: counts.meal
-            )
-            addSyncEvent(event)
-            
-            // 2秒后恢复为空闲状态
             try? await Task.sleep(for: .seconds(2))
             if case .success(let date) = currentState, date == now {
                 currentState = .idle
@@ -491,8 +548,11 @@ final class CloudKitSyncManager {
     }
     
     /// 处理本地上下文保存通知
-    /// 仅缓存变更计数，不记录同步事件（实际上传结果由 handleCloudKitContainerEvent 负责）
+    /// 根据 isImporting 标记准确分类：import 事件期间的保存归为导入计数，否则归为导出计数
     @objc private func handleContextDidSave(_ notification: Notification) {
+        let counts = extractChangeCounts(from: notification)
+        guard !counts.isEmpty else { return }
+        
         Task { @MainActor in
             guard isSyncEnabled,
                   networkMonitor.isConnected,
@@ -500,11 +560,22 @@ final class CloudKitSyncManager {
                 return
             }
             
-            let counts = extractChangeCounts(from: notification)
-            guard counts.total > 0 else { return }
-            
-            // 缓存变更计数，供 CloudKit export 完成事件使用
-            pendingExportCounts = (glucose: counts.glucose, medication: counts.medication, meal: counts.meal)
+            if isImporting {
+                if var existing = pendingImportCounts {
+                    existing.merge(counts)
+                    pendingImportCounts = existing
+                } else {
+                    pendingImportCounts = counts
+                }
+            } else {
+                if var existing = pendingExportCounts {
+                    existing.merge(counts)
+                    pendingExportCounts = existing
+                } else {
+                    pendingExportCounts = counts
+                }
+                hasPendingChanges = true
+            }
         }
     }
     
@@ -525,6 +596,8 @@ final class CloudKitSyncManager {
                 if event.endDate == nil {
                     currentState = .importing
                     isPerformingInitialImport = true
+                    isImporting = true
+                    preImportRecordCounts = countCurrentRecords()
                 }
             case .export:
                 typeStr = "Export"
@@ -536,70 +609,122 @@ final class CloudKitSyncManager {
             }
             
             if let endDate = event.endDate {
-                // 事件已完成
                 if event.succeeded {
                     #if DEBUG
                     print("✅ [CloudKit \(typeStr)] 完成")
                     #endif
                     
-                    let eventType: SyncEvent.EventType
-                    if event.type == .import {
+                    isQuotaExceeded = false
+                    
+                    switch event.type {
+                    case .setup:
+                        break
+                        
+                    case .import:
                         lastImportEventDate = endDate
                         isPerformingInitialImport = false
-                        eventType = .downloadFromCloud
-                    } else {
+                        isImporting = false
+                        lastSyncDate = endDate
+                        currentState = .success(endDate)
+                        
+                        var importCounts = pendingImportCounts ?? ChangeCounts()
+                        
+                        if importCounts.syncedTotal == 0 && importCounts.deletedTotal == 0,
+                           let preCounts = preImportRecordCounts {
+                            let postCounts = countCurrentRecords()
+                            let gDelta = postCounts.glucose - preCounts.glucose
+                            let mDelta = postCounts.medication - preCounts.medication
+                            let mealDelta = postCounts.meal - preCounts.meal
+                            if gDelta > 0 { importCounts.glucose = gDelta }
+                            if gDelta < 0 { importCounts.deletedGlucose = -gDelta }
+                            if mDelta > 0 { importCounts.medication = mDelta }
+                            if mDelta < 0 { importCounts.deletedMedication = -mDelta }
+                            if mealDelta > 0 { importCounts.meal = mealDelta }
+                            if mealDelta < 0 { importCounts.deletedMeal = -mealDelta }
+                        }
+                        
+                        if isManualSyncing {
+                            manualSyncCounts.merge(importCounts)
+                        } else if !importCounts.isEmpty {
+                            let syncEvent = SyncEvent(
+                                type: .downloadFromCloud,
+                                isSuccess: true,
+                                glucoseCount: importCounts.glucose > 0 ? importCounts.glucose : nil,
+                                medicationCount: importCounts.medication > 0 ? importCounts.medication : nil,
+                                mealCount: importCounts.meal > 0 ? importCounts.meal : nil,
+                                deletedGlucoseCount: importCounts.deletedGlucose > 0 ? importCounts.deletedGlucose : nil,
+                                deletedMedicationCount: importCounts.deletedMedication > 0 ? importCounts.deletedMedication : nil,
+                                deletedMealCount: importCounts.deletedMeal > 0 ? importCounts.deletedMeal : nil
+                            )
+                            addSyncEvent(syncEvent)
+                        }
+                        pendingImportCounts = nil
+                        preImportRecordCounts = nil
+                        
+                    case .export:
                         lastExportEventDate = endDate
-                        eventType = .uploadToCloud
-                    }
-                    
-                    lastSyncDate = endDate
-                    currentState = .success(endDate)
-                    
-                    // 记录成功的同步事件，附带缓存的变更计数
-                    if event.type == .export, let counts = pendingExportCounts {
-                        let syncEvent = SyncEvent(
-                            type: eventType,
-                            isSuccess: true,
-                            glucoseCount: counts.glucose,
-                            medicationCount: counts.medication,
-                            mealCount: counts.meal
-                        )
-                        addSyncEvent(syncEvent)
+                        lastSyncDate = endDate
+                        currentState = .success(endDate)
+                        hasPendingChanges = false
+                        
+                        let exportCounts = pendingExportCounts ?? ChangeCounts()
+                        
+                        if isManualSyncing {
+                            manualSyncCounts.merge(exportCounts)
+                        } else if !exportCounts.isEmpty {
+                            let syncEvent = SyncEvent(
+                                type: .uploadToCloud,
+                                isSuccess: true,
+                                glucoseCount: exportCounts.glucose > 0 ? exportCounts.glucose : nil,
+                                medicationCount: exportCounts.medication > 0 ? exportCounts.medication : nil,
+                                mealCount: exportCounts.meal > 0 ? exportCounts.meal : nil,
+                                deletedGlucoseCount: exportCounts.deletedGlucose > 0 ? exportCounts.deletedGlucose : nil,
+                                deletedMedicationCount: exportCounts.deletedMedication > 0 ? exportCounts.deletedMedication : nil,
+                                deletedMealCount: exportCounts.deletedMeal > 0 ? exportCounts.deletedMeal : nil
+                            )
+                            addSyncEvent(syncEvent)
+                        }
                         pendingExportCounts = nil
-                    } else if event.type == .import {
-                        let syncEvent = SyncEvent(
-                            type: eventType,
-                            isSuccess: true
-                        )
-                        addSyncEvent(syncEvent)
+                        
+                    @unknown default:
+                        break
                     }
                     
-                    // 2秒后恢复为空闲
-                    let successDate = endDate
-                    try? await Task.sleep(for: .seconds(2))
-                    if case .success(let d) = currentState, d == successDate {
-                        currentState = .idle
+                    if event.type != .setup {
+                        let successDate = endDate
+                        try? await Task.sleep(for: .seconds(2))
+                        if case .success(let d) = currentState, d == successDate {
+                            currentState = .idle
+                        }
                     }
                 } else if let error = event.error {
+                    guard event.type != .setup else {
+                        #if DEBUG
+                        print("⚠️ [CloudKit Setup] 失败: \(error.localizedDescription)")
+                        #endif
+                        return
+                    }
+                    
+                    let quotaHit = isQuotaExceededError(error)
+                    
                     #if DEBUG
                     print("❌ [CloudKit \(typeStr)] 失败: \(error.localizedDescription)")
-                    if let ckError = error as? CKError {
-                        if ckError.code == .quotaExceeded {
-                            let retryStr = ckError.retryAfterSeconds.map { "\($0)秒后重试" } ?? ""
-                            print("   ⚠️ iCloud 存储空间不足 \(retryStr)")
-                            print("   💡 请前往「设置 > Apple ID > iCloud」管理存储空间")
-                        }
+                    if quotaHit {
+                        print("   ⚠️ iCloud 存储空间不足")
+                        print("   💡 请前往「设置 > Apple ID > iCloud」管理存储空间")
                     }
                     #endif
                     
                     if event.type == .import {
                         isPerformingInitialImport = false
+                        isImporting = false
                     }
                     
+                    isQuotaExceeded = quotaHit
                     currentState = .failed(error)
                     pendingExportCounts = nil
+                    pendingImportCounts = nil
                     
-                    // 将 CKError 转换为更友好的错误消息
                     let friendlyMessage = friendlyErrorMessage(for: error)
                     
                     let syncEvent = SyncEvent(
@@ -617,8 +742,26 @@ final class CloudKitSyncManager {
         }
     }
     
+    /// 检测错误是否包含 quotaExceeded（支持 Partial Failure 解包）
+    private func isQuotaExceededError(_ error: Error) -> Bool {
+        guard let ckError = error as? CKError else { return false }
+        if ckError.code == .quotaExceeded { return true }
+        if ckError.code == .partialFailure,
+           let partialErrors = ckError.partialErrorsByItemID {
+            return partialErrors.values.contains { partialError in
+                (partialError as? CKError)?.code == .quotaExceeded
+            }
+        }
+        return false
+    }
+    
     /// 将 CloudKit/网络错误转换为用户友好的消息
     private func friendlyErrorMessage(for error: Error) -> String {
+        if isQuotaExceededError(error) {
+            return String(localized: "sync.error.quota_exceeded",
+                          defaultValue: "iCloud 存储空间不足，请前往「设置 > Apple ID > iCloud」管理存储空间")
+        }
+        
         if let ckError = error as? CKError {
             switch ckError.code {
             case .networkUnavailable:
@@ -636,11 +779,8 @@ final class CloudKitSyncManager {
             case .zoneBusy:
                 return "iCloud 繁忙，稍后自动重试"
             case .quotaExceeded:
-                if let retryAfter = ckError.retryAfterSeconds {
-                    let minutes = Int(ceil(retryAfter / 60))
-                    return "iCloud 存储空间不足，\(minutes)分钟后重试"
-                }
-                return "iCloud 存储空间不足"
+                return String(localized: "sync.error.quota_exceeded",
+                              defaultValue: "iCloud 存储空间不足，请前往「设置 > Apple ID > iCloud」管理存储空间")
             case .notAuthenticated:
                 return "iCloud 未登录"
             default:
@@ -663,57 +803,66 @@ final class CloudKitSyncManager {
         return error.localizedDescription
     }
     
-    /// 从通知中提取变更数据统计
-    private func extractChangeCounts(from notification: Notification) -> (glucose: Int?, medication: Int?, meal: Int?, total: Int) {
+    /// 从通知中提取变更数据统计（区分新增/更新和删除）
+    private func extractChangeCounts(from notification: Notification) -> ChangeCounts {
         guard let userInfo = notification.userInfo else {
-            return (nil, nil, nil, 0)
+            return ChangeCounts()
         }
         
-        var glucoseCount = 0
-        var medicationCount = 0
-        var mealCount = 0
+        var counts = ChangeCounts()
         
-        // 合并插入、更新、删除的对象
-        let keys = [
-            NSInsertedObjectsKey,
-            NSUpdatedObjectsKey,
-            NSDeletedObjectsKey
-        ]
-        
-        for key in keys {
+        let addKeys = [NSInsertedObjectsKey, NSUpdatedObjectsKey]
+        for key in addKeys {
             guard let objects = userInfo[key] as? Set<NSManagedObject> else { continue }
-            
             for object in objects {
                 let entityName = object.entity.name ?? ""
-                
                 switch entityName {
-                case "GlucoseRecord":
-                    glucoseCount += 1
-                case "MedicationRecord":
-                    medicationCount += 1
-                case "MealRecord":
-                    mealCount += 1
-                default:
-                    break
+                case "GlucoseRecord": counts.glucose += 1
+                case "MedicationRecord": counts.medication += 1
+                case "MealRecord": counts.meal += 1
+                default: break
                 }
             }
         }
         
-        let total = glucoseCount + medicationCount + mealCount
+        if let deletedObjects = userInfo[NSDeletedObjectsKey] as? Set<NSManagedObject> {
+            for object in deletedObjects {
+                let entityName = object.entity.name ?? ""
+                switch entityName {
+                case "GlucoseRecord": counts.deletedGlucose += 1
+                case "MedicationRecord": counts.deletedMedication += 1
+                case "MealRecord": counts.deletedMeal += 1
+                default: break
+                }
+            }
+        }
         
-        return (
-            glucose: glucoseCount > 0 ? glucoseCount : nil,
-            medication: medicationCount > 0 ? medicationCount : nil,
-            meal: mealCount > 0 ? mealCount : nil,
-            total: total
-        )
+        return counts
+    }
+    
+    /// 快照当前数据库中各类记录数量（用于 import 前后对比）
+    @MainActor
+    private func countCurrentRecords() -> (glucose: Int, medication: Int, meal: Int) {
+        guard let container = modelContainer else { return (0, 0, 0) }
+        let context = ModelContext(container)
+        context.autosaveEnabled = false
+        do {
+            let glucose = try context.fetchCount(FetchDescriptor<GlucoseRecord>())
+            let medication = try context.fetchCount(FetchDescriptor<MedicationRecord>())
+            let meal = try context.fetchCount(FetchDescriptor<MealRecord>())
+            return (glucose, medication, meal)
+        } catch {
+            #if DEBUG
+            print("⚠️ [同步] 统计记录数量失败: \(error)")
+            #endif
+            return (0, 0, 0)
+        }
     }
     
     /// 添加同步事件到历史
     private func addSyncEvent(_ event: SyncEvent) {
         syncHistory.insert(event, at: 0)
         
-        // 只保留最近20条
         if syncHistory.count > 20 {
             syncHistory = Array(syncHistory.prefix(20))
         }

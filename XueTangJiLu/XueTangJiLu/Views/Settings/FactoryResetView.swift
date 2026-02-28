@@ -12,6 +12,7 @@ import SwiftData
 struct FactoryResetView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(CloudKitSyncManager.self) private var syncManager
     @Query private var allGlucoseRecords: [GlucoseRecord]
     @Query private var allMealRecords: [MealRecord]
     @Query private var allMedicationRecords: [MedicationRecord]
@@ -22,6 +23,13 @@ struct FactoryResetView: View {
     @State private var showSecondWarning = false
     @State private var isResetting = false
     @State private var resetComplete = false
+    @State private var isSyncingDeletion = false
+    @State private var syncDeletionResult: SyncDeletionResult?
+    
+    private enum SyncDeletionResult {
+        case synced
+        case timeout
+    }
     
     private let requiredText = String(localized: "factory_reset.required_text")
     
@@ -84,7 +92,14 @@ struct FactoryResetView: View {
                     dismiss()
                 }
             } message: {
-                Text(String(localized: "factory_reset.complete_message"))
+                switch syncDeletionResult {
+                case .synced:
+                    Text(String(localized: "factory_reset.complete_synced", defaultValue: "所有数据已清除，删除已同步到 iCloud。"))
+                case .timeout:
+                    Text(String(localized: "factory_reset.complete_sync_pending", defaultValue: "所有本地数据已清除。请保持应用打开并连接网络，以确保删除同步到 iCloud 上所有设备。"))
+                case nil:
+                    Text(String(localized: "factory_reset.complete_message"))
+                }
             }
         }
     }
@@ -221,32 +236,43 @@ struct FactoryResetView: View {
     // MARK: - 重置按钮
     
     private var resetButton: some View {
-        Button(action: {
-            guard confirmationText == requiredText else {
-                // 震动提示输入错误
-                HapticManager.warning()
-                return
-            }
-            // 触发第一次警告
-            showFirstWarning = true
-        }) {
-            HStack {
-                if isResetting {
-                    ProgressView()
-                        .tint(.white)
-                } else {
-                    Image(systemName: "trash.fill")
-                    Text(String(localized: "factory_reset.confirm_button"))
-                        .fontWeight(.semibold)
+        VStack(spacing: 0) {
+            Button(action: {
+                guard confirmationText == requiredText else {
+                    HapticManager.warning()
+                    return
                 }
+                showFirstWarning = true
+            }) {
+                HStack {
+                    if isResetting {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: "trash.fill")
+                        Text(String(localized: "factory_reset.confirm_button"))
+                            .fontWeight(.semibold)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(AppConstants.Spacing.md)
+                .background(confirmationText == requiredText ? Color.red : Color.gray)
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonLarge))
             }
-            .frame(maxWidth: .infinity)
-            .padding(AppConstants.Spacing.md)
-            .background(confirmationText == requiredText ? Color.red : Color.gray)
-            .foregroundStyle(.white)
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonLarge))
+            .disabled(confirmationText != requiredText || isResetting)
+            
+            if isSyncingDeletion {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text(String(localized: "factory_reset.syncing_deletion", defaultValue: "正在同步删除到 iCloud..."))
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                }
+                .padding(.top, AppConstants.Spacing.sm)
+            }
         }
-        .disabled(confirmationText != requiredText || isResetting)
     }
     
     // MARK: - 执行重置
@@ -254,45 +280,52 @@ struct FactoryResetView: View {
     private func performFactoryReset() {
         isResetting = true
         
-        // 延迟执行，让 UI 有时间更新
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            // 1. 删除所有血糖记录
-            for record in allGlucoseRecords {
-                modelContext.delete(record)
+        Task {
+            try? await Task.sleep(for: .milliseconds(500))
+            
+            await MainActor.run {
+                for record in allGlucoseRecords {
+                    modelContext.delete(record)
+                }
+                for record in allMealRecords {
+                    modelContext.delete(record)
+                }
+                for record in allMedicationRecords {
+                    modelContext.delete(record)
+                }
+                if let existingSettings = settingsArray.first {
+                    modelContext.delete(existingSettings)
+                }
+                let newSettings = UserSettings()
+                modelContext.insert(newSettings)
             }
             
-            // 2. 删除所有饮食记录
-            for record in allMealRecords {
-                modelContext.delete(record)
-            }
-            
-            // 3. 删除所有用药记录
-            for record in allMedicationRecords {
-                modelContext.delete(record)
-            }
-            
-            // 4. 重置用户设置
-            if let existingSettings = settingsArray.first {
-                // 删除现有设置
-                modelContext.delete(existingSettings)
-            }
-            
-            // 5. 创建新的默认设置
-            let newSettings = UserSettings()
-            modelContext.insert(newSettings)
-            
-            // 6. 保存更改
             do {
                 try modelContext.save()
                 HapticManager.success()
-                isResetting = false
-                resetComplete = true
+                
+                if syncManager.isSyncEnabled && syncManager.networkMonitor.isConnected {
+                    await MainActor.run { isSyncingDeletion = true }
+                    let exported = await syncManager.waitForExportCompletion(timeout: 15)
+                    await MainActor.run {
+                        isSyncingDeletion = false
+                        syncDeletionResult = exported ? .synced : .timeout
+                        isResetting = false
+                        resetComplete = true
+                    }
+                } else {
+                    await MainActor.run {
+                        syncDeletionResult = syncManager.isSyncEnabled ? .timeout : nil
+                        isResetting = false
+                        resetComplete = true
+                    }
+                }
             } catch {
                 #if DEBUG
                 print("重置失败: \(error)")
                 #endif
                 HapticManager.warning()
-                isResetting = false
+                await MainActor.run { isResetting = false }
             }
         }
     }
@@ -302,5 +335,6 @@ struct FactoryResetView: View {
     NavigationStack {
         FactoryResetView()
     }
+    .environment(CloudKitSyncManager())
     .modelContainer(for: [GlucoseRecord.self, MealRecord.self, MedicationRecord.self, UserSettings.self], inMemory: true)
 }

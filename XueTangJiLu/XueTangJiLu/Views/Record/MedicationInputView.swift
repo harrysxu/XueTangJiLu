@@ -17,36 +17,22 @@ struct MedicationInputView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // 剂量预览
-                dosagePreviewSection
-                    .padding(.top, AppConstants.Spacing.lg)
+            ScrollView {
+                VStack(spacing: AppConstants.Spacing.md) {
+                    // 剂量输入
+                    dosageInputSection
+                        .padding(.top, AppConstants.Spacing.lg)
 
-                // 药物类型选择
-                medicationTypeSelector
-                    .padding(.top, AppConstants.Spacing.lg)
+                    // 药物类型选择
+                    medicationTypeSelector
 
-                // 药物名称（可选）
-                nameField
-                    .padding(.top, AppConstants.Spacing.md)
+                    // 药物名称（可选）
+                    nameField
 
-                // 日期时间
-                dateTimeSection
-                    .padding(.top, AppConstants.Spacing.md)
-
-                Spacer()
-
-                // 自定义数字键盘
-                MinimalKeypadView { key in
-                    viewModel.handleKeyPress(key)
+                    // 日期时间
+                    dateTimeSection
                 }
-                .padding(.top, AppConstants.Spacing.md)
-
-                // 保存按钮
-                saveButton
-                    .padding(.top, AppConstants.Spacing.lg)
-                    .padding(.horizontal, AppConstants.Spacing.lg)
-                    .padding(.bottom, AppConstants.Spacing.sm)
+                .padding(.vertical, AppConstants.Spacing.lg)
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(viewModel.isEditMode ? String(localized: "medication.edit") : "")
@@ -54,21 +40,30 @@ struct MedicationInputView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(String(localized: "cancel")) { dismiss() }
                 }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String(localized: "save")) {
+                        viewModel.saveRecord(modelContext: modelContext)
+                        dismiss()
+                    }
+                    .disabled(!viewModel.isSaveEnabled || viewModel.isSaving)
+                    .fontWeight(.semibold)
+                }
             }
         }
     }
 
-    // MARK: - 剂量预览
+    // MARK: - 剂量输入
 
-    private var dosagePreviewSection: some View {
+    private var dosageInputSection: some View {
         VStack(spacing: AppConstants.Spacing.sm) {
-            HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text(viewModel.dosageText.isEmpty ? "0" : viewModel.dosageText)
-                    .font(.glucoseDisplay)
-                    .foregroundStyle(viewModel.dosageText.isEmpty ? Color(.tertiaryLabel) : .primary)
-                    .contentTransition(.numericText())
-                    .animation(.smooth(duration: 0.15), value: viewModel.dosageText)
-            }
+            TextField("0", text: $viewModel.dosageText)
+                .keyboardType(.decimalPad)
+                .multilineTextAlignment(.center)
+                .font(.glucoseDisplay)
+                .foregroundStyle(viewModel.dosageText.isEmpty ? Color(.tertiaryLabel) : .primary)
+                .onChange(of: viewModel.dosageText) { _, newValue in
+                    viewModel.validateDosageInput(newValue)
+                }
 
             Text(viewModel.selectedType.localizedUnitLabel)
                 .font(.caption)
@@ -150,31 +145,7 @@ struct MedicationInputView: View {
         }
     }
 
-    // MARK: - 保存按钮
-
-    private var saveButton: some View {
-        Button(action: {
-            viewModel.saveRecord(modelContext: modelContext)
-            dismiss()
-        }) {
-            Group {
-                if viewModel.isSaving {
-                    ProgressView().tint(.white)
-                } else {
-                    Text(viewModel.isEditMode ? String(localized: "save") : String(localized: "medication.save_record"))
-                        .font(.body.weight(.semibold))
-                }
-            }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .frame(height: AppConstants.Size.saveButtonHeight)
-            .background(
-                viewModel.isSaveEnabled ? Color.brandPrimary : Color(.systemGray4)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonLarge))
-        }
-        .disabled(!viewModel.isSaveEnabled || viewModel.isSaving)
-    }
+    
 }
 
 #Preview {

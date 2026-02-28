@@ -1,5 +1,4 @@
 /* 隱私權限描述 */
-"NSCameraUsageDescription" = "控糖幫手需要存取您的相機以拍攝飲食照片，協助您記錄飲食資訊。";
-"NSPhotoLibraryUsageDescription" = "控糖幫手需要存取您的相簿以選擇飲食照片，協助您記錄飲食資訊。";
+"NSCameraUsageDescription" = "控糖幫手需要使用相機來拍攝飲食照片，幫助您記錄每餐的飲食情況。";
 "NSHealthShareUsageDescription" = "控糖幫手需要讀取您的血糖數據，以便在應用內展示完整的血糖記錄歷史。";
 "NSHealthUpdateUsageDescription" = "控糖幫手需要將您手動輸入的血糖數據同步到「健康」應用中，確保數據安全備份。";

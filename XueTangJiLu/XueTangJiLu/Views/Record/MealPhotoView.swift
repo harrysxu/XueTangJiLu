@@ -8,21 +8,33 @@
 import SwiftUI
 import SwiftData
 import PhotosUI
+import UniformTypeIdentifiers
+
+private struct ImageTransferable: Transferable {
+    let data: Data
+    
+    static var transferRepresentation: some TransferRepresentation {
+        DataRepresentation(importedContentType: .image) { data in
+            ImageTransferable(data: data)
+        }
+    }
+}
 
 /// 饮食记录页
 struct MealPhotoView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedItem: PhotosPickerItem?
-    @State private var selectedImageData: Data?
     @State private var carbLevel: CarbLevel = .medium
     @State private var mealDescription: String = ""
     @State private var noteText: String = ""
     @State private var selectedDate: Date = .now
     @State private var showDatePicker = false
+    @State private var isSaving = false
+    
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var selectedImageData: Data?
     @State private var showPhotoSection = false
     @State private var showCamera = false
-    @State private var isSaving = false
     
     /// 编辑模式：正在编辑的记录
     var editingRecord: MealRecord? = nil
@@ -48,19 +60,13 @@ struct MealPhotoView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: AppConstants.Spacing.xl) {
-                    // 碳水水平选择
                     carbLevelSelector
-
-                    // 饮食描述
                     descriptionField
-
-                    // 照片区域（可选）
                     photoSectionToggle
-
-                    // 日期时间
+                    if showPhotoSection {
+                        photoSection
+                    }
                     dateTimeSection
-
-                    // 备注
                     noteField
                 }
                 .padding(.horizontal, AppConstants.Spacing.lg)
@@ -78,130 +84,8 @@ struct MealPhotoView: View {
                         .fontWeight(.semibold)
                 }
             }
-        }
-    }
-
-    // MARK: - 照片区域切换
-
-    private var photoSectionToggle: some View {
-        VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-            HStack {
-                Text(String(localized: "meal.photo"))
-                    .font(.subheadline.weight(.medium))
-                Text(String(localized: "meal.optional"))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                if selectedImageData != nil || showPhotoSection {
-                    Button(action: {
-                        withAnimation {
-                            showPhotoSection.toggle()
-                            if !showPhotoSection {
-                                selectedImageData = nil
-                                selectedItem = nil
-                            }
-                        }
-                    }) {
-                        Image(systemName: showPhotoSection ? "chevron.up.circle" : "chevron.down.circle")
-                            .foregroundStyle(Color.brandPrimary)
-                    }
-                }
-            }
-            
-            if showPhotoSection {
-                photoSection
-            } else {
-                Button(action: {
-                    withAnimation {
-                        showPhotoSection = true
-                    }
-                }) {
-                    HStack {
-                        Image(systemName: "photo.badge.plus")
-                            .font(.title3)
-                        Text(String(localized: "meal.add_photo"))
-                            .font(.subheadline)
-                    }
-                    .foregroundStyle(Color.brandPrimary)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
-                    .background(Color(.tertiarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
-
-    // MARK: - 照片区域
-
-    private var photoSection: some View {
-        VStack(spacing: AppConstants.Spacing.md) {
-            if let imageData = selectedImageData,
-               let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                    .overlay(alignment: .topTrailing) {
-                        Button(action: { 
-                            selectedImageData = nil
-                            selectedItem = nil
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.title3)
-                                .foregroundStyle(.white)
-                                .shadow(radius: 2)
-                        }
-                        .padding(8)
-                    }
-            } else {
-                HStack(spacing: AppConstants.Spacing.xl) {
-                    // 拍照按钮
-                    Button(action: { showCamera = true }) {
-                        VStack(spacing: AppConstants.Spacing.sm) {
-                            Image(systemName: "camera.fill")
-                                .font(.title2)
-                                .foregroundStyle(Color.brandPrimary)
-                            Text(String(localized: "meal.take_photo"))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 100)
-                        .background(Color(.tertiarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                    }
-                    .buttonStyle(.plain)
-                    .fullScreenCover(isPresented: $showCamera) {
-                        ImagePicker(sourceType: .camera, selectedImageData: $selectedImageData)
-                    }
-
-                    // 相册选择
-                    PhotosPicker(selection: $selectedItem, matching: .images) {
-                        VStack(spacing: AppConstants.Spacing.sm) {
-                            Image(systemName: "photo.on.rectangle")
-                                .font(.title2)
-                                .foregroundStyle(Color.brandPrimary)
-                            Text(String(localized: "meal.choose_from_library"))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 100)
-                        .background(Color(.tertiarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-        .onChange(of: selectedItem) { _, newItem in
-            Task {
-                if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                    selectedImageData = data
-                }
+            .sheet(isPresented: $showCamera) {
+                ImagePicker(sourceType: .camera, selectedImageData: $selectedImageData)
             }
         }
     }
@@ -215,41 +99,49 @@ struct MealPhotoView: View {
 
             HStack(spacing: AppConstants.Spacing.md) {
                 ForEach(CarbLevel.allCases, id: \.self) { level in
-                    Button(action: {
-                        HapticManager.selection()
-                        carbLevel = level
-                    }) {
-                        VStack(spacing: AppConstants.Spacing.xs) {
-                            Image(systemName: level.iconName)
-                                .font(.title3)
-                            Text(level.localizedDisplayName)
-                                .font(.caption)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppConstants.Spacing.md)
-                        .background(
-                            carbLevel == level
-                                ? Color(level.colorName).opacity(0.15)
-                                : Color(.tertiarySystemGroupedBackground)
-                        )
-                        .foregroundStyle(
-                            carbLevel == level
-                                ? Color(level.colorName)
-                                : .secondary
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonMedium))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonMedium)
-                                .stroke(
-                                    carbLevel == level ? Color(level.colorName) : Color.clear,
-                                    lineWidth: 1.5
-                                )
-                        )
-                    }
-                    .buttonStyle(.plain)
+                    carbLevelButton(for: level)
                 }
             }
         }
+    }
+
+    private func carbLevelButton(for level: CarbLevel) -> some View {
+        let isSelected = carbLevel == level
+        return Button {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                carbLevel = level
+            }
+            HapticManager.selection()
+        } label: {
+            VStack(spacing: AppConstants.Spacing.xs) {
+                Image(systemName: level.iconName)
+                    .font(.title3)
+                Text(level.localizedDisplayName)
+                    .font(.caption)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, AppConstants.Spacing.md)
+            .background(
+                isSelected
+                    ? Color(level.colorName).opacity(0.15)
+                    : Color(.tertiarySystemGroupedBackground)
+            )
+            .foregroundStyle(
+                isSelected
+                    ? Color(level.colorName)
+                    : .secondary
+            )
+            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonMedium))
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonMedium)
+                    .stroke(
+                        isSelected ? Color(level.colorName) : Color.clear,
+                        lineWidth: 1.5
+                    )
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - 饮食描述
@@ -271,6 +163,106 @@ struct MealPhotoView: View {
         }
     }
     
+    // MARK: - 照片开关
+
+    private var photoSectionToggle: some View {
+        Button(action: {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showPhotoSection.toggle()
+            }
+        }) {
+            HStack {
+                Image(systemName: "camera.fill")
+                    .font(.subheadline)
+                Text(String(localized: "meal.photo.toggle"))
+                    .font(.subheadline.weight(.medium))
+                Spacer()
+                Image(systemName: showPhotoSection ? "chevron.up" : "chevron.down")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+            .foregroundStyle(showPhotoSection ? .primary : .secondary)
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - 照片区域
+
+    private var photoSection: some View {
+        VStack(spacing: AppConstants.Spacing.md) {
+            if let imageData = selectedImageData,
+               let uiImage = UIImage(data: imageData) {
+                ZStack(alignment: .topTrailing) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxHeight: 200)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card))
+
+                    Button {
+                        withAnimation {
+                            selectedImageData = nil
+                            selectedItem = nil
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .symbolRenderingMode(.palette)
+                            .foregroundStyle(.white, .black.opacity(0.6))
+                    }
+                    .padding(8)
+                }
+            } else {
+                HStack(spacing: AppConstants.Spacing.lg) {
+                    Button {
+                        showCamera = true
+                    } label: {
+                        VStack(spacing: AppConstants.Spacing.xs) {
+                            Image(systemName: "camera")
+                                .font(.title3)
+                            Text(String(localized: "meal.photo.camera"))
+                                .font(.caption)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppConstants.Spacing.lg)
+                        .background(Color(.tertiarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonMedium))
+                    }
+                    .buttonStyle(.plain)
+
+                    PhotosPicker(
+                        selection: $selectedItem,
+                        matching: .images,
+                        photoLibrary: .shared()
+                    ) {
+                        VStack(spacing: AppConstants.Spacing.xs) {
+                            Image(systemName: "photo.on.rectangle")
+                                .font(.title3)
+                            Text(String(localized: "meal.photo.library"))
+                                .font(.caption)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppConstants.Spacing.lg)
+                        .background(Color(.tertiarySystemGroupedBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonMedium))
+                    }
+                    .buttonStyle(.plain)
+                }
+                .foregroundStyle(.secondary)
+            }
+        }
+        .onChange(of: selectedItem) { _, newItem in
+            guard let newItem else { return }
+            Task { @MainActor in
+                if let result = try? await newItem.loadTransferable(type: ImageTransferable.self),
+                   let uiImage = UIImage(data: result.data) {
+                    let resized = uiImage.resizedForMealStorage()
+                    selectedImageData = resized.jpegData(compressionQuality: 0.7)
+                }
+            }
+        }
+    }
+
     // MARK: - 保存验证
     
     private var isSaveEnabled: Bool {
@@ -329,23 +321,19 @@ struct MealPhotoView: View {
         
         isSaving = true
 
-        let compressedData = selectedImageData
-
         if let existingRecord = editingRecord {
-            // 编辑模式：更新现有记录
             existingRecord.carbLevel = carbLevel
             existingRecord.mealDescription = mealDescription
-            existingRecord.photoData = compressedData
             existingRecord.timestamp = selectedDate
             existingRecord.note = noteText.isEmpty ? nil : noteText
+            existingRecord.photoData = selectedImageData
         } else {
-            // 新建模式：创建新记录
             let record = MealRecord(
                 carbLevel: carbLevel,
                 mealDescription: mealDescription,
-                photoData: compressedData,
                 timestamp: selectedDate,
-                note: noteText.isEmpty ? nil : noteText
+                note: noteText.isEmpty ? nil : noteText,
+                photoData: selectedImageData
             )
             modelContext.insert(record)
         }
@@ -353,6 +341,19 @@ struct MealPhotoView: View {
         HapticManager.success()
         isSaving = false
         dismiss()
+    }
+}
+
+// MARK: - UIImage 压缩扩展
+
+private extension UIImage {
+    func resizedForMealStorage(maxDimension: CGFloat = 1024) -> UIImage {
+        let longerSide = max(size.width, size.height)
+        guard longerSide > maxDimension else { return self }
+        let scale = maxDimension / longerSide
+        let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        return renderer.image { _ in draw(in: CGRect(origin: .zero, size: newSize)) }
     }
 }
 

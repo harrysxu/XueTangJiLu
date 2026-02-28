@@ -16,7 +16,7 @@
 "today.medication" = "今日用藥";
 "quick.glucose" = "記錄血糖";
 "quick.medication" = "記錄用藥";
-"quick.meal" = "拍照飲食";
+"quick.meal" = "記錄飲食";
 "today.summary.card" = "今日摘要";
 "recent.records" = "最近記錄";
 "yesterday.records" = "昨日記錄";
@@ -94,6 +94,9 @@
 "sync.count.glucose" = "%d條血糖";
 "sync.count.medication" = "%d條用藥";
 "sync.count.meal" = "%d條飲食";
+"sync.count.deleted_glucose" = "刪除%d條血糖";
+"sync.count.deleted_medication" = "刪除%d條用藥";
+"sync.count.deleted_meal" = "刪除%d條飲食";
 
 /* Glucose Level */
 "level.low" = "偏低";
@@ -115,8 +118,6 @@
 "meal.carb_medium" = "中碳水";
 "meal.carb_high" = "高碳水";
 "meal.record" = "記錄飲食";
-"meal.take_photo" = "拍照";
-"meal.album" = "相簿";
 "meal.carb_level" = "碳水水平";
 "meal.description" = "飲食描述";
 "meal.description.placeholder" = "如「米飯 + 青菜 + 雞胸肉」";
@@ -484,18 +485,15 @@
 "sync.no_history" = "暫無同步記錄";
 "sync.history_footer" = "顯示最近的同步活動記錄";
 
-/* Meal Photo View */
+/* Meal Record View */
 "meal.edit" = "編輯飲食";
 "meal.record" = "記錄飲食";
-"meal.photo" = "照片";
-"meal.optional" = "(可選)";
-"meal.collapse" = "收起";
-"meal.add_photo" = "添加照片";
-"meal.take_photo" = "拍照";
-"meal.choose_from_library" = "從相冊選擇";
 "meal.carb_level" = "碳水水平";
 "meal.description" = "飲食描述";
 "meal.description_placeholder" = "如\"米飯 + 青菜 + 雞胸肉\"";
+"meal.photo.toggle" = "添加照片";
+"meal.photo.camera" = "拍照";
+"meal.photo.library" = "從相簿選取";
 
 /* Unit Picker */
 "unit.title" = "血糖單位";
@@ -506,6 +504,7 @@
 "reminder.title" = "提醒設置";
 "reminder.notification_permission" = "通知權限";
 "reminder.enabled" = "已開啟";
+"reminder.disabled" = "未開啟";
 "reminder.enable_button" = "開啟";
 "reminder.measurement_reminders" = "測量提醒";
 "reminder.inactivity_reminder" = "久未記錄提醒";
@@ -586,11 +585,13 @@
 "sync.error.no_network" = "無網絡連接";
 "sync.error.wifi_required" = "需要WiFi";
 "sync.error.account_unavailable" = "iCloud賬戶不可用";
+"sync.status.pending_changes" = "有待同步的變更";
 
 /* Reminder Settings */
 "reminder.title" = "提醒設定";
 "reminder.notification_permission" = "通知權限";
 "reminder.enabled" = "已開啟";
+"reminder.disabled" = "未開啟";
 "reminder.enable_button" = "開啟";
 "reminder.measurement_reminders" = "測量提醒";
 "reminder.inactivity_reminder" = "久未記錄提醒";
@@ -799,7 +800,6 @@
 "feature.apple_watch" = "Apple Watch 支持";
 "feature.advanced_charts" = "高級統計圖表";
 "feature.medication_tracking" = "藥物記錄管理";
-"feature.meal_photo_tracking" = "飲食照片記錄";
 "feature.description.unlimited_records" = "每日記錄次數不受限制";
 "feature.description.icloud_sync" = "在所有設備間實時同步數據";
 "feature.description.pdf_export" = "生成專業的血糖報告用於就診";
@@ -807,7 +807,6 @@
 "feature.description.apple_watch" = "在手錶上快速記錄血糖";
 "feature.description.advanced_charts" = "查看餐前餐後配對、週對比等深度分析";
 "feature.description.medication_tracking" = "記錄和管理用藥情況";
-"feature.description.meal_photo_tracking" = "用照片記錄每一餐";
 "feature.button.unlock" = "解鎖此功能";
 "feature.button.unlock_short" = "解鎖";
 "feature.button.upgrade" = "升級";
@@ -818,7 +817,6 @@
 "feature.unlock.csv_export" = "升級後可導出CSV數據";
 "feature.unlock.apple_watch" = "升級後可在Apple Watch上快速記錄";
 "feature.unlock.advanced_charts" = "升級後可查看高級統計圖表";
-"feature.unlock.meal_photo_tracking" = "升級後可拍照記錄飲食";
 "limit.daily_records" = "今日記錄已達上限";
 "limit.upgrade_prompt" = "升級後可無限記錄";
 "limit.history_restricted" = "免費版僅顯示最近7天數據";
@@ -835,3 +833,45 @@
 "store.restore.success.message" = "您的購買已成功恢復";
 "common.ok" = "確定";
 "common.cancel" = "取消";
+"common.delete" = "刪除";
+
+/* Home View */
+"home.title" = "記錄";
+"home.empty.title" = "還沒有任何記錄";
+"home.empty.subtitle" = "點擊下方 \"+\" 開始記錄";
+"home.latest_glucose" = "最新血糖";
+"home.today_summary" = "今日概要";
+"home.stat.count" = "次數";
+"home.stat.today" = "今日";
+"home.stat.average" = "均值";
+"home.stat.tir" = "達標率";
+"home.no_records_a11y" = "暫無記錄";
+"home.latest_a11y" = "最新血糖 %@ %@，%@，%@";
+"home.add_record.a11y" = "添加血糖記錄";
+"home.add_record.hint" = "雙擊打開血糖錄入鍵盤";
+
+/* Sync Status Badge - 補充 */
+"sync.status.downloading" = "下載中";
+"sync.status.uploading" = "上傳中";
+"sync.status.last_sync_format" = "最後同步: %@";
+"sync.status.disabled" = "已禁用";
+"sync.status.not_signed_in" = "未登入 iCloud";
+"sync.status.no_network" = "無網絡連接";
+"sync.status.ready" = "就緒";
+"sync.status.sync_success" = "同步成功";
+"sync.status.failed_detail" = "失敗: %@";
+
+/* Sync Settings - 補充 */
+"sync.quota.title" = "iCloud 儲存空間不足";
+"sync.quota.message" = "您的 iCloud 儲存已滿，數據無法同步到雲端。本地數據不受影響。";
+"sync.quota.manage" = "管理 iCloud 儲存空間";
+"sync.restart.title" = "需要重啟應用";
+"sync.restart.confirm" = "確認更改";
+"sync.restart.message" = "更改同步設置需要重啟應用才能生效。請手動關閉並重新打開應用。\n\n當前設置：%@\n新設置：%@";
+"sync.restart.enabled" = "已啟用";
+"sync.restart.disabled" = "已禁用";
+"sync.state.importing_download" = "正在從 iCloud 下載數據...";
+"sync.state.importing" = "正在從 iCloud 導入...";
+"sync.state.exporting" = "正在上傳到 iCloud...";
+"sync.restart_warning" = "⚠️ 更改同步設置需要重啟應用才能生效";
+"sync.first_sync_tip" = "💡 重新安裝後首次同步可能需要幾分鐘，請保持應用在前台並確保網絡暢通";

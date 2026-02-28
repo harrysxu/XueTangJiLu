@@ -23,7 +23,9 @@ struct ContentView: View {
             }
             // 保存去重结果
             try? modelContext.save()
+            #if DEBUG
             print("⚠️ 检测到\(settingsArray.count)个UserSettings实例，已去重保留1个")
+            #endif
             return result.keep
         }
 
@@ -38,7 +40,9 @@ struct ContentView: View {
         modelContext.insert(newSettings)
         // 初始化本地化的默认标签
         newSettings.initializeLocalizedDefaultTagsIfNeeded()
+        #if DEBUG
         print("✅ 创建新的UserSettings实例")
+        #endif
         return newSettings
     }
 

@@ -74,22 +74,22 @@ struct SyncStatusBadge: View {
     
     private var statusText: String {
         if !syncManager.networkMonitor.isConnected {
-            return "离线"
+            return String(localized: "sync.status.offline")
         }
         
         switch syncManager.currentState {
         case .idle:
             return ""
         case .syncing:
-            return "同步中"
+            return String(localized: "sync.status.syncing")
         case .importing:
-            return "下载中"
+            return String(localized: "sync.status.downloading")
         case .exporting:
-            return "上传中"
+            return String(localized: "sync.status.uploading")
         case .success:
-            return "已同步"
+            return String(localized: "sync.status.synced")
         case .failed:
-            return "失败"
+            return String(localized: "sync.status.failed")
         }
     }
     
@@ -124,19 +124,18 @@ struct SyncStatusDetailView: View {
                     Image(systemName: "clock")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
-                    Text("最后同步: \(syncManager.lastSyncTimeString)")
+                    Text(String(localized: "sync.status.last_sync_format \(syncManager.lastSyncTimeString)"))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
             }
             
-            // 待同步数量
-            if syncManager.pendingOperations > 0 {
+            if syncManager.hasPendingChanges {
                 HStack {
                     Image(systemName: "circle.badge.exclamationmark")
                         .font(.caption2)
                         .foregroundStyle(.orange)
-                    Text("\(syncManager.pendingOperations) 项待同步")
+                    Text(String(localized: "sync.status.pending_changes", defaultValue: "有待同步的变更"))
                         .font(.caption2)
                         .foregroundStyle(.orange)
                 }
@@ -153,30 +152,30 @@ struct SyncStatusDetailView: View {
     
     private var statusDescription: String {
         if !syncManager.isSyncEnabled {
-            return "已禁用"
+            return String(localized: "sync.status.disabled")
         }
         
         if syncManager.iCloudAccountStatus != .available {
-            return "未登录 iCloud"
+            return String(localized: "sync.status.not_signed_in")
         }
         
         if !syncManager.networkMonitor.isConnected {
-            return "无网络连接"
+            return String(localized: "sync.status.no_network")
         }
         
         switch syncManager.currentState {
         case .idle:
-            return "就绪"
+            return String(localized: "sync.status.ready")
         case .syncing:
-            return "正在同步"
+            return String(localized: "sync.status.syncing")
         case .importing:
-            return "正在下载"
+            return String(localized: "sync.status.downloading")
         case .exporting:
-            return "正在上传"
+            return String(localized: "sync.status.uploading")
         case .success:
-            return "同步成功"
+            return String(localized: "sync.status.sync_success")
         case .failed(let error):
-            return "失败: \(error.localizedDescription)"
+            return String(localized: "sync.status.failed_detail \(error.localizedDescription)")
         }
     }
 }

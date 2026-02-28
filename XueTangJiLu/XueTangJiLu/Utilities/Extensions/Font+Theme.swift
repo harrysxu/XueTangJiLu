@@ -28,6 +28,4 @@ extension Font {
     static let glucoseCompact = Font.system(size: 14, weight: .medium, design: .rounded)
         .monospacedDigit()
 
-    /// 键盘按键文字 (28pt Rounded Medium)
-    static let keypadButton = Font.system(size: 28, weight: .medium, design: .rounded)
 }

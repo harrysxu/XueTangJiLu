@@ -42,9 +42,7 @@ struct FeatureManager {
         case .advancedCharts:
             return false
         case .medicationTracking:
-            return true  // 基础功能，免费用户也可以使用
-        case .mealPhotoTracking:
-            return false
+            return true
         }
     }
     
@@ -81,8 +79,6 @@ struct FeatureManager {
             return String(localized: "feature.unlock.advanced_charts")
         case .medicationTracking:
             return ""
-        case .mealPhotoTracking:
-            return String(localized: "feature.unlock.meal_photo_tracking")
         }
     }
     
@@ -94,8 +90,7 @@ struct FeatureManager {
             .pdfExport,
             .csvExport,
             .appleWatch,
-            .advancedCharts,
-            .mealPhotoTracking
+            .advancedCharts
         ]
     }
     
@@ -144,8 +139,6 @@ extension Feature {
             return String(localized: "feature.description.advanced_charts")
         case .medicationTracking:
             return String(localized: "feature.description.medication_tracking")
-        case .mealPhotoTracking:
-            return String(localized: "feature.description.meal_photo_tracking")
         }
     }
 }

@@ -75,7 +75,34 @@ final class GlucoseViewModel {
         return GlucoseUnitConverter.normalize(value: value, preferredUnit: unit)
     }
 
-    // MARK: - 键盘输入处理
+    // MARK: - 系统键盘输入校验
+
+    func validateInput(_ newValue: String, unit: GlucoseUnit) {
+        var cleaned = newValue.filter { $0.isNumber || $0 == "." }
+
+        if unit.maxDecimalPlaces == 0 {
+            cleaned = cleaned.filter { $0 != "." }
+        }
+
+        let dots = cleaned.filter { $0 == "." }
+        if dots.count > 1, let firstDot = cleaned.firstIndex(of: ".") {
+            let afterDot = cleaned[cleaned.index(after: firstDot)...].filter { $0 != "." }
+            cleaned = String(cleaned[...firstDot]) + afterDot
+        }
+
+        if let dotIndex = cleaned.firstIndex(of: ".") {
+            let decimalPart = cleaned[cleaned.index(after: dotIndex)...]
+            if decimalPart.count > unit.maxDecimalPlaces {
+                cleaned = String(cleaned[...dotIndex]) + String(decimalPart.prefix(unit.maxDecimalPlaces))
+            }
+        }
+
+        if cleaned != inputText {
+            inputText = cleaned
+        }
+    }
+
+    // MARK: - 键盘输入处理（保留供测试使用）
 
     func handleKeyPress(_ key: KeypadKey, unit: GlucoseUnit) {
         switch key {
@@ -151,7 +178,9 @@ final class GlucoseViewModel {
                     )
                     existingRecord.syncedToHealthKit = true
                 } catch {
+                    #if DEBUG
                     print("HealthKit 同步失败: \(error)")
+                    #endif
                 }
             }
         } else {
@@ -175,7 +204,9 @@ final class GlucoseViewModel {
                     )
                     record.syncedToHealthKit = true
                 } catch {
+                    #if DEBUG
                     print("HealthKit 同步失败: \(error)")
+                    #endif
                 }
             }
         }

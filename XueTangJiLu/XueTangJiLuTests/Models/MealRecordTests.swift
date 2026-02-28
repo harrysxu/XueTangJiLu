@@ -22,25 +22,21 @@ struct MealRecordTests {
         
         #expect(record.carbLevel == .medium)
         #expect(record.mealDescription == "午餐")
-        #expect(record.photoData == nil)
     }
     
     @Test("完整初始化")
     func testFullInitialization() {
         let timestamp = Date.now
-        let photoData = Data([0x01, 0x02, 0x03])
         
         let record = MealRecord(
             carbLevel: .high,
             mealDescription: "晚餐",
-            photoData: photoData,
             timestamp: timestamp,
             note: "吃了火锅"
         )
         
         #expect(record.carbLevel == .high)
         #expect(record.mealDescription == "晚餐")
-        #expect(record.photoData == photoData)
         #expect(record.timestamp == timestamp)
         #expect(record.note == "吃了火锅")
     }
@@ -66,30 +62,6 @@ struct MealRecordTests {
         let record = MealRecord(carbLevel: .high, mealDescription: "米饭")
         
         #expect(record.carbLevel == .high)
-    }
-    
-    // MARK: - 照片处理测试
-    
-    @Test("有照片判断")
-    func testHasPhoto() {
-        let photoData = Data([0x01, 0x02, 0x03])
-        let record = MealRecord(
-            carbLevel: .medium,
-            mealDescription: "午餐",
-            photoData: photoData
-        )
-        
-        #expect(record.hasPhoto == true)
-    }
-    
-    @Test("无照片判断")
-    func testHasNoPhoto() {
-        let record = MealRecord(
-            carbLevel: .medium,
-            mealDescription: "午餐"
-        )
-        
-        #expect(record.hasPhoto == false)
     }
     
     // MARK: - 去重测试
@@ -127,16 +99,58 @@ struct MealRecordTests {
         #expect(!record1.isDuplicate(of: record2))
     }
     
+    // MARK: - 照片相关测试
+    
+    @Test("有照片的记录")
+    func testHasPhoto() {
+        let fakePhotoData = Data([0xFF, 0xD8, 0xFF])
+        let record = MealRecord(
+            carbLevel: .medium,
+            mealDescription: "午餐",
+            photoData: fakePhotoData
+        )
+        
+        #expect(record.hasPhoto == true)
+        #expect(record.photoData != nil)
+    }
+    
+    @Test("没有照片的记录")
+    func testHasNoPhoto() {
+        let record = MealRecord(
+            carbLevel: .medium,
+            mealDescription: "午餐"
+        )
+        
+        #expect(record.hasPhoto == false)
+        #expect(record.photoData == nil)
+    }
+    
     // MARK: - 冲突解决测试
     
-    @Test("冲突解决 - 优先保留有照片的")
-    func testConflictResolutionWithPhoto() {
-        let photoData = Data([0x01, 0x02, 0x03])
+    @Test("冲突解决 - 保留创建时间更早的")
+    func testConflictResolutionKeepsEarlier() {
+        let record1 = MealRecord(
+            carbLevel: .medium,
+            mealDescription: "午餐"
+        )
         
+        let record2 = MealRecord(
+            carbLevel: .medium,
+            mealDescription: "午餐"
+        )
+        
+        let resolved = MealRecord.resolveConflict(between: record1, and: record2)
+        
+        #expect(resolved.createdAt <= record2.createdAt)
+    }
+    
+    @Test("冲突解决 - 优先保留有照片的记录")
+    func testConflictResolutionPrefersPhoto() {
+        let fakePhotoData = Data([0xFF, 0xD8, 0xFF])
         let recordWithPhoto = MealRecord(
             carbLevel: .medium,
             mealDescription: "午餐",
-            photoData: photoData
+            photoData: fakePhotoData
         )
         
         let recordWithoutPhoto = MealRecord(
@@ -144,8 +158,7 @@ struct MealRecordTests {
             mealDescription: "午餐"
         )
         
-        let resolved = MealRecord.resolveConflict(between: recordWithPhoto, and: recordWithoutPhoto)
-        
+        let resolved = MealRecord.resolveConflict(between: recordWithoutPhoto, and: recordWithPhoto)
         #expect(resolved.hasPhoto == true)
     }
 }

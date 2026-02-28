@@ -328,7 +328,9 @@ struct CloudKitDiagnosticsView: View {
             counts.meal = try modelContext.fetchCount(FetchDescriptor<MealRecord>())
             counts.userSettings = try modelContext.fetchCount(FetchDescriptor<UserSettings>())
         } catch {
+            #if DEBUG
             print("❌ 本地数据统计失败: \(error)")
+            #endif
         }
         localRecordCounts = counts
     }

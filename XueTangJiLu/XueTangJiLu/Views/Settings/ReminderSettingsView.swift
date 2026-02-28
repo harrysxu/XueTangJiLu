@@ -14,7 +14,6 @@ struct ReminderSettingsView: View {
     @Query private var settingsArray: [UserSettings]
     @State private var notificationManager = NotificationManager()
     @State private var sceneTags: [SceneTag] = []
-    @State private var inactivityHours: Int = 0
     @State private var showAuthAlert = false
     @State private var pendingNotifications: [UNNotificationRequest] = []
     @State private var showDebugInfo = false
@@ -40,15 +39,18 @@ struct ReminderSettingsView: View {
                             .font(.caption)
                             .foregroundStyle(.green)
                     } else {
-                        Button(String(localized: "reminder.enable_button")) {
+                        Button {
                             Task {
                                 let granted = await notificationManager.requestAuthorization()
                                 if !granted {
                                     showAuthAlert = true
                                 }
                             }
+                        } label: {
+                            Text(String(localized: "reminder.disabled"))
+                                .font(.caption)
+                                .foregroundStyle(.red)
                         }
-                        .font(.caption)
                     }
                 }
             }
@@ -90,23 +92,6 @@ struct ReminderSettingsView: View {
                 Text(String(localized: "reminder.manage_footer"))
             }
 
-            // 久未记录提醒
-            Section(String(localized: "reminder.inactivity_reminder")) {
-                Picker(String(localized: "reminder.interval"), selection: $inactivityHours) {
-                    Text(String(localized: "reminder.off")).tag(0)
-                    Text(String(localized: "reminder.hours_4")).tag(4)
-                    Text(String(localized: "reminder.hours_6")).tag(6)
-                    Text(String(localized: "reminder.hours_8")).tag(8)
-                    Text(String(localized: "reminder.hours_12")).tag(12)
-                }
-                .onChange(of: inactivityHours) { _, newValue in
-                    settings.inactivityReminderHours = newValue
-                    if newValue > 0 {
-                        notificationManager.scheduleInactivityReminder(hours: newValue)
-                    }
-                    scheduleAllReminders()
-                }
-            }
             
             // 调试工具（仅在开发环境显示）
             #if DEBUG
@@ -123,7 +108,9 @@ struct ReminderSettingsView: View {
                 if !enabledReminderTags.isEmpty {
                     Button(action: {
                         if let firstTag = enabledReminderTags.first {
-                            notificationManager.sendTestNotification(label: firstTag.label)
+                            Task {
+                                await notificationManager.sendTestNotification(label: firstTag.label)
+                            }
                         }
                     }) {
                         Label("发送测试通知（3秒后）", systemImage: "bell.badge")
@@ -191,7 +178,6 @@ struct ReminderSettingsView: View {
 
     private func loadReminders() {
         sceneTags = settings.sceneTags
-        inactivityHours = settings.inactivityReminderHours
     }
     
     private func scheduleAllReminders() {
@@ -205,7 +191,9 @@ struct ReminderSettingsView: View {
                 isEnabled: true
             )
         }
-        notificationManager.scheduleReminders(reminders, sceneTags: settings.sceneTags)
+        Task {
+            await notificationManager.scheduleReminders(reminders, sceneTags: settings.sceneTags)
+        }
     }
 }
 

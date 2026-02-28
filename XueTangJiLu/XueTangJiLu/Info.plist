@@ -3,9 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>控糖助手需要访问您的相机以拍摄饮食照片，帮助您记录饮食信息。</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>控糖助手需要访问您的相册以选择饮食照片，帮助您记录饮食信息。</string>
+	<string>控糖助手需要使用相机来拍摄饮食照片，帮助您记录每餐的饮食情况。</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>控糖助手需要读取您的血糖数据，以便在应用内展示完整的血糖记录历史。</string>
 	<key>NSHealthUpdateUsageDescription</key>

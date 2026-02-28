@@ -318,7 +318,8 @@ struct PDFExportService {
                     if let meal = entry.data as? MealRecord {
                         let description = meal.mealDescription.isEmpty ? String(localized: "pdf.meal_record") : meal.mealDescription
                         let carbLevel = meal.carbLevel.displayName
-                        rowData += [typeMeal, description, carbLevel, meal.note ?? ""]
+                        let photoMark = meal.hasPhoto ? " 📷" : ""
+                        rowData += [typeMeal, description, carbLevel + photoMark, meal.note ?? ""]
                     }
                 }
 
@@ -845,7 +846,7 @@ struct PDFExportService {
             case "饮食":
                 if let meal = entry.data as? MealRecord {
                     let description = meal.mealDescription.isEmpty ? "-" : meal.mealDescription.replacingOccurrences(of: ",", with: "，")
-                    let carbLevel = meal.carbLevel.displayName
+                    let carbLevel = meal.carbLevel.displayName + (meal.hasPhoto ? " [有照片]" : "")
                     let note = meal.note?.replacingOccurrences(of: ",", with: "，") ?? ""
                     row += ",,,,,,,,,\(description),\(carbLevel),\(note)"
                 }

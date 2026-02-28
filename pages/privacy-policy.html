@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私政策 | Privacy Policy — 控糖助手</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --accent: #0071e3;
+            --border: #d2d2d7;
+            --card-bg: #f5f5f7;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1d1d1f;
+                --text: #f5f5f7;
+                --text-secondary: #a1a1a6;
+                --accent: #2997ff;
+                --border: #424245;
+                --card-bg: #2d2d2f;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+        .container { max-width: 720px; margin: 0 auto; padding: 40px 0 60px; }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        h2 { font-size: 20px; font-weight: 600; margin: 32px 0 12px; }
+        h3 { font-size: 17px; font-weight: 600; margin: 20px 0 8px; }
+        p, li { font-size: 15px; color: var(--text-secondary); margin-bottom: 8px; }
+        ul { padding-left: 20px; }
+        .date { font-size: 13px; color: var(--text-secondary); margin-bottom: 32px; }
+        .lang-switch {
+            display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+        }
+        .lang-switch a {
+            font-size: 14px; color: var(--accent); text-decoration: none;
+            padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px;
+        }
+        .lang-switch a:hover, .lang-switch a.active {
+            background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        th, td {
+            text-align: left; padding: 8px 12px; font-size: 14px;
+            border-bottom: 1px solid var(--border); color: var(--text-secondary);
+        }
+        th { font-weight: 600; color: var(--text); }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--accent); text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a class="back-link" href="index.html">&larr; 返回 / Back</a>
+
+    <div class="lang-switch">
+        <a href="#" onclick="switchLang('zh-Hans')" id="btn-zh-Hans" class="active">简体中文</a>
+        <a href="#" onclick="switchLang('zh-Hant')" id="btn-zh-Hant">繁體中文</a>
+        <a href="#" onclick="switchLang('en')" id="btn-en">English</a>
+    </div>
+
+    <!-- 简体中文 -->
+    <div id="zh-Hans" class="section active">
+        <h1>隐私政策</h1>
+        <p class="date">生效日期：2026 年 3 月 1 日</p>
+
+        <p>欢迎使用"控糖助手"（以下简称"本应用"）。我们非常重视您的隐私。本隐私政策说明了本应用如何收集、使用和保护您的个人信息。</p>
+
+        <h2>1. 我们收集的数据</h2>
+        <p>本应用在您使用过程中会存储以下数据，所有数据均保存在您的设备本地及您的私人 iCloud 账户中：</p>
+        <table>
+            <tr><th>数据类型</th><th>说明</th></tr>
+            <tr><td>血糖记录</td><td>您手动输入的血糖值、测量时间、用餐场景标签和备注</td></tr>
+            <tr><td>药物记录</td><td>药物名称、剂量、服药时间</td></tr>
+            <tr><td>饮食记录</td><td>饮食描述、碳水水平、饮食照片</td></tr>
+            <tr><td>用户设置</td><td>血糖单位偏好、提醒设置、场景标签等应用配置</td></tr>
+        </table>
+
+        <h2>2. HealthKit 数据</h2>
+        <p>本应用使用 Apple HealthKit 框架：</p>
+        <ul>
+            <li><strong>读取</strong>：从"健康"应用读取血糖数据，以在应用内展示完整的血糖历史。</li>
+            <li><strong>写入</strong>：将您手动输入的血糖数据同步到"健康"应用中，便于统一管理健康数据。</li>
+        </ul>
+        <p>HealthKit 数据的访问需要您明确授权，您可以随时在系统"设置 > 健康 > 数据访问与设备"中修改权限。本应用不会将 HealthKit 数据用于广告或数据挖掘，也不会将其分享给第三方。</p>
+
+        <h2>3. iCloud 同步</h2>
+        <p>如果您启用了 iCloud 同步功能（付费功能），您的数据将通过 Apple CloudKit 存储在您的<strong>私有数据库</strong>中。这意味着：</p>
+        <ul>
+            <li>只有您本人可以访问这些数据。</li>
+            <li>开发者无法查看、访问或提取您的任何数据。</li>
+            <li>数据在您的设备之间自动同步。</li>
+        </ul>
+        <p><strong>中国大陆用户注意</strong>：根据相关法律法规，中国大陆地区的 iCloud 服务由云上贵州大数据产业发展有限公司运营。您的数据存储和处理受其服务条款约束。</p>
+
+        <h2>4. 相机与照片</h2>
+        <p>本应用需要使用相机权限来拍摄饮食照片。照片经过压缩处理（最大 1024 像素，JPEG 格式）后存储在应用数据中。本应用也支持从相册选取照片，使用 Apple 提供的 PHPicker，无需额外相册权限。</p>
+        <p>您的照片仅用于饮食记录，不会上传至任何外部服务器。</p>
+
+        <h2>5. 本地通知</h2>
+        <p>本应用可根据您的设置发送本地通知，用于提醒您定时测量血糖。通知内容完全在设备本地生成和处理。</p>
+
+        <h2>6. 我们不收集的数据</h2>
+        <ul>
+            <li>本应用<strong>不包含</strong>任何第三方分析或追踪 SDK。</li>
+            <li>本应用<strong>不收集</strong>设备标识符、位置信息或浏览行为。</li>
+            <li>本应用<strong>不展示</strong>任何广告。</li>
+            <li>本应用<strong>不会</strong>将您的任何数据出售或分享给第三方。</li>
+        </ul>
+
+        <h2>7. 订阅与支付</h2>
+        <p>本应用提供应用内订阅服务，所有支付通过 Apple 的 App Store 处理。我们不会收集或存储您的任何支付信息（如信用卡号等）。订阅管理请通过系统"设置 > Apple ID > 订阅"进行。</p>
+
+        <h2>8. 数据安全</h2>
+        <p>您的数据通过以下方式受到保护：</p>
+        <ul>
+            <li>本地数据受设备锁屏密码和生物识别保护。</li>
+            <li>iCloud 数据传输采用端到端加密。</li>
+            <li>CloudKit 私有数据库确保只有您本人可以访问。</li>
+        </ul>
+
+        <h2>9. 数据删除</h2>
+        <p>您可以随时在应用"设置"中使用"工厂重置"功能删除所有本地数据。如需同时删除 iCloud 中的数据，请在系统"设置 > Apple ID > iCloud > 管理存储空间"中删除本应用的数据。</p>
+
+        <h2>10. 儿童隐私</h2>
+        <p>本应用不面向 13 岁以下的儿童。我们不会有意收集儿童的个人信息。</p>
+
+        <h2>11. 隐私政策变更</h2>
+        <p>我们可能会不时更新本隐私政策。更新后的政策将在本页面发布，并更新生效日期。建议您定期查看本页面。</p>
+
+        <h2>12. 联系我们</h2>
+        <p>如果您对本隐私政策有任何疑问，请通过以下方式联系我们：</p>
+        <p>邮箱：<a href="mailto:harrysxu@outlook.com" style="color:var(--accent)">harrysxu@outlook.com</a></p>
+    </div>
+
+    <!-- 繁體中文 -->
+    <div id="zh-Hant" class="section">
+        <h1>隱私政策</h1>
+        <p class="date">生效日期：2026 年 3 月 1 日</p>
+
+        <p>歡迎使用「控糖幫手」（以下簡稱「本應用」）。我們非常重視您的隱私。本隱私政策說明了本應用如何收集、使用和保護您的個人資訊。</p>
+
+        <h2>1. 我們收集的資料</h2>
+        <p>本應用在您使用過程中會儲存以下資料，所有資料均儲存在您的裝置本機及您的私人 iCloud 帳號中：</p>
+        <table>
+            <tr><th>資料類型</th><th>說明</th></tr>
+            <tr><td>血糖記錄</td><td>您手動輸入的血糖值、測量時間、用餐場景標籤和備註</td></tr>
+            <tr><td>藥物記錄</td><td>藥物名稱、劑量、服藥時間</td></tr>
+            <tr><td>飲食記錄</td><td>飲食描述、碳水程度、飲食照片</td></tr>
+            <tr><td>使用者設定</td><td>血糖單位偏好、提醒設定、場景標籤等應用配置</td></tr>
+        </table>
+
+        <h2>2. HealthKit 資料</h2>
+        <p>本應用使用 Apple HealthKit 框架：</p>
+        <ul>
+            <li><strong>讀取</strong>：從「健康」應用讀取血糖資料，以在應用內展示完整的血糖歷史。</li>
+            <li><strong>寫入</strong>：將您手動輸入的血糖資料同步到「健康」應用中，便於統一管理健康資料。</li>
+        </ul>
+        <p>HealthKit 資料的存取需要您明確授權，您可以隨時在系統「設定 > 健康 > 資料取用與裝置」中修改權限。本應用不會將 HealthKit 資料用於廣告或資料探勘，也不會將其分享給第三方。</p>
+
+        <h2>3. iCloud 同步</h2>
+        <p>如果您啟用了 iCloud 同步功能（付費功能），您的資料將透過 Apple CloudKit 儲存在您的<strong>私有資料庫</strong>中。這意味著：</p>
+        <ul>
+            <li>只有您本人可以存取這些資料。</li>
+            <li>開發者無法查看、存取或提取您的任何資料。</li>
+            <li>資料在您的裝置之間自動同步。</li>
+        </ul>
+
+        <h2>4. 相機與照片</h2>
+        <p>本應用需要使用相機權限來拍攝飲食照片。照片經過壓縮處理（最大 1024 像素，JPEG 格式）後儲存在應用資料中。本應用也支援從相簿選取照片，使用 Apple 提供的 PHPicker，無需額外相簿權限。</p>
+        <p>您的照片僅用於飲食記錄，不會上傳至任何外部伺服器。</p>
+
+        <h2>5. 本機通知</h2>
+        <p>本應用可根據您的設定發送本機通知，用於提醒您定時測量血糖。通知內容完全在裝置本機產生和處理。</p>
+
+        <h2>6. 我們不收集的資料</h2>
+        <ul>
+            <li>本應用<strong>不包含</strong>任何第三方分析或追蹤 SDK。</li>
+            <li>本應用<strong>不收集</strong>裝置識別碼、位置資訊或瀏覽行為。</li>
+            <li>本應用<strong>不展示</strong>任何廣告。</li>
+            <li>本應用<strong>不會</strong>將您的任何資料出售或分享給第三方。</li>
+        </ul>
+
+        <h2>7. 訂閱與付款</h2>
+        <p>本應用提供應用內訂閱服務，所有付款透過 Apple 的 App Store 處理。我們不會收集或儲存您的任何付款資訊（如信用卡號等）。訂閱管理請透過系統「設定 > Apple ID > 訂閱」進行。</p>
+
+        <h2>8. 資料安全</h2>
+        <p>您的資料透過以下方式受到保護：</p>
+        <ul>
+            <li>本機資料受裝置鎖定密碼和生物辨識保護。</li>
+            <li>iCloud 資料傳輸採用端對端加密。</li>
+            <li>CloudKit 私有資料庫確保只有您本人可以存取。</li>
+        </ul>
+
+        <h2>9. 資料刪除</h2>
+        <p>您可以隨時在應用「設定」中使用「工廠重置」功能刪除所有本機資料。如需同時刪除 iCloud 中的資料，請在系統「設定 > Apple ID > iCloud > 管理儲存空間」中刪除本應用的資料。</p>
+
+        <h2>10. 兒童隱私</h2>
+        <p>本應用不面向 13 歲以下的兒童。我們不會有意收集兒童的個人資訊。</p>
+
+        <h2>11. 隱私政策變更</h2>
+        <p>我們可能會不時更新本隱私政策。更新後的政策將在本頁面發佈，並更新生效日期。建議您定期查看本頁面。</p>
+
+        <h2>12. 聯繫我們</h2>
+        <p>如果您對本隱私政策有任何疑問，請透過以下方式聯繫我們：</p>
+        <p>電郵：<a href="mailto:harrysxu@outlook.com" style="color:var(--accent)">harrysxu@outlook.com</a></p>
+    </div>
+
+    <!-- English -->
+    <div id="en" class="section">
+        <h1>Privacy Policy</h1>
+        <p class="date">Effective Date: March 1, 2026</p>
+
+        <p>Welcome to Glucose Control Assistant (the "App"). We take your privacy seriously. This Privacy Policy explains how the App collects, uses, and protects your personal information.</p>
+
+        <h2>1. Data We Collect</h2>
+        <p>The App stores the following data during your use. All data is stored locally on your device and in your private iCloud account:</p>
+        <table>
+            <tr><th>Data Type</th><th>Description</th></tr>
+            <tr><td>Glucose Records</td><td>Blood glucose values, measurement times, meal context tags, and notes you enter manually</td></tr>
+            <tr><td>Medication Records</td><td>Medication names, dosages, and times taken</td></tr>
+            <tr><td>Meal Records</td><td>Meal descriptions, carbohydrate levels, and meal photos</td></tr>
+            <tr><td>User Settings</td><td>Glucose unit preferences, reminder settings, scene tags, and other app configurations</td></tr>
+        </table>
+
+        <h2>2. HealthKit Data</h2>
+        <p>The App uses Apple's HealthKit framework:</p>
+        <ul>
+            <li><strong>Read</strong>: Reads blood glucose data from the Health app to display your complete glucose history.</li>
+            <li><strong>Write</strong>: Syncs your manually entered glucose data to the Health app for unified health data management.</li>
+        </ul>
+        <p>Access to HealthKit data requires your explicit authorization. You can modify permissions at any time in Settings > Health > Data Access & Devices. The App will never use HealthKit data for advertising or data mining, nor share it with any third party.</p>
+
+        <h2>3. iCloud Sync</h2>
+        <p>If you enable iCloud sync (a premium feature), your data is stored in your <strong>private database</strong> via Apple CloudKit. This means:</p>
+        <ul>
+            <li>Only you can access your data.</li>
+            <li>The developer cannot view, access, or extract any of your data.</li>
+            <li>Data syncs automatically across your devices.</li>
+        </ul>
+        <p><strong>Note for users in mainland China</strong>: In accordance with applicable laws, iCloud services in mainland China are operated by Guizhou-Cloud Big Data Industry Co., Ltd. (GCBD). Your data storage and processing are subject to their terms of service.</p>
+
+        <h2>4. Camera & Photos</h2>
+        <p>The App requires camera access to take meal photos. Photos are compressed (max 1024px, JPEG format) and stored within the app's data. The App also supports selecting photos from your library using Apple's PHPicker, which does not require additional photo library permissions.</p>
+        <p>Your photos are used solely for meal records and are never uploaded to any external server.</p>
+
+        <h2>5. Local Notifications</h2>
+        <p>The App can send local notifications based on your settings to remind you to measure your blood glucose. Notification content is generated and processed entirely on your device.</p>
+
+        <h2>6. Data We Do Not Collect</h2>
+        <ul>
+            <li>The App contains <strong>no</strong> third-party analytics or tracking SDKs.</li>
+            <li>The App does <strong>not</strong> collect device identifiers, location data, or browsing behavior.</li>
+            <li>The App displays <strong>no</strong> advertisements.</li>
+            <li>The App will <strong>never</strong> sell or share any of your data with third parties.</li>
+        </ul>
+
+        <h2>7. Subscriptions & Payments</h2>
+        <p>The App offers in-app subscriptions. All payments are processed through Apple's App Store. We do not collect or store any payment information (such as credit card numbers). To manage subscriptions, go to Settings > Apple ID > Subscriptions.</p>
+
+        <h2>8. Data Security</h2>
+        <p>Your data is protected by:</p>
+        <ul>
+            <li>Local data is protected by your device passcode and biometrics.</li>
+            <li>iCloud data is transmitted with end-to-end encryption.</li>
+            <li>CloudKit private database ensures only you can access your data.</li>
+        </ul>
+
+        <h2>9. Data Deletion</h2>
+        <p>You can delete all local data at any time using the "Factory Reset" option in the App's Settings. To also delete iCloud data, go to Settings > Apple ID > iCloud > Manage Storage and remove the App's data.</p>
+
+        <h2>10. Children's Privacy</h2>
+        <p>The App is not intended for children under 13. We do not knowingly collect personal information from children.</p>
+
+        <h2>11. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. Updated policies will be posted on this page with a revised effective date. We encourage you to review this page periodically.</p>
+
+        <h2>12. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+        <p>Email: <a href="mailto:harrysxu@outlook.com" style="color:var(--accent)">harrysxu@outlook.com</a></p>
+    </div>
+</div>
+
+<script>
+function switchLang(lang) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.lang-switch a').forEach(a => a.classList.remove('active'));
+    document.getElementById(lang).classList.add('active');
+    document.getElementById('btn-' + lang).classList.add('active');
+    document.documentElement.lang = lang;
+}
+</script>
+</body>
+</html>

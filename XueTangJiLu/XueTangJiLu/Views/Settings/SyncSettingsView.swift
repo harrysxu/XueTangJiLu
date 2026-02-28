@@ -30,14 +30,43 @@ struct SyncSettingsView: View {
                 }
             }
             
+            // iCloud 配额超限警告
+            if syncManager.isQuotaExceeded {
+                Section {
+                    VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
+                        Label(String(localized: "sync.quota.title"), systemImage: "externaldrive.badge.exclamationmark")
+                            .font(.headline)
+                            .foregroundStyle(.orange)
+                        
+                        Text(String(localized: "sync.quota.message"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        
+                        Button {
+                            if let url = URL(string: "App-prefs:CASTLE") {
+                                UIApplication.shared.open(url)
+                            }
+                        } label: {
+                            Text(String(localized: "sync.quota.manage"))
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        .padding(.top, AppConstants.Spacing.xs)
+                    }
+                    .padding(.vertical, AppConstants.Spacing.xs)
+                }
+            }
+            
             // 账户状态
             accountStatusSection
             
             // 同步控制
             syncControlSection
             
+            #if DEBUG
             // 诊断工具
             diagnosticsSection
+            #endif
             
             // 同步历史 - 只在账户可用时显示
             if syncManager.iCloudAccountStatus == .available {
@@ -55,25 +84,21 @@ struct SyncSettingsView: View {
         .sheet(isPresented: $showPaywall) {
             PaywallView()
         }
-        .alert("需要重启应用", isPresented: $showRestartAlert) {
-            Button("稍后重启", role: .cancel) {
-                // 恢复原来的设置
+        .alert(String(localized: "sync.restart.title"), isPresented: $showRestartAlert) {
+            Button(String(localized: "common.cancel"), role: .cancel) {
                 if let pending = pendingSyncEnabled {
                     syncManager.isSyncEnabled = !pending
                     pendingSyncEnabled = nil
                 }
             }
-            Button("立即重启") {
-                // 应用更改并退出应用
+            Button(String(localized: "sync.restart.confirm")) {
                 if let pending = pendingSyncEnabled {
                     syncManager.isSyncEnabled = pending
                     pendingSyncEnabled = nil
                 }
-                // 退出应用，iOS 会自动重启
-                exit(0)
             }
         } message: {
-            Text("更改同步设置需要重启应用才能生效。\n\n当前设置：\(syncManager.isSyncEnabled ? "已启用" : "已禁用")\n新设置：\(pendingSyncEnabled == true ? "启用" : "禁用")")
+            Text(String(localized: "sync.restart.message \(syncManager.isSyncEnabled ? String(localized: "sync.restart.enabled") : String(localized: "sync.restart.disabled")) \(pendingSyncEnabled == true ? String(localized: "sync.restart.enabled") : String(localized: "sync.restart.disabled"))"))
         }
     }
     
@@ -226,7 +251,7 @@ struct SyncSettingsView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
-                    Text("正在从 iCloud 下载数据...")
+                    Text(String(localized: "sync.state.importing_download"))
                         .font(.caption)
                         .foregroundStyle(.blue)
                 }
@@ -235,7 +260,7 @@ struct SyncSettingsView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
-                    Text("正在从 iCloud 导入...")
+                    Text(String(localized: "sync.state.importing"))
                         .font(.caption)
                         .foregroundStyle(.blue)
                 }
@@ -244,7 +269,7 @@ struct SyncSettingsView: View {
                 HStack(spacing: 8) {
                     ProgressView()
                         .controlSize(.small)
-                    Text("正在上传到 iCloud...")
+                    Text(String(localized: "sync.state.exporting"))
                         .font(.caption)
                         .foregroundStyle(.blue)
                 }
@@ -269,11 +294,11 @@ struct SyncSettingsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(String(localized: "sync.footer"))
                 
-                Text("⚠️ 更改同步设置需要重启应用才能生效")
+                Text(String(localized: "sync.restart_warning"))
                     .foregroundStyle(.orange)
                     .font(.caption)
                 
-                Text("💡 重新安装后首次同步可能需要几分钟，请保持应用在前台并确保网络畅通")
+                Text(String(localized: "sync.first_sync_tip"))
                     .foregroundStyle(.secondary)
                     .font(.caption)
             }
@@ -339,23 +364,25 @@ struct SyncSettingsView: View {
                             .font(.caption)
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            // 事件类型
-                            Text(String(localized: LocalizedStringResource(stringLiteral: event.type.localizedKey)))
+                            Text(event.type.localizedString)
                                 .font(.subheadline)
                             
-                            // 数据统计
                             if let countString = event.formattedCountString() {
                                 Text(countString)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                             
-                            // 时间
+                            if let deletedString = event.formattedDeletedCountString() {
+                                Text(deletedString)
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
+                            
                             Text(event.timestamp, style: .relative)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                             
-                            // 错误信息
                             if let error = event.errorMessage {
                                 Text(error)
                                     .font(.caption2)

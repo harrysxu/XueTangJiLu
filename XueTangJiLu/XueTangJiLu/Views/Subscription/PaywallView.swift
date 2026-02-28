@@ -231,9 +231,9 @@ struct PaywallView: View {
             .disabled(storeManager.isLoading)
             
             HStack(spacing: AppConstants.Spacing.lg) {
-                Link(String(localized: "subscription.link.privacy"), destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                Link(String(localized: "subscription.link.privacy"), destination: URL(string: AppConstants.privacyPolicyURL)!)
                 Text("•")
-                Link(String(localized: "subscription.link.terms"), destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                Link(String(localized: "subscription.link.terms"), destination: URL(string: AppConstants.termsOfServiceURL)!)
             }
             .font(.caption)
             .foregroundStyle(.secondary)

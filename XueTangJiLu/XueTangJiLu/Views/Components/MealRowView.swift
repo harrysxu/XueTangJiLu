@@ -13,19 +13,7 @@ struct MealRowView: View {
 
     var body: some View {
         HStack(spacing: AppConstants.Spacing.md) {
-            // 左侧：照片缩略图或图标
-            if let photoData = record.photoData, let uiImage = UIImage(data: photoData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 40, height: 40)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else {
-                Image(systemName: "fork.knife.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(Color(record.carbLevel.colorName))
-                    .frame(width: 40, height: 40)
-            }
+            mealIcon
 
             // 中间：描述 + 碳水标签
             VStack(alignment: .leading, spacing: 2) {
@@ -50,16 +38,23 @@ struct MealRowView: View {
 
             Spacer()
 
-            // 右侧：时间
+            // 右侧：时间 + 状态标记
             VStack(alignment: .trailing, spacing: 2) {
                 Text(record.timestamp, format: .dateTime.hour().minute())
                     .font(.caption)
                     .foregroundStyle(.primary)
                 
-                if record.note != nil {
-                    Image(systemName: "note.text")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                HStack(spacing: 4) {
+                    if record.hasPhoto {
+                        Image(systemName: "camera.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    if record.note != nil {
+                        Image(systemName: "note.text")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
                 }
             }
         }
@@ -69,6 +64,23 @@ struct MealRowView: View {
         .accessibilityLabel("\(record.timestamp.timeString) \(record.carbLevel.localizedDisplayName) \(record.mealDescription)")
         .accessibilityHint("轻点可编辑，右划可删除")
     }
+
+    @ViewBuilder
+    private var mealIcon: some View {
+        if let photoData = record.photoData,
+           let uiImage = UIImage(data: photoData) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 40, height: 40)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        } else {
+            Image(systemName: "fork.knife.circle.fill")
+                .font(.title2)
+                .foregroundStyle(Color(record.carbLevel.colorName))
+                .frame(width: 40, height: 40)
+        }
+    }
 }
 
 #Preview {
@@ -77,7 +89,6 @@ struct MealRowView: View {
             record: MealRecord(
                 carbLevel: .high,
                 mealDescription: "米饭 + 红烧肉 + 可乐",
-                photoData: nil,
                 timestamp: .now
             )
         )
@@ -86,7 +97,6 @@ struct MealRowView: View {
             record: MealRecord(
                 carbLevel: .low,
                 mealDescription: "鸡胸肉沙拉",
-                photoData: nil,
                 timestamp: .now.addingTimeInterval(-3600),
                 note: "健康饮食"
             )
@@ -96,7 +106,6 @@ struct MealRowView: View {
             record: MealRecord(
                 carbLevel: .medium,
                 mealDescription: "",
-                photoData: nil,
                 timestamp: .now.addingTimeInterval(-7200)
             )
         )

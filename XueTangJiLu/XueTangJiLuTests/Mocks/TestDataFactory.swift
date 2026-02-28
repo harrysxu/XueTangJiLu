@@ -75,16 +75,16 @@ enum TestDataFactory {
     static func createMealRecord(
         carbLevel: CarbLevel = .medium,
         mealDescription: String = "午餐",
-        photoData: Data? = nil,
         timestamp: Date = .now,
-        note: String? = nil
+        note: String? = nil,
+        photoData: Data? = nil
     ) -> MealRecord {
         return MealRecord(
             carbLevel: carbLevel,
             mealDescription: mealDescription,
-            photoData: photoData,
             timestamp: timestamp,
-            note: note
+            note: note,
+            photoData: photoData
         )
     }
     

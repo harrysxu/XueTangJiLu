@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用条款 | Terms of Service — 控糖助手</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --accent: #0071e3;
+            --border: #d2d2d7;
+            --card-bg: #f5f5f7;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1d1d1f;
+                --text: #f5f5f7;
+                --text-secondary: #a1a1a6;
+                --accent: #2997ff;
+                --border: #424245;
+                --card-bg: #2d2d2f;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+        .container { max-width: 720px; margin: 0 auto; padding: 40px 0 60px; }
+        h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        h2 { font-size: 20px; font-weight: 600; margin: 32px 0 12px; }
+        h3 { font-size: 17px; font-weight: 600; margin: 20px 0 8px; }
+        p, li { font-size: 15px; color: var(--text-secondary); margin-bottom: 8px; }
+        ul { padding-left: 20px; }
+        .date { font-size: 13px; color: var(--text-secondary); margin-bottom: 32px; }
+        .lang-switch {
+            display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+        }
+        .lang-switch a {
+            font-size: 14px; color: var(--accent); text-decoration: none;
+            padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px;
+        }
+        .lang-switch a:hover, .lang-switch a.active {
+            background: var(--accent); color: #fff; border-color: var(--accent);
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        .highlight {
+            background: var(--card-bg); border-left: 3px solid var(--accent);
+            padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0;
+        }
+        .highlight p { margin-bottom: 0; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--accent); text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a class="back-link" href="index.html">&larr; 返回 / Back</a>
+
+    <div class="lang-switch">
+        <a href="#" onclick="switchLang('zh-Hans')" id="btn-zh-Hans" class="active">简体中文</a>
+        <a href="#" onclick="switchLang('zh-Hant')" id="btn-zh-Hant">繁體中文</a>
+        <a href="#" onclick="switchLang('en')" id="btn-en">English</a>
+    </div>
+
+    <!-- 简体中文 -->
+    <div id="zh-Hans" class="section active">
+        <h1>使用条款</h1>
+        <p class="date">生效日期：2026 年 3 月 1 日</p>
+
+        <p>欢迎使用"控糖助手"（以下简称"本应用"）。下载、安装或使用本应用即表示您同意受以下条款的约束。如果您不同意这些条款，请勿使用本应用。</p>
+
+        <h2>1. 非医疗设备声明</h2>
+        <div class="highlight">
+            <p><strong>重要提示</strong>：本应用不是医疗设备，不提供医疗诊断、治疗或建议。本应用记录的所有数据仅供个人参考，不能替代专业医疗建议。在做出任何健康相关决定之前，请务必咨询您的医生或其他合格的医疗保健专业人员。</p>
+        </div>
+
+        <h2>2. 服务说明</h2>
+        <p>本应用为血糖管理辅助工具，提供以下功能：</p>
+        <ul>
+            <li>记录血糖值、药物和饮食信息</li>
+            <li>查看血糖趋势和统计数据</li>
+            <li>设置测量提醒</li>
+            <li>与 Apple HealthKit 同步血糖数据</li>
+            <li>通过 iCloud 在多设备间同步数据（付费功能）</li>
+            <li>导出 PDF/CSV 报告（付费功能）</li>
+        </ul>
+
+        <h2>3. 订阅服务</h2>
+        <h3>3.1 免费版本</h3>
+        <p>免费版本包含基础功能，但有以下限制：</p>
+        <ul>
+            <li>每日最多记录 5 条血糖数据</li>
+            <li>仅可查看最近 7 天的历史记录</li>
+        </ul>
+
+        <h3>3.2 付费订阅</h3>
+        <p>本应用提供以下订阅方案：</p>
+        <ul>
+            <li><strong>月度订阅</strong>：按月自动续订</li>
+            <li><strong>季度订阅</strong>：按季度自动续订</li>
+            <li><strong>年度订阅</strong>：按年自动续订</li>
+            <li><strong>终身买断</strong>：一次性购买，永久使用</li>
+        </ul>
+
+        <h3>3.3 自动续订</h3>
+        <ul>
+            <li>订阅付款将在确认购买时从您的 Apple ID 账户中扣除。</li>
+            <li>订阅将自动续订，除非您在当前周期结束前至少 24 小时关闭自动续订。</li>
+            <li>续订费用将在当前周期结束前 24 小时内从您的账户中扣除。</li>
+            <li>您可以在购买后随时通过 Apple ID 账户设置管理和取消订阅。</li>
+        </ul>
+
+        <h3>3.4 退款</h3>
+        <p>所有购买均通过 Apple App Store 处理。退款请求请联系 Apple 支持或通过 <a href="https://reportaproblem.apple.com" style="color:var(--accent)">reportaproblem.apple.com</a> 提交。</p>
+
+        <h2>4. 用户责任</h2>
+        <ul>
+            <li>您有责任确保输入数据的准确性。</li>
+            <li>您应当定期备份重要的健康数据。</li>
+            <li>您不得将本应用用于任何非法目的。</li>
+            <li>您不得尝试对本应用进行逆向工程、反编译或反汇编。</li>
+        </ul>
+
+        <h2>5. 知识产权</h2>
+        <p>本应用及其所有内容（包括但不限于设计、图标、代码和文案）的知识产权归开发者所有。您获得的是有限的、非独占的、不可转让的使用许可。</p>
+
+        <h2>6. 免责声明</h2>
+        <ul>
+            <li>本应用按"现状"提供，不作任何形式的明示或暗示保证。</li>
+            <li>我们不保证应用将不间断运行或不含错误。</li>
+            <li>对于因使用或无法使用本应用而导致的任何直接、间接、附带或后果性损害，我们不承担责任。</li>
+            <li>对于因数据丢失、同步延迟或设备故障造成的损失，我们不承担责任。</li>
+        </ul>
+
+        <h2>7. 服务变更</h2>
+        <p>我们保留随时修改、暂停或终止本应用服务的权利，恕不另行通知。我们将尽力提前通知重大变更。</p>
+
+        <h2>8. 条款变更</h2>
+        <p>我们可能会不时更新本使用条款。更新后的条款将在本页面发布并更新生效日期。继续使用本应用即表示您接受更新后的条款。</p>
+
+        <h2>9. 适用法律</h2>
+        <p>本使用条款受中华人民共和国法律管辖。</p>
+
+        <h2>10. 联系我们</h2>
+        <p>如果您对本使用条款有任何疑问，请通过以下方式联系我们：</p>
+        <p>邮箱：<a href="mailto:harrysxu@outlook.com" style="color:var(--accent)">harrysxu@outlook.com</a></p>
+    </div>
+
+    <!-- 繁體中文 -->
+    <div id="zh-Hant" class="section">
+        <h1>使用條款</h1>
+        <p class="date">生效日期：2026 年 3 月 1 日</p>
+
+        <p>歡迎使用「控糖幫手」（以下簡稱「本應用」）。下載、安裝或使用本應用即表示您同意受以下條款的約束。如果您不同意這些條款，請勿使用本應用。</p>
+
+        <h2>1. 非醫療設備聲明</h2>
+        <div class="highlight">
+            <p><strong>重要提示</strong>：本應用不是醫療設備，不提供醫療診斷、治療或建議。本應用記錄的所有資料僅供個人參考，不能替代專業醫療建議。在做出任何健康相關決定之前，請務必諮詢您的醫生或其他合格的醫療保健專業人員。</p>
+        </div>
+
+        <h2>2. 服務說明</h2>
+        <p>本應用為血糖管理輔助工具，提供以下功能：</p>
+        <ul>
+            <li>記錄血糖值、藥物和飲食資訊</li>
+            <li>查看血糖趨勢和統計資料</li>
+            <li>設定測量提醒</li>
+            <li>與 Apple HealthKit 同步血糖資料</li>
+            <li>透過 iCloud 在多裝置間同步資料（付費功能）</li>
+            <li>匯出 PDF/CSV 報告（付費功能）</li>
+        </ul>
+
+        <h2>3. 訂閱服務</h2>
+        <h3>3.1 免費版本</h3>
+        <p>免費版本包含基礎功能，但有以下限制：</p>
+        <ul>
+            <li>每日最多記錄 5 筆血糖資料</li>
+            <li>僅可查看最近 7 天的歷史記錄</li>
+        </ul>
+
+        <h3>3.2 付費訂閱</h3>
+        <p>本應用提供以下訂閱方案：</p>
+        <ul>
+            <li><strong>月度訂閱</strong>：按月自動續訂</li>
+            <li><strong>季度訂閱</strong>：按季度自動續訂</li>
+            <li><strong>年度訂閱</strong>：按年自動續訂</li>
+            <li><strong>終身買斷</strong>：一次性購買，永久使用</li>
+        </ul>
+
+        <h3>3.3 自動續訂</h3>
+        <ul>
+            <li>訂閱付款將在確認購買時從您的 Apple ID 帳號中扣除。</li>
+            <li>訂閱將自動續訂，除非您在當前週期結束前至少 24 小時關閉自動續訂。</li>
+            <li>續訂費用將在當前週期結束前 24 小時內從您的帳號中扣除。</li>
+            <li>您可以在購買後隨時透過 Apple ID 帳號設定管理和取消訂閱。</li>
+        </ul>
+
+        <h3>3.4 退款</h3>
+        <p>所有購買均透過 Apple App Store 處理。退款請求請聯繫 Apple 支援或透過 <a href="https://reportaproblem.apple.com" style="color:var(--accent)">reportaproblem.apple.com</a> 提交。</p>
+
+        <h2>4. 使用者責任</h2>
+        <ul>
+            <li>您有責任確保輸入資料的準確性。</li>
+            <li>您應當定期備份重要的健康資料。</li>
+            <li>您不得將本應用用於任何非法目的。</li>
+            <li>您不得嘗試對本應用進行逆向工程、反編譯或反組譯。</li>
+        </ul>
+
+        <h2>5. 智慧財產權</h2>
+        <p>本應用及其所有內容（包括但不限於設計、圖示、程式碼和文案）的智慧財產權歸開發者所有。您獲得的是有限的、非獨佔的、不可轉讓的使用許可。</p>
+
+        <h2>6. 免責聲明</h2>
+        <ul>
+            <li>本應用按「現狀」提供，不作任何形式的明示或暗示保證。</li>
+            <li>我們不保證應用將不間斷運行或不含錯誤。</li>
+            <li>對於因使用或無法使用本應用而導致的任何直接、間接、附帶或後果性損害，我們不承擔責任。</li>
+            <li>對於因資料遺失、同步延遲或裝置故障造成的損失，我們不承擔責任。</li>
+        </ul>
+
+        <h2>7. 服務變更</h2>
+        <p>我們保留隨時修改、暫停或終止本應用服務的權利，恕不另行通知。我們將盡力提前通知重大變更。</p>
+
+        <h2>8. 條款變更</h2>
+        <p>我們可能會不時更新本使用條款。更新後的條款將在本頁面發佈並更新生效日期。繼續使用本應用即表示您接受更新後的條款。</p>
+
+        <h2>9. 適用法律</h2>
+        <p>本使用條款受中華人民共和國法律管轄。</p>
+
+        <h2>10. 聯繫我們</h2>
+        <p>如果您對本使用條款有任何疑問，請透過以下方式聯繫我們：</p>
+        <p>電郵：<a href="mailto:harrysxu@outlook.com" style="color:var(--accent)">harrysxu@outlook.com</a></p>
+    </div>
+
+    <!-- English -->
+    <div id="en" class="section">
+        <h1>Terms of Service</h1>
+        <p class="date">Effective Date: March 1, 2026</p>
+
+        <p>Welcome to Glucose Control Assistant (the "App"). By downloading, installing, or using the App, you agree to be bound by the following terms. If you do not agree to these terms, please do not use the App.</p>
+
+        <h2>1. Not a Medical Device</h2>
+        <div class="highlight">
+            <p><strong>Important</strong>: This App is not a medical device and does not provide medical diagnosis, treatment, or advice. All data recorded by the App is for personal reference only and cannot replace professional medical advice. Always consult your doctor or other qualified healthcare professional before making any health-related decisions.</p>
+        </div>
+
+        <h2>2. Service Description</h2>
+        <p>The App is a blood glucose management assistant that provides:</p>
+        <ul>
+            <li>Recording blood glucose values, medications, and meal information</li>
+            <li>Viewing glucose trends and statistics</li>
+            <li>Setting measurement reminders</li>
+            <li>Syncing glucose data with Apple HealthKit</li>
+            <li>Multi-device data sync via iCloud (premium feature)</li>
+            <li>Exporting PDF/CSV reports (premium feature)</li>
+        </ul>
+
+        <h2>3. Subscription Services</h2>
+        <h3>3.1 Free Version</h3>
+        <p>The free version includes basic features with the following limitations:</p>
+        <ul>
+            <li>Up to 5 glucose records per day</li>
+            <li>View only the last 7 days of history</li>
+        </ul>
+
+        <h3>3.2 Premium Subscriptions</h3>
+        <p>The App offers the following subscription plans:</p>
+        <ul>
+            <li><strong>Monthly</strong>: Auto-renews every month</li>
+            <li><strong>Quarterly</strong>: Auto-renews every 3 months</li>
+            <li><strong>Yearly</strong>: Auto-renews every year</li>
+            <li><strong>Lifetime</strong>: One-time purchase, permanent access</li>
+        </ul>
+
+        <h3>3.3 Auto-Renewal</h3>
+        <ul>
+            <li>Subscription payment will be charged to your Apple ID account upon confirmation of purchase.</li>
+            <li>Subscriptions automatically renew unless auto-renewal is turned off at least 24 hours before the end of the current period.</li>
+            <li>Renewal charges will be applied to your account within 24 hours before the end of the current period.</li>
+            <li>You can manage and cancel subscriptions at any time through your Apple ID account settings after purchase.</li>
+        </ul>
+
+        <h3>3.4 Refunds</h3>
+        <p>All purchases are processed through the Apple App Store. For refund requests, please contact Apple Support or submit a request at <a href="https://reportaproblem.apple.com" style="color:var(--accent)">reportaproblem.apple.com</a>.</p>
+
+        <h2>4. User Responsibilities</h2>
+        <ul>
+            <li>You are responsible for ensuring the accuracy of the data you enter.</li>
+            <li>You should regularly back up important health data.</li>
+            <li>You must not use the App for any unlawful purpose.</li>
+            <li>You must not attempt to reverse engineer, decompile, or disassemble the App.</li>
+        </ul>
+
+        <h2>5. Intellectual Property</h2>
+        <p>All intellectual property rights in the App and its content (including but not limited to design, icons, code, and copy) belong to the developer. You are granted a limited, non-exclusive, non-transferable license to use the App.</p>
+
+        <h2>6. Disclaimer</h2>
+        <ul>
+            <li>The App is provided "as is" without any express or implied warranties.</li>
+            <li>We do not guarantee that the App will operate uninterrupted or error-free.</li>
+            <li>We shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use or inability to use the App.</li>
+            <li>We shall not be liable for any loss caused by data loss, sync delays, or device failures.</li>
+        </ul>
+
+        <h2>7. Service Changes</h2>
+        <p>We reserve the right to modify, suspend, or terminate the App's services at any time without prior notice. We will make reasonable efforts to notify users of significant changes in advance.</p>
+
+        <h2>8. Changes to These Terms</h2>
+        <p>We may update these Terms of Service from time to time. Updated terms will be posted on this page with a revised effective date. Your continued use of the App constitutes acceptance of the updated terms.</p>
+
+        <h2>9. Governing Law</h2>
+        <p>These Terms of Service shall be governed by the laws of the People's Republic of China.</p>
+
+        <h2>10. Contact Us</h2>
+        <p>If you have any questions about these Terms of Service, please contact us at:</p>
+        <p>Email: <a href="mailto:harrysxu@outlook.com" style="color:var(--accent)">harrysxu@outlook.com</a></p>
+    </div>
+</div>
+
+<script>
+function switchLang(lang) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.lang-switch a').forEach(a => a.classList.remove('active'));
+    document.getElementById(lang).classList.add('active');
+    document.getElementById('btn-' + lang).classList.add('active');
+    document.documentElement.lang = lang;
+}
+</script>
+</body>
+</html>

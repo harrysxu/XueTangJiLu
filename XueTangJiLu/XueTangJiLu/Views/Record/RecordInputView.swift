@@ -52,50 +52,31 @@ struct RecordInputView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // 限制提示横幅
-                if !subscriptionManager.isPremiumUser, let remaining = remainingRecords {
-                    LimitationBanner(limitationType: .dailyRecords(remaining: remaining, total: 5))
-                        .padding(.horizontal, AppConstants.Spacing.lg)
+            ScrollView {
+                VStack(spacing: AppConstants.Spacing.md) {
+                    // 限制提示横幅
+                    if !subscriptionManager.isPremiumUser, let remaining = remainingRecords {
+                        LimitationBanner(limitationType: .dailyRecords(remaining: remaining, total: 5))
+                            .padding(.horizontal, AppConstants.Spacing.lg)
+                    }
+
+                    // 数值输入区域（带渐变背景）
+                    valueInputSection
                         .padding(.top, AppConstants.Spacing.sm)
-                }
-                
-                // 数值预览区域（带渐变背景）
-                valuePreviewSection
-                    .padding(.top, AppConstants.Spacing.sm)
 
-                // 场景标签选择器（网格）
-                mealContextSelector
-                    .padding(.top, AppConstants.Spacing.md)
+                    // 场景标签选择器（网格）
+                    mealContextSelector
 
-                // 快捷备注标签
-                quickNoteSelector
-                    .padding(.top, AppConstants.Spacing.sm)
+                    // 快捷备注标签
+                    quickNoteSelector
 
-                // 日期时间
-                dateTimeSection
-                    .padding(.top, AppConstants.Spacing.sm)
+                    // 日期时间
+                    dateTimeSection
 
-                // 备注区域
-                if viewModel.showNoteField {
+                    // 备注区域
                     noteSection
-                        .padding(.top, AppConstants.Spacing.sm)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
                 }
-
-                Spacer()
-
-                // 自定义数字键盘
-                MinimalKeypadView { key in
-                    viewModel.handleKeyPress(key, unit: unit)
-                }
-                .padding(.top, AppConstants.Spacing.sm)
-
-                // 保存按钮
-                saveButton
-                    .padding(.top, AppConstants.Spacing.md)
-                    .padding(.horizontal, AppConstants.Spacing.lg)
-                    .padding(.bottom, AppConstants.Spacing.sm)
+                .padding(.vertical, AppConstants.Spacing.lg)
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(viewModel.isEditMode ? String(localized: "record.edit") : "")
@@ -105,30 +86,49 @@ struct RecordInputView: View {
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Button(viewModel.showNoteField ? String(localized: "hide.note") : String(localized: "note")) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            viewModel.showNoteField.toggle()
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(String(localized: "save")) {
+                        if FeatureManager.hasReachedDailyLimit(
+                            todayRecordsCount: todayRecordsCount,
+                            isPremium: subscriptionManager.isPremiumUser
+                        ) {
+                            showUpgradeAlert = true
+                            return
+                        }
+                        Task {
+                            await viewModel.saveRecord(
+                                modelContext: modelContext,
+                                unit: unit,
+                                healthKitManager: healthKitManager,
+                                healthKitEnabled: settings.healthKitSyncEnabled
+                            )
+                            dismiss()
                         }
                     }
+                    .disabled(!viewModel.isSaveEnabled(unit: unit) || viewModel.isSaving)
+                    .fontWeight(.semibold)
                 }
             }
+            .featureLockAlert(isPresented: $showUpgradeAlert, feature: .unlimitedRecords)
             .sheet(isPresented: $showAllScenes) {
                 allScenesSheet
             }
         }
     }
 
-    // MARK: - 数值预览（带渐变背景）
+    // MARK: - 数值输入（带渐变背景）
 
-    private var valuePreviewSection: some View {
+    private var valueInputSection: some View {
         VStack(spacing: AppConstants.Spacing.xs) {
-            Text(viewModel.inputText.isEmpty ? "0.0" : viewModel.inputText)
+            TextField("0.0", text: $viewModel.inputText)
+                .keyboardType(unit.maxDecimalPlaces > 0 ? .decimalPad : .numberPad)
+                .multilineTextAlignment(.center)
                 .font(.glucoseDisplay)
                 .foregroundStyle(viewModel.inputText.isEmpty ? Color(.tertiaryLabel) : valueColor)
-                .contentTransition(.numericText())
-                .animation(.smooth(duration: 0.15), value: viewModel.inputText)
                 .accessibilityIdentifier("glucosePreview")
+                .onChange(of: viewModel.inputText) { _, newValue in
+                    viewModel.validateInput(newValue, unit: unit)
+                }
 
             Text(unit.rawValue)
                 .font(.caption)
@@ -212,7 +212,6 @@ struct RecordInputView: View {
                             viewModel.noteText = ""
                         } else {
                             viewModel.noteText = tag.label
-                            viewModel.showNoteField = true
                         }
                     }) {
                         HStack(spacing: 4) {
@@ -323,53 +322,7 @@ struct RecordInputView: View {
             .padding(.horizontal, AppConstants.Spacing.lg)
     }
 
-    // MARK: - 保存按钮
-
-    private var saveButton: some View {
-        Button(action: {
-            // 检查是否达到每日限制
-            if FeatureManager.hasReachedDailyLimit(
-                todayRecordsCount: todayRecordsCount,
-                isPremium: subscriptionManager.isPremiumUser
-            ) {
-                showUpgradeAlert = true
-                return
-            }
-            
-            Task {
-                await viewModel.saveRecord(
-                    modelContext: modelContext,
-                    unit: unit,
-                    healthKitManager: healthKitManager,
-                    healthKitEnabled: settings.healthKitSyncEnabled
-                )
-                dismiss()
-            }
-        }) {
-            Group {
-                if viewModel.isSaving {
-                    ProgressView()
-                        .tint(.white)
-                } else {
-                    Text(viewModel.isEditMode ? String(localized: "record.save_changes") : String(localized: "save.record"))
-                        .font(.body.weight(.semibold))
-                }
-            }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .frame(height: AppConstants.Size.saveButtonHeight)
-            .background(
-                viewModel.isSaveEnabled(unit: unit)
-                    ? Color.brandPrimary
-                    : Color(.systemGray4)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.buttonLarge))
-        }
-        .disabled(!viewModel.isSaveEnabled(unit: unit) || viewModel.isSaving)
-        .accessibilityLabel("\(viewModel.isEditMode ? String(localized: "record.save_changes") : String(localized: "save.record")) \(viewModel.inputText) \(unit.rawValue) \(settings.displayName(for: viewModel.selectedSceneTagId))")
-        .accessibilityIdentifier("saveRecord")
-        .featureLockAlert(isPresented: $showUpgradeAlert, feature: .unlimitedRecords)
-    }
+    
     
     // MARK: - 所有场景选择Sheet
     

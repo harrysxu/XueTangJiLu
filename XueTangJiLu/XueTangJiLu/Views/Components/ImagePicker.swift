@@ -34,7 +34,6 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {
-        // 不需要更新
     }
     
     func makeCoordinator() -> Coordinator {

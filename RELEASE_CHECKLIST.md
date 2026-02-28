@@ -5,9 +5,7 @@
 ## ✅ 已完成项
 
 ### 1. 隐私权限配置
-- [x] 添加 `NSPhotoLibraryUsageDescription` 到 Info.plist
-- [x] 补充相机权限的英文和繁体中文本地化
-- [x] 补充相册权限的三种语言本地化
+- [x] HealthKit 权限配置
 - **文件位置：**
   - `Info.plist`
   - `Resources/en.lproj/InfoPlist.strings`
@@ -83,8 +81,6 @@
 - [ ] 在真机上测试（至少2台设备）
 - [ ] 测试 iCloud 同步（多设备）
 - [ ] 测试 HealthKit 读写权限
-- [ ] 测试相机权限请求
-- [ ] 测试相册权限请求
 - [ ] 测试推送通知
 - [ ] 测试 Widget 显示和刷新
 - [ ] 测试三种语言切换（英文、简体中文、繁体中文）

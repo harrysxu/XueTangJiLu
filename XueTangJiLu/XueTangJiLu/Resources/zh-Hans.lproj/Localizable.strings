@@ -16,7 +16,7 @@
 "today.medication" = "今日用药";
 "quick.glucose" = "记录血糖";
 "quick.medication" = "记录用药";
-"quick.meal" = "拍照饮食";
+"quick.meal" = "记录饮食";
 "today.summary.card" = "今日摘要";
 "recent.records" = "最近记录";
 "yesterday.records" = "昨日记录";
@@ -94,6 +94,9 @@
 "sync.count.glucose" = "%d条血糖";
 "sync.count.medication" = "%d条用药";
 "sync.count.meal" = "%d条饮食";
+"sync.count.deleted_glucose" = "删除%d条血糖";
+"sync.count.deleted_medication" = "删除%d条用药";
+"sync.count.deleted_meal" = "删除%d条饮食";
 
 /* Glucose Level */
 "level.low" = "偏低";
@@ -115,8 +118,6 @@
 "meal.carb_medium" = "中碳水";
 "meal.carb_high" = "高碳水";
 "meal.record" = "记录饮食";
-"meal.take_photo" = "拍照";
-"meal.album" = "相册";
 "meal.carb_level" = "碳水水平";
 "meal.description" = "饮食描述";
 "meal.description.placeholder" = "如\"米饭 + 青菜 + 鸡胸肉\"";
@@ -428,18 +429,15 @@
 "sync.no_history" = "暂无同步记录";
 "sync.history_footer" = "显示最近的同步活动记录";
 
-/* Meal Photo View */
+/* Meal Record View */
 "meal.edit" = "编辑饮食";
 "meal.record" = "记录饮食";
-"meal.photo" = "照片";
-"meal.optional" = "(可选)";
-"meal.collapse" = "收起";
-"meal.add_photo" = "添加照片";
-"meal.take_photo" = "拍照";
-"meal.choose_from_library" = "从相册选择";
 "meal.carb_level" = "碳水水平";
 "meal.description" = "饮食描述";
 "meal.description_placeholder" = "如\"米饭 + 青菜 + 鸡胸肉\"";
+"meal.photo.toggle" = "添加照片";
+"meal.photo.camera" = "拍照";
+"meal.photo.library" = "从相册选取";
 
 /* Unit Picker */
 "unit.title" = "血糖单位";
@@ -450,6 +448,7 @@
 "reminder.title" = "提醒设置";
 "reminder.notification_permission" = "通知权限";
 "reminder.enabled" = "已开启";
+"reminder.disabled" = "未开启";
 "reminder.enable_button" = "开启";
 "reminder.measurement_reminders" = "测量提醒";
 "reminder.inactivity_reminder" = "久未记录提醒";
@@ -587,11 +586,13 @@
 "sync.error.no_network" = "无网络连接";
 "sync.error.wifi_required" = "需要WiFi";
 "sync.error.account_unavailable" = "iCloud账户不可用";
+"sync.status.pending_changes" = "有待同步的变更";
 
 /* Reminder Settings */
 "reminder.title" = "提醒设置";
 "reminder.notification_permission" = "通知权限";
 "reminder.enabled" = "已开启";
+"reminder.disabled" = "未开启";
 "reminder.enable_button" = "开启";
 "reminder.measurement_reminders" = "测量提醒";
 "reminder.inactivity_reminder" = "久未记录提醒";
@@ -802,7 +803,6 @@
 "feature.apple_watch" = "Apple Watch 支持";
 "feature.advanced_charts" = "高级统计图表";
 "feature.medication_tracking" = "药物记录管理";
-"feature.meal_photo_tracking" = "饮食照片记录";
 "feature.description.unlimited_records" = "每日记录次数不受限制";
 "feature.description.icloud_sync" = "在所有设备间实时同步数据";
 "feature.description.pdf_export" = "生成专业的血糖报告用于就诊";
@@ -810,7 +810,6 @@
 "feature.description.apple_watch" = "在手表上快速记录血糖";
 "feature.description.advanced_charts" = "查看餐前餐后配对、周对比等深度分析";
 "feature.description.medication_tracking" = "记录和管理用药情况";
-"feature.description.meal_photo_tracking" = "用照片记录每一餐";
 "feature.button.unlock" = "解锁此功能";
 "feature.button.unlock_short" = "解锁";
 "feature.button.upgrade" = "升级";
@@ -821,7 +820,6 @@
 "feature.unlock.csv_export" = "升级后可导出CSV数据";
 "feature.unlock.apple_watch" = "升级后可在Apple Watch上快速记录";
 "feature.unlock.advanced_charts" = "升级后可查看高级统计图表";
-"feature.unlock.meal_photo_tracking" = "升级后可拍照记录饮食";
 
 /* Limitations - 限制提示 */
 "limit.daily_records" = "今日记录已达上限";
@@ -844,3 +842,45 @@
 /* Common */
 "common.ok" = "确定";
 "common.cancel" = "取消";
+"common.delete" = "删除";
+
+/* Home View */
+"home.title" = "记录";
+"home.empty.title" = "还没有任何记录";
+"home.empty.subtitle" = "点击下方 \"+\" 开始记录";
+"home.latest_glucose" = "最新血糖";
+"home.today_summary" = "今日概要";
+"home.stat.count" = "次数";
+"home.stat.today" = "今日";
+"home.stat.average" = "均值";
+"home.stat.tir" = "达标率";
+"home.no_records_a11y" = "暂无记录";
+"home.latest_a11y" = "最新血糖 %@ %@，%@，%@";
+"home.add_record.a11y" = "添加血糖记录";
+"home.add_record.hint" = "双击打开血糖录入键盘";
+
+/* Sync Status Badge - 补充 */
+"sync.status.downloading" = "下载中";
+"sync.status.uploading" = "上传中";
+"sync.status.last_sync_format" = "最后同步: %@";
+"sync.status.disabled" = "已禁用";
+"sync.status.not_signed_in" = "未登录 iCloud";
+"sync.status.no_network" = "无网络连接";
+"sync.status.ready" = "就绪";
+"sync.status.sync_success" = "同步成功";
+"sync.status.failed_detail" = "失败: %@";
+
+/* Sync Settings - 补充 */
+"sync.quota.title" = "iCloud 存储空间不足";
+"sync.quota.message" = "您的 iCloud 存储已满，数据无法同步到云端。本地数据不受影响。";
+"sync.quota.manage" = "管理 iCloud 存储空间";
+"sync.restart.title" = "需要重启应用";
+"sync.restart.confirm" = "确认更改";
+"sync.restart.message" = "更改同步设置需要重启应用才能生效。请手动关闭并重新打开应用。\n\n当前设置：%@\n新设置：%@";
+"sync.restart.enabled" = "已启用";
+"sync.restart.disabled" = "已禁用";
+"sync.state.importing_download" = "正在从 iCloud 下载数据...";
+"sync.state.importing" = "正在从 iCloud 导入...";
+"sync.state.exporting" = "正在上传到 iCloud...";
+"sync.restart_warning" = "⚠️ 更改同步设置需要重启应用才能生效";
+"sync.first_sync_tip" = "💡 重新安装后首次同步可能需要几分钟，请保持应用在前台并确保网络畅通";

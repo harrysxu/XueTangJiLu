@@ -141,7 +141,7 @@ struct SyncDebugView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     InfoRow(label: "同步状态", value: stateDescription)
                     InfoRow(label: "最后同步", value: syncManager.lastSyncTimeString)
-                    InfoRow(label: "待同步数", value: "\(syncManager.pendingOperations)")
+                    InfoRow(label: "待同步", value: syncManager.hasPendingChanges ? "是" : "否")
                     InfoRow(label: "历史记录", value: "\(syncManager.syncHistory.count)")
                     InfoRow(label: "同步开关", value: syncManager.isSyncEnabled ? "开启" : "关闭")
                     InfoRow(label: "WiFi限制", value: syncManager.wifiOnlySync ? "是" : "否")

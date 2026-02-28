@@ -263,23 +263,48 @@ struct TestDataGeneratorView: View {
     
     @ViewBuilder
     private var deleteSection: some View {
-        if totalExistingTestRecords > 0 {
+        if totalExistingTestRecords > 0 || deleteComplete {
             Section {
-                Button(role: .destructive) {
-                    showDeleteConfirm = true
-                } label: {
+                if deleteComplete {
                     HStack {
                         Spacer()
-                        Image(systemName: "trash")
-                        Text("清除测试数据（\(totalExistingTestRecords) 条）")
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                        Text("已清除 \(deletedCount) 条测试数据")
                         Spacer()
                     }
                     .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.green)
                     .padding(.vertical, 4)
+                } else {
+                    Button(role: .destructive) {
+                        showDeleteConfirm = true
+                    } label: {
+                        HStack {
+                            Spacer()
+                            if isDeleting {
+                                ProgressView()
+                                    .padding(.trailing, 4)
+                                Text("正在清除...")
+                            } else {
+                                Image(systemName: "trash")
+                                Text("清除测试数据（\(totalExistingTestRecords) 条）")
+                            }
+                            Spacer()
+                        }
+                        .font(.subheadline.weight(.medium))
+                        .padding(.vertical, 4)
+                    }
+                    .disabled(isDeleting)
                 }
             } footer: {
-                Text("将删除所有测试数据：\(existingTestGlucoseRecords.count)条血糖、\(existingTestMedicationRecords.count)条用药、\(existingTestMealRecords.count)条饮食记录")
-                    .font(.caption2)
+                if !deleteComplete {
+                    Text("将删除所有测试数据：\(existingTestGlucoseRecords.count)条血糖、\(existingTestMedicationRecords.count)条用药、\(existingTestMealRecords.count)条饮食记录。删除后将自动同步到 iCloud。")
+                        .font(.caption2)
+                } else {
+                    Text("删除操作已保存，iCloud 将自动同步删除。")
+                        .font(.caption2)
+                }
             }
         }
     }
@@ -415,16 +440,56 @@ struct TestDataGeneratorView: View {
 
     // MARK: - 数据清除
 
+    @State private var isDeleting = false
+    @State private var deleteComplete = false
+    @State private var deletedCount = 0
+
     private func deleteTestData() {
-        for record in existingTestGlucoseRecords {
-            modelContext.delete(record)
+        isDeleting = true
+        deleteComplete = false
+        
+        do {
+            let glucoseDescriptor = FetchDescriptor<GlucoseRecord>(
+                predicate: #Predicate { $0.source == "test_data" }
+            )
+            let glucoseRecords = try modelContext.fetch(glucoseDescriptor)
+            
+            let medicationDescriptor = FetchDescriptor<MedicationRecord>(
+                predicate: #Predicate { $0.note == "test_data" }
+            )
+            let medicationRecords = try modelContext.fetch(medicationDescriptor)
+            
+            let mealDescriptor = FetchDescriptor<MealRecord>(
+                predicate: #Predicate { $0.note == "test_data" }
+            )
+            let mealRecords = try modelContext.fetch(mealDescriptor)
+            
+            let total = glucoseRecords.count + medicationRecords.count + mealRecords.count
+            
+            for record in glucoseRecords {
+                modelContext.delete(record)
+            }
+            for record in medicationRecords {
+                modelContext.delete(record)
+            }
+            for record in mealRecords {
+                modelContext.delete(record)
+            }
+            
+            try modelContext.save()
+            deletedCount = total
+            deleteComplete = true
+            
+            #if DEBUG
+            print("✅ 已删除 \(total) 条测试数据（血糖:\(glucoseRecords.count) 用药:\(medicationRecords.count) 饮食:\(mealRecords.count)），等待 iCloud 自动同步删除")
+            #endif
+        } catch {
+            #if DEBUG
+            print("❌ 删除测试数据失败: \(error)")
+            #endif
         }
-        for record in existingTestMedicationRecords {
-            modelContext.delete(record)
-        }
-        for record in existingTestMealRecords {
-            modelContext.delete(record)
-        }
+        
+        isDeleting = false
         generationComplete = false
         generatedGlucoseCount = 0
         generatedMedicationCount = 0
@@ -853,9 +918,8 @@ enum TestDataGenerator {
                 let record = MealRecord(
                     carbLevel: carbLevel,
                     mealDescription: description,
-                    photoData: nil, // 测试数据不生成照片
                     timestamp: timestamp,
-                    note: "test_data" // 使用note字段标记测试数据
+                    note: "test_data"
                 )
                 records.append(record)
             }

@@ -13,8 +13,6 @@ import HealthKit
 protocol HealthKitManagerProtocol {
     var isAuthorized: Bool { get }
     var isAvailable: Bool { get }
-    var todaySteps: Int { get }
-    var todayExerciseMinutes: Int { get }
     
     func requestAuthorization() async throws
     func saveGlucose(value: Double, date: Date, sceneTagId: String) async throws
@@ -32,12 +30,6 @@ final class MockHealthKitManager: HealthKitManagerProtocol {
     
     /// 是否可用
     var isAvailable: Bool = true
-    
-    /// 今日步数
-    var todaySteps: Int = 0
-    
-    /// 今日运动分钟
-    var todayExerciseMinutes: Int = 0
     
     /// 是否应该抛出错误
     var shouldThrowError: Bool = false
@@ -116,8 +108,6 @@ final class MockHealthKitManager: HealthKitManagerProtocol {
         mockGlucoseRecords.removeAll()
         isDuplicateCalled = false
         mockIsDuplicate = false
-        todaySteps = 0
-        todayExerciseMinutes = 0
     }
 }
 

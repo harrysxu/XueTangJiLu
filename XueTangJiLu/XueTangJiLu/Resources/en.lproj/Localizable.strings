@@ -94,6 +94,9 @@
 "sync.count.glucose" = "%d glucose records";
 "sync.count.medication" = "%d medication records";
 "sync.count.meal" = "%d meal records";
+"sync.count.deleted_glucose" = "%d glucose deleted";
+"sync.count.deleted_medication" = "%d medication deleted";
+"sync.count.deleted_meal" = "%d meal deleted";
 
 /* Glucose Level */
 "level.low" = "Low";
@@ -115,8 +118,6 @@
 "meal.carb_medium" = "Medium Carb";
 "meal.carb_high" = "High Carb";
 "meal.record" = "Log Meal";
-"meal.take_photo" = "Camera";
-"meal.album" = "Album";
 "meal.carb_level" = "Carb Level";
 "meal.description" = "Meal Description";
 "meal.description.placeholder" = "e.g. Rice + vegetables + chicken";
@@ -467,18 +468,15 @@
 "sync.no_history" = "No sync history";
 "sync.history_footer" = "Shows recent sync activity";
 
-/* Meal Photo View */
+/* Meal Record View */
 "meal.edit" = "Edit Meal";
 "meal.record" = "Record Meal";
-"meal.photo" = "Photo";
-"meal.optional" = "(Optional)";
-"meal.collapse" = "Collapse";
-"meal.add_photo" = "Add Photo";
-"meal.take_photo" = "Take Photo";
-"meal.choose_from_library" = "Choose from Library";
 "meal.carb_level" = "Carb Level";
 "meal.description" = "Meal Description";
 "meal.description_placeholder" = "e.g. \"Rice + Vegetables + Chicken\"";
+"meal.photo.toggle" = "Add Photo";
+"meal.photo.camera" = "Camera";
+"meal.photo.library" = "Photo Library";
 
 /* Unit Picker */
 "unit.title" = "Glucose Unit";
@@ -489,6 +487,7 @@
 "reminder.title" = "Reminder Settings";
 "reminder.notification_permission" = "Notification Permission";
 "reminder.enabled" = "Enabled";
+"reminder.disabled" = "Not Enabled";
 "reminder.enable_button" = "Enable";
 "reminder.measurement_reminders" = "Measurement Reminders";
 "reminder.inactivity_reminder" = "Inactivity Reminder";
@@ -603,11 +602,13 @@
 "sync.error.no_network" = "No Network Connection";
 "sync.error.wifi_required" = "WiFi Required";
 "sync.error.account_unavailable" = "iCloud Account Unavailable";
+"sync.status.pending_changes" = "Pending changes";
 
 /* Reminder Settings */
 "reminder.title" = "Reminder Settings";
 "reminder.notification_permission" = "Notification Permission";
 "reminder.enabled" = "Enabled";
+"reminder.disabled" = "Not Enabled";
 "reminder.enable_button" = "Enable";
 "reminder.measurement_reminders" = "Measurement Reminders";
 "reminder.inactivity_reminder" = "Inactivity Reminder";
@@ -818,7 +819,6 @@
 "feature.apple_watch" = "Apple Watch";
 "feature.advanced_charts" = "Advanced Charts";
 "feature.medication_tracking" = "Medication Tracking";
-"feature.meal_photo_tracking" = "Meal Photo Tracking";
 "feature.description.unlimited_records" = "No daily limit on glucose records";
 "feature.description.icloud_sync" = "Sync data across all your devices";
 "feature.description.pdf_export" = "Generate professional reports for medical visits";
@@ -826,7 +826,6 @@
 "feature.description.apple_watch" = "Quick glucose logging on your wrist";
 "feature.description.advanced_charts" = "View meal pairing, weekly comparison and more";
 "feature.description.medication_tracking" = "Track and manage medications";
-"feature.description.meal_photo_tracking" = "Capture every meal with photos";
 "feature.button.unlock" = "Unlock Feature";
 "feature.button.unlock_short" = "Unlock";
 "feature.button.upgrade" = "Upgrade";
@@ -837,7 +836,6 @@
 "feature.unlock.csv_export" = "Upgrade to export CSV data";
 "feature.unlock.apple_watch" = "Upgrade to use Apple Watch";
 "feature.unlock.advanced_charts" = "Upgrade to view advanced charts";
-"feature.unlock.meal_photo_tracking" = "Upgrade to take meal photos";
 
 /* Limitations */
 "limit.daily_records" = "Daily record limit reached";
@@ -860,3 +858,45 @@
 /* Common */
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
+"common.delete" = "Delete";
+
+/* Home View */
+"home.title" = "Records";
+"home.empty.title" = "No records yet";
+"home.empty.subtitle" = "Tap \"+\" below to start recording";
+"home.latest_glucose" = "Latest Glucose";
+"home.today_summary" = "Today's Summary";
+"home.stat.count" = "Count";
+"home.stat.today" = "Today";
+"home.stat.average" = "Average";
+"home.stat.tir" = "In Range";
+"home.no_records_a11y" = "No records";
+"home.latest_a11y" = "Latest glucose %@ %@, %@, %@";
+"home.add_record.a11y" = "Add glucose record";
+"home.add_record.hint" = "Double tap to open glucose input";
+
+/* Sync Status Badge */
+"sync.status.downloading" = "Downloading";
+"sync.status.uploading" = "Uploading";
+"sync.status.last_sync_format" = "Last sync: %@";
+"sync.status.disabled" = "Disabled";
+"sync.status.not_signed_in" = "Not signed in to iCloud";
+"sync.status.no_network" = "No network connection";
+"sync.status.ready" = "Ready";
+"sync.status.sync_success" = "Sync successful";
+"sync.status.failed_detail" = "Failed: %@";
+
+/* Sync Settings - Additional */
+"sync.quota.title" = "iCloud Storage Full";
+"sync.quota.message" = "Your iCloud storage is full. Data cannot sync to the cloud. Local data is not affected.";
+"sync.quota.manage" = "Manage iCloud Storage";
+"sync.restart.title" = "Restart Required";
+"sync.restart.confirm" = "Confirm Change";
+"sync.restart.message" = "Changing sync settings requires restarting the app. Please close and reopen the app for changes to take effect.\n\nCurrent: %@\nNew: %@";
+"sync.restart.enabled" = "Enabled";
+"sync.restart.disabled" = "Disabled";
+"sync.state.importing_download" = "Downloading from iCloud...";
+"sync.state.importing" = "Importing from iCloud...";
+"sync.state.exporting" = "Uploading to iCloud...";
+"sync.restart_warning" = "⚠️ Changing sync settings requires restarting the app";
+"sync.first_sync_tip" = "💡 First sync after reinstall may take a few minutes. Keep the app in the foreground with a stable network connection";

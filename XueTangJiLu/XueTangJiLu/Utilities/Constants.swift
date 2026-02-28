@@ -47,8 +47,6 @@ enum AppConstants: Sendable {
     enum Size: Sendable {
         /// 浮动录入按钮尺寸
         static let fabSize: CGFloat = 56
-        /// 键盘按键高度
-        static let keypadButtonHeight: CGFloat = 60
         /// 保存按钮高度
         static let saveButtonHeight: CGFloat = 54
         /// 场景标签高度
@@ -79,4 +77,8 @@ enum AppConstants: Sendable {
 
     nonisolated static let cloudKitContainerID = "iCloud.com.xxl.XueTangJiLu"
     nonisolated static let appGroupID = "group.com.xxl.XueTangJiLu"
+
+    // MARK: - URLs
+    static let privacyPolicyURL = "https://harrysxu.github.io/XueTangJiLu/privacy-policy.html"
+    static let termsOfServiceURL = "https://harrysxu.github.io/XueTangJiLu/terms-of-service.html"
 }

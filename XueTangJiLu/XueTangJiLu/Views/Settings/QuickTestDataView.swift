@@ -5,6 +5,7 @@
 //  Created by AI Assistant on 2026/2/20.
 //
 
+#if DEBUG
 import SwiftUI
 import SwiftData
 
@@ -97,9 +98,7 @@ struct QuickTestDataView: View {
         let record = MealRecord(
             carbLevel: levels.randomElement() ?? .medium,
             mealDescription: descriptions.randomElement() ?? "饮食",
-            photoData: nil,
-            timestamp: Date.now.addingTimeInterval(-Double.random(in: 0...3600)),
-            note: nil
+            timestamp: Date.now.addingTimeInterval(-Double.random(in: 0...3600))
         )
         modelContext.insert(record)
         HapticManager.success()
@@ -136,9 +135,7 @@ struct QuickTestDataView: View {
             let record = MealRecord(
                 carbLevel: [.medium, .high, .low][i],
                 mealDescription: ["全麦面包 + 鸡蛋", "米饭 + 红烧肉", "鸡胸肉沙拉"][i],
-                photoData: nil,
-                timestamp: Date.now.addingTimeInterval(-Double(i * 3600 + 900)),
-                note: nil
+                timestamp: Date.now.addingTimeInterval(-Double(i * 3600 + 900))
             )
             modelContext.insert(record)
         }
@@ -157,3 +154,4 @@ struct QuickTestDataView: View {
     QuickTestDataView()
         .modelContainer(for: [GlucoseRecord.self, MedicationRecord.self, MealRecord.self], inMemory: true)
 }
+#endif

@@ -30,7 +30,6 @@ struct LogView: View {
     @State private var recordToEdit: GlucoseRecord? = nil
     @State private var medicationToEdit: MedicationRecord? = nil
     @State private var mealToEdit: MealRecord? = nil
-    @State private var showMealPaywall = false
     
     enum RecordType: String, CaseIterable, Identifiable {
         case glucose = "血糖"
@@ -189,7 +188,11 @@ struct LogView: View {
                     .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showMealInput) {
-                MealPhotoView(editingRecord: mealToEdit)
+                MealPhotoView()
+                    .presentationDragIndicator(.visible)
+            }
+            .sheet(item: $mealToEdit) { record in
+                MealPhotoView(editingRecord: record)
                     .presentationDragIndicator(.visible)
             }
             .sheet(isPresented: $showCustomDateRange) {
@@ -219,14 +222,6 @@ struct LogView: View {
                 if !newValue {
                     medicationToEdit = nil
                 }
-            }
-            .onChange(of: showMealInput) { oldValue, newValue in
-                if !newValue {
-                    mealToEdit = nil
-                }
-            }
-            .sheet(isPresented: $showMealPaywall) {
-                PaywallView()
             }
         }
     }
@@ -390,12 +385,7 @@ struct LogView: View {
                                             .buttonStyle(.plain)
                                         case .meal(let record):
                                             Button(action: {
-                                                if FeatureManager.canAccessFeature(.mealPhotoTracking, isPremium: subscriptionManager.isPremiumUser) {
-                                                    mealToEdit = record
-                                                    showMealInput = true
-                                                } else {
-                                                    showMealPaywall = true
-                                                }
+                                                mealToEdit = record
                                             }) {
                                                 MealRowView(record: record)
                                             }
@@ -474,11 +464,7 @@ struct LogView: View {
             
             Button {
                 HapticManager.light()
-                if FeatureManager.canAccessFeature(.mealPhotoTracking, isPremium: subscriptionManager.isPremiumUser) {
-                    showMealInput = true
-                } else {
-                    showMealPaywall = true
-                }
+                showMealInput = true
             } label: {
                 Label(String(localized: "meal.record"), systemImage: "fork.knife")
             }
