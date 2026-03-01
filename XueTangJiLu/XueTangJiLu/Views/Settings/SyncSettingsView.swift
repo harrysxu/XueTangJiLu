@@ -307,6 +307,7 @@ struct SyncSettingsView: View {
     
     // MARK: - Diagnostics Section
     
+    #if DEBUG
     private var diagnosticsSection: some View {
         Section {
             NavigationLink(destination: CloudKitDiagnosticsView()) {
@@ -322,6 +323,7 @@ struct SyncSettingsView: View {
             Text("使用诊断工具检查 CloudKit 配置和同步问题")
         }
     }
+    #endif
     
     private var canManualSync: Bool {
         syncManager.isSyncEnabled &&

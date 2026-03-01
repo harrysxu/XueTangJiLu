@@ -202,7 +202,7 @@ struct PaywallView: View {
             .disabled(selectedProduct == nil || storeManager.isPurchasing)
             .opacity(selectedProduct == nil ? 0.6 : 1.0)
             
-            if let product = selectedProduct {
+            if selectedProduct != nil {
                 Text(String(localized: "subscription.button.price_info"))
                     .font(.caption)
                     .foregroundStyle(.secondary)

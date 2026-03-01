@@ -79,6 +79,6 @@ enum AppConstants: Sendable {
     nonisolated static let appGroupID = "group.com.xxl.XueTangJiLu"
 
     // MARK: - URLs
-    static let privacyPolicyURL = "https://harrysxu.github.io/XueTangJiLu/privacy-policy.html"
-    static let termsOfServiceURL = "https://harrysxu.github.io/XueTangJiLu/terms-of-service.html"
+    static let privacyPolicyURL = "https://harrysxu.github.io/XueTangJiLu/pages/privacy-policy.html"
+    static let termsOfServiceURL = "https://harrysxu.github.io/XueTangJiLu/pages/terms-of-service.html"
 }

@@ -439,20 +439,7 @@ final class UserSettings {
     var deviceIdentifier: String?
 
     var customizationScore: Int {
-        var score = 0
-        if hasCompletedOnboarding { score += 10 }
-        if remindersData != nil { score += 5 }
-        if sceneTagsData != nil { score += 4 }
-        if annotationTagsData != nil { score += 3 }
-        if thresholdConfigData != nil { score += 3 }
-        if healthKitSyncEnabled { score += 2 }
-        // 比较 thresholdConfigData 是否存在且不是默认值
-        if let data = thresholdConfigData,
-           let config = try? JSONDecoder().decode(ThresholdConfig.self, from: data),
-           config != ThresholdConfig.defaults {
-            score += 3
-        }
-        return score
+        customizationScoreValue()
     }
     
     nonisolated func customizationScoreValue() -> Int {

@@ -38,7 +38,7 @@ struct XueTangJiLuApp: App {
             }
         }
         
-        // 3. 创建 ModelContainer（使用迁移计划）
+        // 3. 创建 ModelContainer
         let modelConfiguration = ModelConfiguration(
             schema: Schema([
                 UserSettings.self,
@@ -48,7 +48,6 @@ struct XueTangJiLuApp: App {
             ]),
             isStoredInMemoryOnly: false,
             groupContainer: .identifier(AppConstants.appGroupID),
-            // ⚠️ 关键：根据用户设置决定是否启用 CloudKit
             cloudKitDatabase: syncEnabled ? .private(AppConstants.cloudKitContainerID) : .none
         )
 
@@ -58,24 +57,51 @@ struct XueTangJiLuApp: App {
                 GlucoseRecord.self,
                 MedicationRecord.self,
                 MealRecord.self,
-                migrationPlan: XueTangJiLuMigrationPlan.self,
                 configurations: modelConfiguration
             )
-            
-            // 将 ModelContainer 传递给同步管理器，用于手动同步
-            cloudKitSyncManager.modelContainer = modelContainer
-            
-            if syncEnabled {
-                print("✅ ModelContainer 创建成功，CloudKit 同步已配置")
-                print("   - Container ID: \(AppConstants.cloudKitContainerID)")
-                print("   - App Group: \(AppConstants.appGroupID)")
-            } else {
-                print("✅ ModelContainer 创建成功，CloudKit 同步已禁用")
-                print("   - 仅使用本地存储")
-                print("   - App Group: \(AppConstants.appGroupID)")
-            }
         } catch {
-            fatalError("无法创建 ModelContainer: \(error)")
+            // App Group 中残留了不兼容的旧数据库（卸载 app 不会清理 App Group），
+            // 删除旧数据库文件后重建
+            print("⚠️ 数据库加载失败: \(error)")
+            print("🔄 正在清理旧数据库并重建...")
+            
+            if let containerURL = FileManager.default.containerURL(
+                forSecurityApplicationGroupIdentifier: AppConstants.appGroupID
+            ) {
+                let supportDir = containerURL.appendingPathComponent("Library/Application Support")
+                if let contents = try? FileManager.default.contentsOfDirectory(
+                    at: supportDir, includingPropertiesForKeys: nil
+                ) {
+                    for url in contents where url.lastPathComponent.hasPrefix("default") {
+                        try? FileManager.default.removeItem(at: url)
+                    }
+                }
+            }
+            
+            do {
+                modelContainer = try ModelContainer(
+                    for: UserSettings.self,
+                    GlucoseRecord.self,
+                    MedicationRecord.self,
+                    MealRecord.self,
+                    configurations: modelConfiguration
+                )
+                print("✅ 数据库已成功重建（旧数据已清除）")
+            } catch {
+                fatalError("无法创建 ModelContainer: \(error)")
+            }
+        }
+        
+        cloudKitSyncManager.modelContainer = modelContainer
+        
+        if syncEnabled {
+            print("✅ ModelContainer 创建成功，CloudKit 同步已配置")
+            print("   - Container ID: \(AppConstants.cloudKitContainerID)")
+            print("   - App Group: \(AppConstants.appGroupID)")
+        } else {
+            print("✅ ModelContainer 创建成功，CloudKit 同步已禁用")
+            print("   - 仅使用本地存储")
+            print("   - App Group: \(AppConstants.appGroupID)")
         }
     }
 
