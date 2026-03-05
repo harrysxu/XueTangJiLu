@@ -33,6 +33,7 @@ struct MetricExplanation {
     let referenceStandard: String?
     let clinicalSignificance: String
     let practicalUse: String
+    let references: [String]
     
     init(
         type: MetricType,
@@ -41,7 +42,8 @@ struct MetricExplanation {
         formula: String? = nil,
         referenceStandard: String? = nil,
         clinicalSignificance: String,
-        practicalUse: String
+        practicalUse: String,
+        references: [String] = []
     ) {
         self.type = type
         self.title = title
@@ -50,6 +52,7 @@ struct MetricExplanation {
         self.referenceStandard = referenceStandard
         self.clinicalSignificance = clinicalSignificance
         self.practicalUse = practicalUse
+        self.references = references
     }
 }
 
@@ -62,9 +65,13 @@ struct MetricExplanationLibrary {
             title: "平均血糖",
             briefDescription: "所有记录的算术平均值",
             formula: "平均血糖 = 所有血糖记录之和 ÷ 记录总数",
-            referenceStandard: "餐前 4.4-7.0 mmol/L，餐后 < 10.0 mmol/L",
+            referenceStandard: "餐前 4.4-7.2 mmol/L (ADA)，餐后 < 10.0 mmol/L",
             clinicalSignificance: "反映选定时间段内的整体血糖控制水平，是计算估算糖化的基础指标。",
-            practicalUse: "帮助了解血糖总体趋势，配合达标率和波动系数可全面评估血糖管理效果。"
+            practicalUse: "帮助了解血糖总体趋势，配合达标率和波动系数可全面评估血糖管理效果。",
+            references: [
+                "American Diabetes Association. Standards of Care in Diabetes—2026. Diabetes Care, 2026;49(Suppl 1).",
+                "中华医学会糖尿病学分会.中国糖尿病防治指南(2024版).中华糖尿病杂志, 2025.",
+            ]
         ),
         
         .estimatedA1C: MetricExplanation(
@@ -74,7 +81,12 @@ struct MetricExplanationLibrary {
             formula: "eA1C (%) = (平均血糖 × 18.0182 + 46.7) ÷ 28.7",
             referenceStandard: "< 7.0% 良好，7.0-8.0% 尚可，> 8.0% 需改善",
             clinicalSignificance: "糖化血红蛋白反映近2-3个月的血糖控制情况，是糖尿病管理的金标准。估算值可作为日常参考，但不能替代医院检测。",
-            practicalUse: "帮助日常监测血糖控制趋势，及时调整饮食和用药方案。每次就医前可参考估算值与医生沟通。"
+            practicalUse: "帮助日常监测血糖控制趋势，及时调整饮食和用药方案。每次就医前可参考估算值与医生沟通。",
+            references: [
+                "Nathan DM, et al. Translating the A1C assay into estimated average glucose values. Diabetes Care, 2008;31(8):1473-1478.",
+                "American Diabetes Association. Standards of Care in Diabetes—2026. Diabetes Care, 2026;49(Suppl 1).",
+                "中华医学会糖尿病学分会.中国糖尿病防治指南(2024版).中华糖尿病杂志, 2025.",
+            ]
         ),
         
         .timeInRange: MetricExplanation(
@@ -84,7 +96,11 @@ struct MetricExplanationLibrary {
             formula: "达标率 (%) = (达标记录数 ÷ 总记录数) × 100%",
             referenceStandard: "> 70% 良好，50-70% 尚可，< 50% 需改善",
             clinicalSignificance: "Time in Range (TIR) 是国际推荐的核心血糖控制指标，比糖化血红蛋白更能反映血糖波动情况。",
-            practicalUse: "综合评估血糖管理效果，比单纯看平均值更全面。可以发现血糖是否经常超出目标范围，指导调整治疗方案。"
+            practicalUse: "综合评估血糖管理效果，比单纯看平均值更全面。可以发现血糖是否经常超出目标范围，指导调整治疗方案。",
+            references: [
+                "Battelino T, et al. Clinical Targets for Continuous Glucose Monitoring Data Interpretation: Recommendations From the International Consensus on Time in Range. Diabetes Care, 2019;42(8):1593-1603.",
+                "American Diabetes Association. Standards of Care in Diabetes—2026. Diabetes Care, 2026;49(Suppl 1).",
+            ]
         ),
         
         .coefficientOfVariation: MetricExplanation(
@@ -94,7 +110,11 @@ struct MetricExplanationLibrary {
             formula: "CV% = (标准差 ÷ 平均值) × 100%",
             referenceStandard: "< 36% 稳定，≥ 36% 波动较大",
             clinicalSignificance: "评估血糖稳定性的关键指标。血糖波动过大可能增加低血糖风险和并发症发生率，即使平均值正常也需要关注。",
-            practicalUse: "指导饮食规律性和用药时机。波动大提示需要调整饮食结构、规律进餐时间，或与医生讨论用药方案。"
+            practicalUse: "指导饮食规律性和用药时机。波动大提示需要调整饮食结构、规律进餐时间，或与医生讨论用药方案。",
+            references: [
+                "Monnier L, et al. Toward Defining the Threshold Between Low and High Glucose Variability in Diabetes. Diabetes Care, 2017;40(7):832-838.",
+                "Battelino T, et al. Clinical Targets for Continuous Glucose Monitoring Data Interpretation. Diabetes Care, 2019;42(8):1593-1603.",
+            ]
         ),
         
         .timeAboveRange: MetricExplanation(
@@ -104,7 +124,10 @@ struct MetricExplanationLibrary {
             formula: "TAR (%) = (高血糖记录数 ÷ 总记录数) × 100%",
             referenceStandard: "< 25% 为目标，越低越好",
             clinicalSignificance: "反映高血糖发生频率。长期高血糖会增加糖尿病并发症风险，需要及时控制。",
-            practicalUse: "帮助识别高血糖发生的时段和场景，针对性调整饮食或用药。"
+            practicalUse: "帮助识别高血糖发生的时段和场景，针对性调整饮食或用药。",
+            references: [
+                "Battelino T, et al. Clinical Targets for Continuous Glucose Monitoring Data Interpretation. Diabetes Care, 2019;42(8):1593-1603.",
+            ]
         ),
         
         .timeBelowRange: MetricExplanation(
@@ -114,7 +137,10 @@ struct MetricExplanationLibrary {
             formula: "TBR (%) = (低血糖记录数 ÷ 总记录数) × 100%",
             referenceStandard: "< 4% 为目标，越低越好",
             clinicalSignificance: "反映低血糖发生频率。低血糖有急性危险，需要特别重视和预防。",
-            practicalUse: "帮助识别低血糖风险时段，调整用药剂量或进餐时间，避免危险。"
+            practicalUse: "帮助识别低血糖风险时段，调整用药剂量或进餐时间，避免危险。",
+            references: [
+                "Battelino T, et al. Clinical Targets for Continuous Glucose Monitoring Data Interpretation. Diabetes Care, 2019;42(8):1593-1603.",
+            ]
         ),
         
         .glucoseDistribution: MetricExplanation(
@@ -124,7 +150,10 @@ struct MetricExplanationLibrary {
             formula: nil,
             referenceStandard: "低于范围 < 4%，达标范围 > 70%，高于范围 < 25%",
             clinicalSignificance: "三段式血糖分布图可以快速识别血糖管理的主要问题：是高血糖多还是低血糖多。",
-            practicalUse: "帮助制定个性化的血糖管理策略。如果高血糖占比大，需要控制饮食或调整用药；如果低血糖多，需要减少用药或增加进食。"
+            practicalUse: "帮助制定个性化的血糖管理策略。如果高血糖占比大，需要控制饮食或调整用药；如果低血糖多，需要减少用药或增加进食。",
+            references: [
+                "Battelino T, et al. Clinical Targets for Continuous Glucose Monitoring Data Interpretation. Diabetes Care, 2019;42(8):1593-1603.",
+            ]
         ),
         
         .perTagTIR: MetricExplanation(
@@ -134,7 +163,11 @@ struct MetricExplanationLibrary {
             formula: "各场景独立计算：(该场景达标记录数 ÷ 该场景总记录数) × 100%",
             referenceStandard: "各场景目标 > 70%",
             clinicalSignificance: "不同场景（餐前、餐后等）有不同的血糖目标范围。分场景评估可以发现特定时段的管理问题。",
-            practicalUse: "帮助识别哪个场景的血糖控制较差，针对性调整该时段的饮食或用药。例如餐后达标率低，可能需要控制碳水化合物摄入。"
+            practicalUse: "帮助识别哪个场景的血糖控制较差，针对性调整该时段的饮食或用药。例如餐后达标率低，可能需要控制碳水化合物摄入。",
+            references: [
+                "Battelino T, et al. Clinical Targets for Continuous Glucose Monitoring Data Interpretation. Diabetes Care, 2019;42(8):1593-1603.",
+                "American Diabetes Association. Standards of Care in Diabetes—2026. Diabetes Care, 2026;49(Suppl 1).",
+            ]
         ),
         
         .mealPair: MetricExplanation(
@@ -142,9 +175,14 @@ struct MetricExplanationLibrary {
             title: "餐前餐后配对",
             briefDescription: "基于时间自动配对的血糖升幅分析",
             formula: "升幅 = 餐后血糖 - 餐前血糖\n\n配对规则（完全基于时间）：\n• 同一天内\n• 餐后时间晚于餐前\n• 时间间隔 ≤ 4小时\n• 选择时间最接近的餐前记录\n\n注意：配对不考虑标签名称语义，仅依据阈值分组（餐前/餐后）和时间关系。例如「下午吃饭前」和「下午喝茶后」若符合上述规则也会配对。",
-            referenceStandard: "升幅 < 3.0 mmol/L 为理想",
+            referenceStandard: "升幅 < 3.0 mmol/L 为理想（临床常用参考值）",
             clinicalSignificance: "餐后血糖升幅反映饮食对血糖的影响。升幅过大说明进餐后血糖波动大，可能增加并发症风险。",
-            practicalUse: "帮助评估具体某餐的血糖影响，指导调整食物种类和分量。升幅大的餐次可以考虑减少碳水化合物或增加餐前用药。建议每餐的餐前餐后记录保持规律，以确保配对的准确性。"
+            practicalUse: "帮助评估具体某餐的血糖影响，指导调整食物种类和分量。升幅大的餐次可以考虑减少碳水化合物或增加餐前用药。建议每餐的餐前餐后记录保持规律，以确保配对的准确性。",
+            references: [
+                "American Diabetes Association. Standards of Care in Diabetes—2026. Diabetes Care, 2026;49(Suppl 1).",
+                "中华医学会糖尿病学分会.中国糖尿病防治指南(2024版).中华糖尿病杂志, 2025.",
+                "International Diabetes Federation. Guideline for Management of PostMeal Glucose in Diabetes. Diabetes Research and Clinical Practice, 2014;103(2):256-268.",
+            ]
         ),
         
         .tagDistribution: MetricExplanation(
@@ -197,4 +235,61 @@ struct MetricExplanationLibrary {
     static func briefDescription(for type: MetricType) -> String {
         return explanations[type]?.briefDescription ?? ""
     }
+    
+    /// 所有去重后的参考文献列表
+    static var allUniqueReferences: [String] {
+        var seen = Set<String>()
+        var result: [String] = []
+        for explanation in explanations.values {
+            for ref in explanation.references where !seen.contains(ref) {
+                seen.insert(ref)
+                result.append(ref)
+            }
+        }
+        return result.sorted()
+    }
+}
+
+/// 集中管理的医学参考来源
+struct MedicalReferenceLibrary {
+    
+    struct Reference: Identifiable {
+        let id = UUID()
+        let title: String
+        let detail: String
+        let url: String?
+    }
+    
+    static let references: [Reference] = [
+        Reference(
+            title: "ADA Standards of Care",
+            detail: "American Diabetes Association. Standards of Care in Diabetes—2026. Diabetes Care, 2026;49(Suppl 1).",
+            url: "https://diabetesjournals.org/care/issue/49/Supplement_1"
+        ),
+        Reference(
+            title: "国际 TIR 共识",
+            detail: "Battelino T, et al. Clinical Targets for Continuous Glucose Monitoring Data Interpretation: Recommendations From the International Consensus on Time in Range. Diabetes Care, 2019;42(8):1593-1603.",
+            url: "https://doi.org/10.2337/dci19-0028"
+        ),
+        Reference(
+            title: "eA1C 换算公式",
+            detail: "Nathan DM, et al. Translating the A1C assay into estimated average glucose values. Diabetes Care, 2008;31(8):1473-1478.",
+            url: "https://doi.org/10.2337/dc08-0545"
+        ),
+        Reference(
+            title: "CV% 波动阈值",
+            detail: "Monnier L, et al. Toward Defining the Threshold Between Low and High Glucose Variability in Diabetes. Diabetes Care, 2017;40(7):832-838.",
+            url: "https://doi.org/10.2337/dc16-1769"
+        ),
+        Reference(
+            title: "中国糖尿病防治指南",
+            detail: "中华医学会糖尿病学分会. 中国糖尿病防治指南(2024版). 中华糖尿病杂志, 2025.",
+            url: "https://diab.cma.org.cn/cn/ncontent.aspx?oid=3042"
+        ),
+        Reference(
+            title: "IDF 餐后血糖管理指南",
+            detail: "International Diabetes Federation. Guideline for Management of PostMeal Glucose in Diabetes. Diabetes Research and Clinical Practice, 2014;103(2):256-268.",
+            url: "https://doi.org/10.1016/j.diabres.2012.08.002"
+        ),
+    ]
 }

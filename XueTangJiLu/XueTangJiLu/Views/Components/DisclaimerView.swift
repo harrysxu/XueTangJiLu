@@ -107,7 +107,21 @@ struct DisclaimerBanner: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             
-            Spacer()
+            Spacer(minLength: 4)
+            
+            NavigationLink {
+                MedicalReferencesView()
+            } label: {
+                HStack(spacing: 3) {
+                    Image(systemName: "book.closed")
+                        .font(.caption2)
+                    Text(String(localized: "disclaimer.banner.references"))
+                        .font(.caption2)
+                }
+                .foregroundStyle(.blue)
+                .lineLimit(1)
+                .fixedSize()
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)

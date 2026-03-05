@@ -187,6 +187,14 @@ struct MetricExplanationDetailView: View {
                             removal: .opacity
                         ))
                         
+                        if !explanation.references.isEmpty {
+                            referencesCard
+                                .transition(.asymmetric(
+                                    insertion: .scale.combined(with: .opacity),
+                                    removal: .opacity
+                                ))
+                        }
+                        
                         disclaimerCard
                             .transition(.asymmetric(
                                 insertion: .scale.combined(with: .opacity),
@@ -320,6 +328,53 @@ struct MetricExplanationDetailView: View {
                 
                 RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
                     .fill(iconColor)
+                    .frame(width: 4)
+            }
+        )
+        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+    }
+    
+    // MARK: - 参考文献
+    
+    private var referencesCard: some View {
+        VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
+            HStack(spacing: AppConstants.Spacing.sm) {
+                Image(systemName: "book.closed")
+                    .font(.title3)
+                    .foregroundStyle(theme.primaryColor)
+                    .frame(width: 28)
+                
+                Text("参考文献")
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+            }
+            
+            VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
+                ForEach(Array(explanation.references.enumerated()), id: \.offset) { index, ref in
+                    HStack(alignment: .top, spacing: 6) {
+                        Text("[\(index + 1)]")
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                            .frame(width: 24, alignment: .trailing)
+                        
+                        Text(ref)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineSpacing(2)
+                    }
+                }
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                    .fill(Color.cardBackground)
+                
+                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.card)
+                    .fill(theme.primaryColor)
                     .frame(width: 4)
             }
         )

@@ -157,6 +157,7 @@
 "profile.version" = "版本";
 "profile.privacy" = "隱私政策";
 "profile.disclaimer" = "免責聲明";
+"profile.references" = "醫學參考來源";
 "profile.rate" = "給我們評分";
 "profile.connected" = "已連接";
 "profile.connect" = "連接";
@@ -197,6 +198,13 @@
 "disclaimer.navigation_title" = "使用須知";
 "disclaimer.accept" = "我已知曉";
 "disclaimer.banner" = "數據僅供參考,不構成醫療建議,請遵醫囑";
+"disclaimer.banner.references" = "查看參考來源";
+
+/* Medical References */
+"references.title" = "參考來源";
+"references.header" = "本應用中的血糖參考範圍及健康指標標準均來自以下權威醫學文獻，僅供參考，不構成醫療建議。";
+"references.view_source" = "查看原文";
+"references.disclaimer" = "以上參考文獻僅用於說明本應用所採用指標的學術來源，不構成對任何疾病的診斷或治療建議。如有健康問題，請諮詢專業醫生。";
 
 /* About - Privacy & Disclaimer */
 "about.privacy.title" = "隱私政策";
@@ -297,9 +305,9 @@
 "threshold.fasting_premeal" = "空腹/餐前";
 "threshold.postmeal" = "餐後";
 "threshold.bedtime" = "睡前";
-"threshold.ada_fasting" = "ADA推薦：4.4-7.0 mmol/L";
+"threshold.ada_fasting" = "ADA推薦：4.4-7.2 mmol/L";
 "threshold.ada_postmeal" = "ADA推薦：<10.0 mmol/L";
-"threshold.ada_bedtime" = "ADA推薦：5.0-8.3 mmol/L";
+"threshold.ada_bedtime" = "參考建議：5.0-8.3 mmol/L";
 
 /* MedicationType Units */
 "med.unit_insulin" = "單位(U)";

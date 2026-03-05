@@ -157,6 +157,7 @@
 "profile.version" = "Version";
 "profile.privacy" = "Privacy Policy";
 "profile.disclaimer" = "Disclaimer";
+"profile.references" = "Medical References";
 "profile.rate" = "Rate Us";
 "profile.connected" = "Connected";
 "profile.connect" = "Connect";
@@ -197,6 +198,13 @@
 "disclaimer.navigation_title" = "Usage Notice";
 "disclaimer.accept" = "I Understand";
 "disclaimer.banner" = "Data is for reference only, does not constitute medical advice, please follow doctor's orders";
+"disclaimer.banner.references" = "View References";
+
+/* Medical References */
+"references.title" = "References";
+"references.header" = "The glucose reference ranges and health metric standards used in this app are based on the following authoritative medical literature, provided for reference only and not as medical advice.";
+"references.view_source" = "View Source";
+"references.disclaimer" = "The references above are provided solely to indicate the academic sources of the metrics used in this app and do not constitute diagnosis or treatment advice for any condition. Please consult a qualified healthcare professional for any health concerns.";
 
 /* About - Privacy & Disclaimer */
 "about.privacy.title" = "Privacy Policy";
@@ -280,9 +288,9 @@
 "threshold.fasting_premeal" = "Fasting/Pre-meal";
 "threshold.postmeal" = "Post-meal";
 "threshold.bedtime" = "Bedtime";
-"threshold.ada_fasting" = "ADA Recommended: 4.4-7.0 mmol/L";
+"threshold.ada_fasting" = "ADA Recommended: 4.4-7.2 mmol/L";
 "threshold.ada_postmeal" = "ADA Recommended: <10.0 mmol/L";
-"threshold.ada_bedtime" = "ADA Recommended: 5.0-8.3 mmol/L";
+"threshold.ada_bedtime" = "Reference: 5.0-8.3 mmol/L";
 
 /* MedicationType Units */
 "med.unit_insulin" = "Units(U)";

@@ -12,6 +12,8 @@ import SwiftUI
 enum AppConstants: Sendable {
 
     // MARK: - 血糖阈值 (mmol/L)
+    // 来源: Battelino T, et al. Diabetes Care, 2019;42(8):1593-1603.
+    //       ADA Standards of Care in Diabetes—2024.
 
     /// 低血糖阈值
     static let glucoseLowThreshold: Double = 3.9
@@ -59,11 +61,13 @@ enum AppConstants: Sendable {
     nonisolated static let glucoseConversionFactor: Double = 18.0182
 
     // MARK: - CV% 阈值
+    // 来源: Monnier L, et al. Diabetes Care, 2017;40(7):832-838.
 
     /// 波动系数稳定阈值（低于此值认为血糖波动稳定）
     static let cvStableThreshold: Double = 36.0
 
     // MARK: - TIR 目标
+    // 来源: Battelino T, et al. Diabetes Care, 2019;42(8):1593-1603.
 
     /// TIR 达标率目标（>70% 为良好）
     static let tirGoodThreshold: Double = 70.0

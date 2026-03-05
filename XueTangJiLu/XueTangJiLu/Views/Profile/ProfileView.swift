@@ -503,6 +503,27 @@ struct ProfileView: View {
 
                 Divider().padding(.leading, 52)
 
+                NavigationLink(destination: MedicalReferencesView()) {
+                    HStack(spacing: AppConstants.Spacing.md) {
+                        Image(systemName: "book.closed")
+                            .font(.body)
+                            .foregroundStyle(Color.brandPrimary)
+                            .frame(width: 28)
+                        Text(String(localized: "profile.references"))
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.horizontal, AppConstants.Spacing.lg)
+                    .padding(.vertical, AppConstants.Spacing.md)
+                }
+                .buttonStyle(.plain)
+
+                Divider().padding(.leading, 52)
+
                 Button(action: requestReview) {
                     HStack(spacing: AppConstants.Spacing.md) {
                         Image(systemName: "star")

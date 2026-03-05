@@ -219,6 +219,12 @@ struct SettingsView: View {
                 Text(String(localized: "profile.disclaimer"))
             }
 
+            NavigationLink {
+                MedicalReferencesView()
+            } label: {
+                Text(String(localized: "profile.references"))
+            }
+
             Button(action: requestReview) {
                 Text(String(localized: "profile.rate"))
             }
