@@ -69,10 +69,6 @@ struct StatisticsView: View {
                             )
                             .padding(.top, 60)
                         } else {
-                            // 免责声明横幅
-                            DisclaimerBanner()
-                                .padding(.top)
-                            
                             // 时间范围选择器
                             timeRangePicker
 
@@ -104,6 +100,9 @@ struct StatisticsView: View {
                             } else {
                                 FeatureLockView(feature: .advancedCharts)
                             }
+                            
+                            DisclaimerBanner()
+                                .padding(.top, AppConstants.Spacing.lg)
                         }
                     }
                     .padding(.horizontal, AppConstants.Spacing.lg)

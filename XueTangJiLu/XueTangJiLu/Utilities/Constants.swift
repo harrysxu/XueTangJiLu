@@ -13,7 +13,7 @@ enum AppConstants: Sendable {
 
     // MARK: - 血糖阈值 (mmol/L)
     // 来源: Battelino T, et al. Diabetes Care, 2019;42(8):1593-1603.
-    //       ADA Standards of Care in Diabetes—2024.
+    //       ADA Standards of Care in Diabetes—2026.
 
     /// 低血糖阈值
     static let glucoseLowThreshold: Double = 3.9
