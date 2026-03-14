@@ -193,18 +193,27 @@
 "disclaimer.item1" = "本APP是輔助記錄工具,不能替代醫生診斷";
 "disclaimer.item2" = "所有數據分析僅供參考,不構成醫療建議";
 "disclaimer.item3" = "血糖異常時請及時就醫,遵醫囑調整治療方案";
-"disclaimer.item4" = "低血糖時請立即補充糖分,必要時撥打120";
+"disclaimer.item4" = "低血糖時請立即補充糖分,必要時撥打119";
 "disclaimer.description" = "控糖幫手旨在幫助您記錄和瞭解血糖數據,但不應作為醫療決策的唯一依據。請定期複查,聽從醫生專業指導。";
 "disclaimer.navigation_title" = "使用須知";
 "disclaimer.accept" = "我已知曉";
+"disclaimer.item5" = "血糖分級標準參考權威醫學文獻,可在設定中查看參考來源";
 "disclaimer.banner" = "數據僅供參考,不構成醫療建議,請遵醫囑";
 "disclaimer.banner.references" = "查看參考來源";
+"citation.view_sources" = "分級標準來源";
+"pdf.references_title" = "參考文獻";
 
 /* Medical References */
 "references.title" = "參考來源";
 "references.header" = "本應用中的血糖參考範圍及健康指標標準均來自以下權威醫學文獻，僅供參考，不構成醫療建議。";
 "references.view_source" = "查看原文";
 "references.disclaimer" = "以上參考文獻僅用於說明本應用所採用指標的學術來源，不構成對任何疾病的診斷或治療建議。如有健康問題，請諮詢專業醫生。";
+"reference.title.ada" = "ADA 診療標準";
+"reference.title.tir" = "國際 TIR 共識";
+"reference.title.ea1c" = "eA1C 換算公式";
+"reference.title.cv" = "CV% 波動閾值";
+"reference.title.cds" = "中國糖尿病防治指南";
+"reference.title.idf" = "IDF 臨床實踐建議";
 
 /* About - Privacy & Disclaimer */
 "about.privacy.title" = "隱私政策";
@@ -883,3 +892,72 @@
 "sync.state.exporting" = "正在上傳到 iCloud...";
 "sync.restart_warning" = "⚠️ 更改同步設置需要重啟應用才能生效";
 "sync.first_sync_tip" = "💡 重新安裝後首次同步可能需要幾分鐘，請保持應用在前台並確保網絡暢通";
+
+/* Record Detail View */
+"record.detail.title" = "記錄詳情";
+"record.detail.glucose_value" = "血糖數值";
+"record.detail.timestamp" = "記錄時間";
+"record.detail.scene_label" = "場景";
+"record.detail.source" = "數據來源";
+"record.detail.source.manual" = "手動錄入";
+"record.detail.healthkit_sync" = "HealthKit 同步";
+"record.detail.synced" = "已同步";
+"record.detail.not_synced" = "未同步";
+
+/* Trend View */
+"trend.title" = "趨勢";
+"trend.empty.hint" = "開始記錄血糖後，這裡將展示您的趨勢圖表";
+"trend.tir.target" = "目標 > 70%";
+"trend.cv.target" = "目標 < 36%";
+
+/* Metric Explanation View */
+"metric.formula" = "計算方法";
+"metric.reference_standard" = "參考標準";
+"metric.clinical_significance" = "臨床意義";
+"metric.practical_use" = "輔助作用";
+"metric.disclaimer" = "本說明僅供參考，不構成醫療建議。如有疑問請諮詢專業醫生。";
+
+/* Daily Summary Card */
+"daily.recorded" = "已記錄";
+
+/* Share Card */
+"share.keep_good_habit" = "繼續保持良好的記錄習慣";
+
+/* Common */
+"common.close" = "關閉";
+"common.open_settings" = "打開設定";
+"common.not_selected" = "未選中";
+"common.double_tap_toggle" = "雙擊切換選中狀態";
+
+/* PDF Export */
+"pdf.has_photo" = "[有照片]";
+
+/* Sync Error View */
+"sync.error.nav_title" = "同步錯誤";
+"sync.error.solutions" = "解決方案";
+"sync.error.technical_details" = "技術詳情";
+"sync.error.not_authenticated_title" = "未登入 iCloud";
+"sync.error.network_title" = "網路連接失敗";
+"sync.error.permission_title" = "權限不足";
+"sync.error.quota_full_message" = "您的 iCloud 儲存空間已滿，無法將數據同步到雲端。本地數據不受影響，清理空間後將自動恢復同步。";
+"sync.error.quota.step1" = "打開「設定」> 點擊頂部 Apple ID > iCloud > 管理帳戶儲存空間";
+"sync.error.quota.step2" = "刪除不需要的 iCloud 備份、照片或其他應用數據";
+"sync.error.quota.step3" = "或升級到 iCloud+ 獲取更多儲存空間（50GB 僅需 ¥6/月）";
+"sync.error.quota.step4" = "清理後重新打開本應用，同步將自動恢復";
+"sync.error.auth.step1" = "打開「設定」應用";
+"sync.error.auth.step2" = "點擊頂部的 Apple ID";
+"sync.error.auth.step3" = "登入您的 iCloud 帳戶";
+"sync.error.network.step1" = "檢查設備的網絡連接";
+"sync.error.network.step2" = "確保已連接到互聯網";
+"sync.error.network.step3" = "嘗試切換網絡或重啟路由器";
+"sync.error.permission.step1" = "打開「設定」> 隱私與安全性";
+"sync.error.permission.step2" = "確保應用有 iCloud 訪問權限";
+"sync.error.permission.step3" = "重新授權應用";
+"sync.error.default.step1" = "稍後重試";
+"sync.error.default.step2" = "如問題持續，請聯繫技術支援";
+
+/* Sync Settings Diagnostics */
+"sync.cloudkit_diagnostics" = "CloudKit 診斷";
+"sync.debug_title" = "同步調試";
+"sync.diagnostics_section" = "診斷工具";
+"sync.diagnostics_footer" = "使用診斷工具檢查 CloudKit 配置和同步問題";

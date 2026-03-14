@@ -60,11 +60,15 @@ struct ThresholdConfig: Codable, Equatable, Sendable {
     var tagOverrides: [String: ThresholdRange]
 
     /// 默认配置
+    /// 来源: ADA Standards of Care in Diabetes—2026.
+    /// 空腹/餐前: 80-130 mg/dL (4.4-7.2 mmol/L)
+    /// 餐后: <180 mg/dL (<10.0 mmol/L)
+    /// 睡前: 90-150 mg/dL (5.0-8.3 mmol/L)
     static let defaults = ThresholdConfig(
         groupDefaults: [
             ThresholdGroup.fasting.rawValue:       ThresholdRange(low: 4.4, high: 7.2),
             ThresholdGroup.postprandial.rawValue:  ThresholdRange(low: 4.4, high: 10.0),
-            ThresholdGroup.bedtime.rawValue:        ThresholdRange(low: 4.4, high: 7.8),
+            ThresholdGroup.bedtime.rawValue:        ThresholdRange(low: 5.0, high: 8.3),
         ],
         tagOverrides: [:]
     )
@@ -79,7 +83,7 @@ struct ThresholdConfig: Codable, Equatable, Sendable {
         switch group {
         case .fasting:       return ThresholdRange(low: 4.4, high: 7.2)
         case .postprandial:  return ThresholdRange(low: 4.4, high: 10.0)
-        case .bedtime:       return ThresholdRange(low: 4.4, high: 7.8)
+        case .bedtime:       return ThresholdRange(low: 5.0, high: 8.3)
         }
     }
 }

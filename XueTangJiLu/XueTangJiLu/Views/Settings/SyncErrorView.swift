@@ -36,7 +36,7 @@ struct SyncErrorView: View {
                     
                     if !solutions.isEmpty {
                         VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
-                            Text("解决方案")
+                            Text("sync.error.solutions", tableName: "Localizable")
                                 .font(.headline)
                             
                             ForEach(Array(solutions.enumerated()), id: \.offset) { index, solution in
@@ -65,7 +65,7 @@ struct SyncErrorView: View {
                         }
                     }
                     
-                    DisclosureGroup("技术详情") {
+                    DisclosureGroup(String(localized: "sync.error.technical_details")) {
                         Text(error.localizedDescription)
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -77,11 +77,11 @@ struct SyncErrorView: View {
                 }
                 .padding(AppConstants.Spacing.lg)
             }
-            .navigationTitle("同步错误")
+            .navigationTitle(String(localized: "sync.error.nav_title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("关闭") {
+                    Button(String(localized: "common.close")) {
                         dismiss()
                     }
                 }
@@ -137,22 +137,22 @@ struct SyncErrorView: View {
     }
     
     private var errorTitle: String {
-        if containsQuotaExceeded { return "iCloud 存储空间不足" }
+        if containsQuotaExceeded { return String(localized: "sync.quota.title") }
         switch topLevelCKCode {
         case .notAuthenticated:
-            return "未登录 iCloud"
+            return String(localized: "sync.error.not_authenticated_title")
         case .networkUnavailable, .networkFailure:
-            return "网络连接失败"
+            return String(localized: "sync.error.network_title")
         case .permissionFailure:
-            return "权限不足"
+            return String(localized: "sync.error.permission_title")
         default:
-            return "同步失败"
+            return String(localized: "sync.failed")
         }
     }
     
     private var errorMessage: String {
         if containsQuotaExceeded {
-            return "您的 iCloud 存储空间已满，无法将数据同步到云端。本地数据不受影响，清理空间后将自动恢复同步。"
+            return String(localized: "sync.error.quota_full_message")
         }
         if let ckError = error as? CKError {
             return ckError.userFriendlyMessage
@@ -163,35 +163,35 @@ struct SyncErrorView: View {
     private var solutions: [String] {
         if containsQuotaExceeded {
             return [
-                "打开「设置」> 点击顶部 Apple ID > iCloud > 管理账户储存空间",
-                "删除不需要的 iCloud 备份、照片或其他应用数据",
-                "或升级到 iCloud+ 获取更多存储空间（50GB 仅需 ¥6/月）",
-                "清理后重新打开本应用，同步将自动恢复"
+                String(localized: "sync.error.quota.step1"),
+                String(localized: "sync.error.quota.step2"),
+                String(localized: "sync.error.quota.step3"),
+                String(localized: "sync.error.quota.step4")
             ]
         }
         switch topLevelCKCode {
         case .notAuthenticated:
             return [
-                "打开「设置」应用",
-                "点击顶部的 Apple ID",
-                "登录您的 iCloud 账户"
+                String(localized: "sync.error.auth.step1"),
+                String(localized: "sync.error.auth.step2"),
+                String(localized: "sync.error.auth.step3")
             ]
         case .networkUnavailable, .networkFailure:
             return [
-                "检查设备的网络连接",
-                "确保已连接到互联网",
-                "尝试切换网络或重启路由器"
+                String(localized: "sync.error.network.step1"),
+                String(localized: "sync.error.network.step2"),
+                String(localized: "sync.error.network.step3")
             ]
         case .permissionFailure:
             return [
-                "打开「设置」> 隐私与安全性",
-                "确保应用有 iCloud 访问权限",
-                "重新授权应用"
+                String(localized: "sync.error.permission.step1"),
+                String(localized: "sync.error.permission.step2"),
+                String(localized: "sync.error.permission.step3")
             ]
         default:
             return [
-                "稍后重试",
-                "如问题持续，请联系技术支持"
+                String(localized: "sync.error.default.step1"),
+                String(localized: "sync.error.default.step2")
             ]
         }
     }
@@ -207,7 +207,7 @@ struct SyncErrorView: View {
     private var actionButtons: [ActionButton] {
         if containsQuotaExceeded {
             return [
-                ActionButton(title: "管理 iCloud 存储空间") {
+                ActionButton(title: String(localized: "sync.quota.manage")) {
                     if let url = URL(string: "App-prefs:CASTLE") {
                         UIApplication.shared.open(url)
                     }
@@ -217,7 +217,7 @@ struct SyncErrorView: View {
         switch topLevelCKCode {
         case .notAuthenticated:
             return [
-                ActionButton(title: "打开设置") {
+                ActionButton(title: String(localized: "common.open_settings")) {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
                     }

@@ -144,6 +144,8 @@ struct RecordInputView: View {
                 }
                 .foregroundStyle(Color.forGlucoseLevel(level))
                 .transition(.opacity)
+                
+                ReferenceSourceLink()
             }
         }
         .frame(maxWidth: .infinity)

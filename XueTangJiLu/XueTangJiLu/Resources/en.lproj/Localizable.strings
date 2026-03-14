@@ -197,14 +197,23 @@
 "disclaimer.description" = "Glucose Control Assistant helps you track and understand your glucose data, but should not be the sole basis for medical decisions. Regular check-ups and professional medical guidance are essential.";
 "disclaimer.navigation_title" = "Usage Notice";
 "disclaimer.accept" = "I Understand";
+"disclaimer.item5" = "Glucose rating standards are based on authoritative medical literature. View references in Settings.";
 "disclaimer.banner" = "Data is for reference only, does not constitute medical advice, please follow doctor's orders";
 "disclaimer.banner.references" = "View References";
+"citation.view_sources" = "Rating Sources";
+"pdf.references_title" = "References";
 
 /* Medical References */
 "references.title" = "References";
 "references.header" = "The glucose reference ranges and health metric standards used in this app are based on the following authoritative medical literature, provided for reference only and not as medical advice.";
 "references.view_source" = "View Source";
 "references.disclaimer" = "The references above are provided solely to indicate the academic sources of the metrics used in this app and do not constitute diagnosis or treatment advice for any condition. Please consult a qualified healthcare professional for any health concerns.";
+"reference.title.ada" = "ADA Standards of Care";
+"reference.title.tir" = "International TIR Consensus";
+"reference.title.ea1c" = "eA1C Conversion Formula";
+"reference.title.cv" = "CV% Variability Threshold";
+"reference.title.cds" = "China Diabetes Guidelines";
+"reference.title.idf" = "IDF Clinical Recommendations";
 
 /* About - Privacy & Disclaimer */
 "about.privacy.title" = "Privacy Policy";
@@ -908,3 +917,72 @@
 "sync.state.exporting" = "Uploading to iCloud...";
 "sync.restart_warning" = "⚠️ Changing sync settings requires restarting the app";
 "sync.first_sync_tip" = "💡 First sync after reinstall may take a few minutes. Keep the app in the foreground with a stable network connection";
+
+/* Record Detail View */
+"record.detail.title" = "Record Details";
+"record.detail.glucose_value" = "Glucose Value";
+"record.detail.timestamp" = "Record Time";
+"record.detail.scene_label" = "Scene";
+"record.detail.source" = "Source";
+"record.detail.source.manual" = "Manual Entry";
+"record.detail.healthkit_sync" = "HealthKit Sync";
+"record.detail.synced" = "Synced";
+"record.detail.not_synced" = "Not Synced";
+
+/* Trend View */
+"trend.title" = "Trends";
+"trend.empty.hint" = "Start recording glucose to see your trend chart";
+"trend.tir.target" = "Target > 70%";
+"trend.cv.target" = "Target < 36%";
+
+/* Metric Explanation View */
+"metric.formula" = "Calculation Method";
+"metric.reference_standard" = "Reference Standard";
+"metric.clinical_significance" = "Clinical Significance";
+"metric.practical_use" = "Practical Use";
+"metric.disclaimer" = "This information is for reference only and does not constitute medical advice. Consult your doctor if in doubt.";
+
+/* Daily Summary Card */
+"daily.recorded" = "Recorded";
+
+/* Share Card */
+"share.keep_good_habit" = "Keep up the good recording habit";
+
+/* Common */
+"common.close" = "Close";
+"common.open_settings" = "Open Settings";
+"common.not_selected" = "Not Selected";
+"common.double_tap_toggle" = "Double tap to toggle selection";
+
+/* PDF Export */
+"pdf.has_photo" = "[Has Photo]";
+
+/* Sync Error View */
+"sync.error.nav_title" = "Sync Error";
+"sync.error.solutions" = "Solutions";
+"sync.error.technical_details" = "Technical Details";
+"sync.error.not_authenticated_title" = "Not Signed In to iCloud";
+"sync.error.network_title" = "Network Connection Failed";
+"sync.error.permission_title" = "Insufficient Permission";
+"sync.error.quota_full_message" = "Your iCloud storage is full. Data cannot be synced to the cloud. Local data is not affected. Sync will resume automatically after freeing up space.";
+"sync.error.quota.step1" = "Open Settings > tap Apple ID at the top > iCloud > Manage Account Storage";
+"sync.error.quota.step2" = "Delete unneeded iCloud backups, photos or app data";
+"sync.error.quota.step3" = "Or upgrade to iCloud+ for more storage (50GB for ¥6/month)";
+"sync.error.quota.step4" = "Reopen this app after clearing space, sync will resume automatically";
+"sync.error.auth.step1" = "Open the Settings app";
+"sync.error.auth.step2" = "Tap your Apple ID at the top";
+"sync.error.auth.step3" = "Sign in to your iCloud account";
+"sync.error.network.step1" = "Check your device's network connection";
+"sync.error.network.step2" = "Make sure you're connected to the internet";
+"sync.error.network.step3" = "Try switching networks or restarting your router";
+"sync.error.permission.step1" = "Open Settings > Privacy & Security";
+"sync.error.permission.step2" = "Make sure the app has iCloud access";
+"sync.error.permission.step3" = "Re-authorize the app";
+"sync.error.default.step1" = "Try again later";
+"sync.error.default.step2" = "Contact support if the problem persists";
+
+/* Sync Settings Diagnostics */
+"sync.cloudkit_diagnostics" = "CloudKit Diagnostics";
+"sync.debug_title" = "Sync Debug";
+"sync.diagnostics_section" = "Diagnostic Tools";
+"sync.diagnostics_footer" = "Use diagnostic tools to check CloudKit configuration and sync issues";

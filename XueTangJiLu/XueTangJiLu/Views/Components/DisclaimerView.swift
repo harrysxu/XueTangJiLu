@@ -47,6 +47,11 @@ struct DisclaimerView: View {
                             icon: "exclamationmark.triangle",
                             text: String(localized: "disclaimer.item4")
                         )
+                        
+                        DisclaimerItem(
+                            icon: "book.closed",
+                            text: String(localized: "disclaimer.item5")
+                        )
                     }
                     .padding()
                     .background(Color(.secondarySystemGroupedBackground))
@@ -91,6 +96,23 @@ struct DisclaimerItem: View {
             Text(text)
                 .font(.subheadline)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// 参考来源链接（可复用组件，用于在各页面展示引用入口）
+struct ReferenceSourceLink: View {
+    var body: some View {
+        NavigationLink {
+            MedicalReferencesView()
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "book.closed")
+                    .font(.caption2)
+                Text(String(localized: "citation.view_sources"))
+                    .font(.caption2)
+            }
+            .foregroundStyle(.secondary)
         }
     }
 }

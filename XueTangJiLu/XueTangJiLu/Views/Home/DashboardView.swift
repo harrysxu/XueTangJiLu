@@ -549,11 +549,11 @@ struct DashboardView: View {
             
             // 底部提示
             VStack(spacing: 8) {
-                Text("继续保持良好的记录习惯")
+                Text("share.keep_good_habit", tableName: "Localizable")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.8))
                 
-                Text("本摘要仅供参考，不构成医疗建议")
+                Text("share.disclaimer", tableName: "Localizable")
                     .font(.system(size: 9))
                     .foregroundStyle(.white.opacity(0.6))
             }

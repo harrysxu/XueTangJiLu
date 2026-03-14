@@ -64,6 +64,9 @@ enum GlucoseLevel {
     }
 
     /// 根据 mmol/L 值 + 标签 ID + 用户设置判定血糖水平（支持自定义标签）
+    ///
+    /// +3.0 mmol/L 偏移量为 App 的 UX 分级设计，用于在「偏高」和「注意」之间
+    /// 提供渐进式提醒。此分级仅用于界面颜色提示，不用于 TIR/TAR/TBR 等统计指标计算。
     static func from(value: Double, tagId: String, settings: UserSettings) -> GlucoseLevel {
         let range = settings.thresholdRange(for: tagId)
         switch value {
@@ -75,6 +78,8 @@ enum GlucoseLevel {
     }
 
     /// 根据 mmol/L 值 + 自定义阈值判定血糖水平
+    ///
+    /// +3.0 mmol/L 偏移量说明同上，为 UX 渐进式分级设计，非医学诊断标准。
     static func from(value: Double, low: Double, high: Double) -> GlucoseLevel {
         switch value {
         case ..<low:                 return .low

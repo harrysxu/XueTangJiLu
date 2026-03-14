@@ -331,7 +331,10 @@ struct PDFExportService {
                 yOffset += 18
             }
 
-            // 8. 页脚免责声明
+            // 8. 参考文献
+            drawReferences(context: context, yOffset: &yOffset, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
+
+            // 9. 页脚免责声明
             drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
         }
     }
@@ -352,6 +355,45 @@ struct PDFExportService {
             in: CGRect(x: margin, y: pageHeight - 50, width: pageWidth - margin * 2, height: 30),
             withAttributes: disclaimerAttributes
         )
+    }
+
+    /// 绘制参考文献列表（在报告最后一页的记录之后）
+    private static func drawReferences(
+        context: UIGraphicsPDFRendererContext,
+        yOffset: inout CGFloat,
+        pageWidth: CGFloat,
+        pageHeight: CGFloat,
+        margin: CGFloat
+    ) {
+        let contentWidth = pageWidth - margin * 2
+        let neededHeight: CGFloat = CGFloat(MedicalReferenceLibrary.references.count) * 28 + 40
+
+        if yOffset + neededHeight > pageHeight - 60 {
+            drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
+            context.beginPage()
+            yOffset = margin
+        }
+
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 12, weight: .semibold),
+            .foregroundColor: UIColor.secondaryLabel
+        ]
+        let refAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 8),
+            .foregroundColor: UIColor.tertiaryLabel
+        ]
+
+        yOffset += 12
+        let sectionTitle = String(localized: "pdf.references_title")
+        sectionTitle.draw(at: CGPoint(x: margin, y: yOffset), withAttributes: titleAttributes)
+        yOffset += 20
+
+        for (index, ref) in MedicalReferenceLibrary.references.enumerated() {
+            let text = "[\(index + 1)] \(ref.detail)"
+            let rect = CGRect(x: margin, y: yOffset, width: contentWidth, height: 24)
+            text.draw(in: rect, withAttributes: refAttributes)
+            yOffset += 14
+        }
     }
 
     // MARK: - 月度总结报告
@@ -735,6 +777,9 @@ struct PDFExportService {
                 }
             }
 
+            // 参考文献
+            drawReferences(context: context, yOffset: &yOffset, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
+
             // 页脚
             drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
         }
@@ -756,13 +801,18 @@ struct PDFExportService {
         meals: [MealRecord] = [],
         recordType: ExportRecordType = .all
     ) -> String {
-        var csv = "类型,日期,时间,血糖值,单位,阈值状态,阈值范围,场景,药物类型,药物名称,剂量,饮食描述,碳水等级,备注\n"
+        var csv = String(localized: "pdf.csv_header") + "\n"
 
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "HH:mm"
+
+        // 使用内部常量作为类型标识，与本地化显示文字解耦
+        let typeGlucose = "glucose"
+        let typeMedication = "medication"
+        let typeMeal = "meal"
 
         // 合并所有记录并按时间排序（根据 recordType 筛选）
         struct TimelineEntry: Comparable {
@@ -784,15 +834,15 @@ struct PDFExportService {
         // 根据记录类型筛选
         switch recordType {
         case .all:
-            entries += records.map { TimelineEntry(timestamp: $0.timestamp, type: "血糖", data: $0) }
-            entries += medications.map { TimelineEntry(timestamp: $0.timestamp, type: "用药", data: $0) }
-            entries += meals.map { TimelineEntry(timestamp: $0.timestamp, type: "饮食", data: $0) }
+            entries += records.map { TimelineEntry(timestamp: $0.timestamp, type: typeGlucose, data: $0) }
+            entries += medications.map { TimelineEntry(timestamp: $0.timestamp, type: typeMedication, data: $0) }
+            entries += meals.map { TimelineEntry(timestamp: $0.timestamp, type: typeMeal, data: $0) }
         case .glucoseOnly:
-            entries = records.map { TimelineEntry(timestamp: $0.timestamp, type: "血糖", data: $0) }
+            entries = records.map { TimelineEntry(timestamp: $0.timestamp, type: typeGlucose, data: $0) }
         case .medicationOnly:
-            entries = medications.map { TimelineEntry(timestamp: $0.timestamp, type: "用药", data: $0) }
+            entries = medications.map { TimelineEntry(timestamp: $0.timestamp, type: typeMedication, data: $0) }
         case .mealOnly:
-            entries = meals.map { TimelineEntry(timestamp: $0.timestamp, type: "饮食", data: $0) }
+            entries = meals.map { TimelineEntry(timestamp: $0.timestamp, type: typeMeal, data: $0) }
         }
         
         // 排序
@@ -801,11 +851,19 @@ struct PDFExportService {
         for entry in entries {
             let date = dateFormatter.string(from: entry.timestamp)
             let time = timeFormatter.string(from: entry.timestamp)
-            
-            var row = "\(entry.type),\(date),\(time),"
+
+            let localizedType: String
+            switch entry.type {
+            case typeGlucose:      localizedType = String(localized: "pdf.type_glucose")
+            case typeMedication:   localizedType = String(localized: "pdf.type_medication")
+            case typeMeal:         localizedType = String(localized: "pdf.type_meal")
+            default:               localizedType = String(localized: "pdf.other")
+            }
+
+            var row = "\(localizedType),\(date),\(time),"
             
             switch entry.type {
-            case "血糖":
+            case typeGlucose:
                 if let record = entry.data as? GlucoseRecord {
                     let value = record.displayValue(in: unit)
                     
@@ -815,11 +873,11 @@ struct PDFExportService {
                     if let settings {
                         let range = settings.thresholdRange(for: record.sceneTagId)
                         if record.value > range.high {
-                            thresholdStatus = "偏高 ↑"
+                            thresholdStatus = String(localized: "pdf.threshold_high")
                         } else if record.value < range.low {
-                            thresholdStatus = "偏低 ↓"
+                            thresholdStatus = String(localized: "pdf.threshold_low")
                         } else {
-                            thresholdStatus = "正常"
+                            thresholdStatus = String(localized: "pdf.threshold_normal")
                         }
                         thresholdRange = "\(String(format: "%.1f", range.low))-\(String(format: "%.1f", range.high))"
                     } else {
@@ -829,24 +887,24 @@ struct PDFExportService {
                     
                     let context = settings?.displayName(for: record.sceneTagId) 
                         ?? MealContext(rawValue: record.sceneTagId)?.defaultDisplayName 
-                        ?? "其他"
+                        ?? String(localized: "pdf.other")
                     let note = record.note?.replacingOccurrences(of: ",", with: "，") ?? ""
                     row += "\(value),\(unit.rawValue),\(thresholdStatus),\(thresholdRange),\(context),,,,,\(note)"
                 }
                 
-            case "用药":
+            case typeMedication:
                 if let medication = entry.data as? MedicationRecord {
-                    let medType = medication.medicationType.displayName
+                    let medType = medication.medicationType.localizedDisplayName
                     let name = medication.name.isEmpty ? "-" : medication.name
                     let dosage = medication.displayDosage
                     let note = medication.note?.replacingOccurrences(of: ",", with: "，") ?? ""
                     row += ",,,,,,\(medType),\(name),\(dosage),,,\(note)"
                 }
                 
-            case "饮食":
+            case typeMeal:
                 if let meal = entry.data as? MealRecord {
                     let description = meal.mealDescription.isEmpty ? "-" : meal.mealDescription.replacingOccurrences(of: ",", with: "，")
-                    let carbLevel = meal.carbLevel.displayName + (meal.hasPhoto ? " [有照片]" : "")
+                    let carbLevel = meal.carbLevel.localizedDisplayName + (meal.hasPhoto ? " \(String(localized: "pdf.has_photo"))" : "")
                     let note = meal.note?.replacingOccurrences(of: ",", with: "，") ?? ""
                     row += ",,,,,,,,,\(description),\(carbLevel),\(note)"
                 }
@@ -1073,6 +1131,9 @@ struct PDFExportService {
                 yOffset += 16
             }
             
+            // 参考文献
+            drawReferences(context: context, yOffset: &yOffset, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
+
             // 页脚
             drawDisclaimer(context: context, pageWidth: pageWidth, pageHeight: pageHeight, margin: margin)
         }

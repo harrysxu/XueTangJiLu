@@ -80,7 +80,7 @@ struct MetricExplanationLibrary {
             briefDescription: "根据平均血糖估算的糖化血红蛋白值，仅供参考",
             formula: "eA1C (%) = (平均血糖 × 18.0182 + 46.7) ÷ 28.7",
             referenceStandard: "< 7.0% 良好，7.0-8.0% 尚可，> 8.0% 需改善",
-            clinicalSignificance: "糖化血红蛋白反映近2-3个月的血糖控制情况，是糖尿病管理的金标准。估算值可作为日常参考，但不能替代医院检测。",
+            clinicalSignificance: "糖化血红蛋白反映近2-3个月的血糖控制情况，是糖尿病管理的金标准。估算值可作为日常参考，但不能替代医院检测。\n\n注：国际共识已推荐 GMI（Glucose Management Indicator）替代 eA1C，但 GMI 公式基于连续血糖监测（CGM）数据验证。本应用基于手动指尖血糖记录，因此采用经典 Nathan 2008 eA1C 公式更为合适。",
             practicalUse: "帮助日常监测血糖控制趋势，及时调整饮食和用药方案。每次就医前可参考估算值与医生沟通。",
             references: [
                 "Nathan DM, et al. Translating the A1C assay into estimated average glucose values. Diabetes Care, 2008;31(8):1473-1478.",
@@ -175,13 +175,13 @@ struct MetricExplanationLibrary {
             title: "餐前餐后配对",
             briefDescription: "基于时间自动配对的血糖升幅分析",
             formula: "升幅 = 餐后血糖 - 餐前血糖\n\n配对规则（完全基于时间）：\n• 同一天内\n• 餐后时间晚于餐前\n• 时间间隔 ≤ 4小时\n• 选择时间最接近的餐前记录\n\n注意：配对不考虑标签名称语义，仅依据阈值分组（餐前/餐后）和时间关系。例如「下午吃饭前」和「下午喝茶后」若符合上述规则也会配对。",
-            referenceStandard: "升幅 < 3.0 mmol/L 为理想（临床常用参考值）",
+            referenceStandard: "升幅 < 3.0 mmol/L 为理想（综合 ADA 餐后目标及 IDF 指南推导）",
             clinicalSignificance: "餐后血糖升幅反映饮食对血糖的影响。升幅过大说明进餐后血糖波动大，可能增加并发症风险。",
             practicalUse: "帮助评估具体某餐的血糖影响，指导调整食物种类和分量。升幅大的餐次可以考虑减少碳水化合物或增加餐前用药。建议每餐的餐前餐后记录保持规律，以确保配对的准确性。",
             references: [
                 "American Diabetes Association. Standards of Care in Diabetes—2026. Diabetes Care, 2026;49(Suppl 1).",
                 "中华医学会糖尿病学分会.中国糖尿病防治指南(2024版).中华糖尿病杂志, 2025.",
-                "International Diabetes Federation. Guideline for Management of PostMeal Glucose in Diabetes. Diabetes Research and Clinical Practice, 2014;103(2):256-268.",
+                "International Diabetes Federation. IDF Global Clinical Practice Recommendations for Managing Type 2 Diabetes, 2025.",
             ]
         ),
         
@@ -262,34 +262,34 @@ struct MedicalReferenceLibrary {
     
     static let references: [Reference] = [
         Reference(
-            title: "ADA Standards of Care",
+            title: String(localized: "reference.title.ada"),
             detail: "American Diabetes Association. Standards of Care in Diabetes—2026. Diabetes Care, 2026;49(Suppl 1).",
             url: "https://diabetesjournals.org/care/issue/49/Supplement_1"
         ),
         Reference(
-            title: "国际 TIR 共识",
+            title: String(localized: "reference.title.tir"),
             detail: "Battelino T, et al. Clinical Targets for Continuous Glucose Monitoring Data Interpretation: Recommendations From the International Consensus on Time in Range. Diabetes Care, 2019;42(8):1593-1603.",
             url: "https://doi.org/10.2337/dci19-0028"
         ),
         Reference(
-            title: "eA1C 换算公式",
+            title: String(localized: "reference.title.ea1c"),
             detail: "Nathan DM, et al. Translating the A1C assay into estimated average glucose values. Diabetes Care, 2008;31(8):1473-1478.",
             url: "https://doi.org/10.2337/dc08-0545"
         ),
         Reference(
-            title: "CV% 波动阈值",
+            title: String(localized: "reference.title.cv"),
             detail: "Monnier L, et al. Toward Defining the Threshold Between Low and High Glucose Variability in Diabetes. Diabetes Care, 2017;40(7):832-838.",
             url: "https://doi.org/10.2337/dc16-1769"
         ),
         Reference(
-            title: "中国糖尿病防治指南",
+            title: String(localized: "reference.title.cds"),
             detail: "中华医学会糖尿病学分会. 中国糖尿病防治指南(2024版). 中华糖尿病杂志, 2025.",
             url: "https://diab.cma.org.cn/cn/ncontent.aspx?oid=3042"
         ),
         Reference(
-            title: "IDF 餐后血糖管理指南",
-            detail: "International Diabetes Federation. Guideline for Management of PostMeal Glucose in Diabetes. Diabetes Research and Clinical Practice, 2014;103(2):256-268.",
-            url: "https://doi.org/10.1016/j.diabres.2012.08.002"
+            title: String(localized: "reference.title.idf"),
+            detail: "International Diabetes Federation. IDF Global Clinical Practice Recommendations for Managing Type 2 Diabetes, 2025. ISBN: 978-2-930229-97-3.",
+            url: "https://idf.org/t2d-cpr-2025"
         ),
     ]
 }

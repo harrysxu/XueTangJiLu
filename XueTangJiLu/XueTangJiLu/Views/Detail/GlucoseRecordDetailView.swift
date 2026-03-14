@@ -52,7 +52,7 @@ struct GlucoseRecordDetailView: View {
             .padding(.vertical, AppConstants.Spacing.lg)
         }
         .background(Color.pageBackground)
-        .navigationTitle("记录详情")
+        .navigationTitle(String(localized: "record.detail.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
     
@@ -62,7 +62,7 @@ struct GlucoseRecordDetailView: View {
         VStack(spacing: AppConstants.Spacing.lg) {
             // 血糖数值
             VStack(spacing: AppConstants.Spacing.sm) {
-                Text("血糖数值")
+                Text(String(localized: "record.detail.glucose_value"))
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                 
@@ -82,7 +82,7 @@ struct GlucoseRecordDetailView: View {
             HStack(spacing: AppConstants.Spacing.xs) {
                 Image(systemName: level.accessoryIconName)
                     .font(.body)
-                Text(level.description)
+                Text(level.localizedDescription)
                     .font(.body.weight(.medium))
             }
             .foregroundStyle(Color.forGlucoseLevel(level))
@@ -90,6 +90,9 @@ struct GlucoseRecordDetailView: View {
             .padding(.vertical, AppConstants.Spacing.sm)
             .background(Color.forGlucoseLevel(level).opacity(0.12))
             .clipShape(Capsule())
+            
+            ReferenceSourceLink()
+                .padding(.top, AppConstants.Spacing.xs)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, AppConstants.Spacing.xl)
@@ -105,7 +108,7 @@ struct GlucoseRecordDetailView: View {
         VStack(spacing: 0) {
             detailRow(
                 icon: "clock",
-                title: "记录时间",
+                title: String(localized: "record.detail.timestamp"),
                 value: record.timestamp.formatted(date: .abbreviated, time: .shortened)
             )
             
@@ -113,7 +116,7 @@ struct GlucoseRecordDetailView: View {
             
             detailRow(
                 icon: contextIconName,
-                title: "场景",
+                title: String(localized: "record.detail.scene_label"),
                 value: contextDisplayName
             )
             
@@ -121,8 +124,8 @@ struct GlucoseRecordDetailView: View {
             
             detailRow(
                 icon: "arrow.left.arrow.right",
-                title: "数据来源",
-                value: record.source == "manual" ? "手动录入" : "HealthKit"
+                title: String(localized: "record.detail.source"),
+                value: record.source == "manual" ? String(localized: "record.detail.source.manual") : "HealthKit"
             )
             
             if record.source == "manual" && settings.healthKitSyncEnabled {
@@ -130,8 +133,8 @@ struct GlucoseRecordDetailView: View {
                 
                 detailRow(
                     icon: "heart.fill",
-                    title: "HealthKit 同步",
-                    value: record.syncedToHealthKit ? "已同步" : "未同步"
+                    title: String(localized: "record.detail.healthkit_sync"),
+                    value: record.syncedToHealthKit ? String(localized: "record.detail.synced") : String(localized: "record.detail.not_synced")
                 )
             }
         }
@@ -149,7 +152,7 @@ struct GlucoseRecordDetailView: View {
                 Image(systemName: "note.text")
                     .font(.subheadline)
                     .foregroundStyle(Color.brandPrimary)
-                Text("备注")
+                Text("note", tableName: "Localizable")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
             }

@@ -156,7 +156,7 @@ struct MetricExplanationDetailView: View {
                             sectionCard(
                                 icon: "ruler",
                                 iconColor: theme.primaryColor,
-                                title: "参考标准",
+                                title: String(localized: "metric.reference_standard"),
                                 content: standard
                             )
                             .transition(.asymmetric(
@@ -168,7 +168,7 @@ struct MetricExplanationDetailView: View {
                         sectionCard(
                             icon: "heart.text.square",
                             iconColor: theme.primaryColor,
-                            title: "临床意义",
+                            title: String(localized: "metric.clinical_significance"),
                             content: explanation.clinicalSignificance
                         )
                         .transition(.asymmetric(
@@ -179,7 +179,7 @@ struct MetricExplanationDetailView: View {
                         sectionCard(
                             icon: "lightbulb.fill",
                             iconColor: theme.primaryColor,
-                            title: "辅助作用",
+                            title: String(localized: "metric.practical_use"),
                             content: explanation.practicalUse
                         )
                         .transition(.asymmetric(
@@ -265,7 +265,7 @@ struct MetricExplanationDetailView: View {
                     .foregroundStyle(theme.primaryColor)
                     .frame(width: 28)
                 
-                Text("计算方法")
+                Text("metric.formula", tableName: "Localizable")
                     .font(.headline)
                     .foregroundStyle(.primary)
             }
@@ -344,7 +344,7 @@ struct MetricExplanationDetailView: View {
                     .foregroundStyle(theme.primaryColor)
                     .frame(width: 28)
                 
-                Text("参考文献")
+                Text("pdf.references_title", tableName: "Localizable")
                     .font(.headline)
                     .foregroundStyle(.primary)
             }
@@ -390,7 +390,7 @@ struct MetricExplanationDetailView: View {
                 .foregroundStyle(.orange)
                 .symbolRenderingMode(.hierarchical)
             
-            Text("本说明仅供参考，不构成医疗建议。如有疑问请咨询专业医生。")
+            Text("metric.disclaimer", tableName: "Localizable")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

@@ -197,14 +197,23 @@
 "disclaimer.description" = "控糖助手旨在帮助您记录和了解血糖数据,但不应作为医疗决策的唯一依据。请定期复查,听从医生专业指导。";
 "disclaimer.navigation_title" = "使用须知";
 "disclaimer.accept" = "我已知晓";
+"disclaimer.item5" = "血糖分级标准参考权威医学文献,可在设置中查看参考来源";
 "disclaimer.banner" = "数据仅供参考,不构成医疗建议,请遵医嘱";
 "disclaimer.banner.references" = "查看参考来源";
+"citation.view_sources" = "分级标准来源";
+"pdf.references_title" = "参考文献";
 
 /* Medical References */
 "references.title" = "参考来源";
 "references.header" = "本应用中的血糖参考范围及健康指标标准均来自以下权威医学文献，仅供参考，不构成医疗建议。";
 "references.view_source" = "查看原文";
 "references.disclaimer" = "以上参考文献仅用于说明本应用所采用指标的学术来源，不构成对任何疾病的诊断或治疗建议。如有健康问题，请咨询专业医生。";
+"reference.title.ada" = "ADA 诊疗标准";
+"reference.title.tir" = "国际 TIR 共识";
+"reference.title.ea1c" = "eA1C 换算公式";
+"reference.title.cv" = "CV% 波动阈值";
+"reference.title.cds" = "中国糖尿病防治指南";
+"reference.title.idf" = "IDF 临床实践建议";
 
 /* About - Privacy & Disclaimer */
 "about.privacy.title" = "隐私政策";
@@ -892,3 +901,72 @@
 "sync.state.exporting" = "正在上传到 iCloud...";
 "sync.restart_warning" = "⚠️ 更改同步设置需要重启应用才能生效";
 "sync.first_sync_tip" = "💡 重新安装后首次同步可能需要几分钟，请保持应用在前台并确保网络畅通";
+
+/* Record Detail View */
+"record.detail.title" = "记录详情";
+"record.detail.glucose_value" = "血糖数值";
+"record.detail.timestamp" = "记录时间";
+"record.detail.scene_label" = "场景";
+"record.detail.source" = "数据来源";
+"record.detail.source.manual" = "手动录入";
+"record.detail.healthkit_sync" = "HealthKit 同步";
+"record.detail.synced" = "已同步";
+"record.detail.not_synced" = "未同步";
+
+/* Trend View */
+"trend.title" = "趋势";
+"trend.empty.hint" = "开始记录血糖后，这里将展示您的趋势图表";
+"trend.tir.target" = "目标 > 70%";
+"trend.cv.target" = "目标 < 36%";
+
+/* Metric Explanation View */
+"metric.formula" = "计算方法";
+"metric.reference_standard" = "参考标准";
+"metric.clinical_significance" = "临床意义";
+"metric.practical_use" = "辅助作用";
+"metric.disclaimer" = "本说明仅供参考，不构成医疗建议。如有疑问请咨询专业医生。";
+
+/* Daily Summary Card */
+"daily.recorded" = "已记录";
+
+/* Share Card */
+"share.keep_good_habit" = "继续保持良好的记录习惯";
+
+/* Common */
+"common.close" = "关闭";
+"common.open_settings" = "打开设置";
+"common.not_selected" = "未选中";
+"common.double_tap_toggle" = "双击切换选中状态";
+
+/* PDF Export */
+"pdf.has_photo" = "[有照片]";
+
+/* Sync Error View */
+"sync.error.nav_title" = "同步错误";
+"sync.error.solutions" = "解决方案";
+"sync.error.technical_details" = "技术详情";
+"sync.error.not_authenticated_title" = "未登录 iCloud";
+"sync.error.network_title" = "网络连接失败";
+"sync.error.permission_title" = "权限不足";
+"sync.error.quota_full_message" = "您的 iCloud 存储空间已满，无法将数据同步到云端。本地数据不受影响，清理空间后将自动恢复同步。";
+"sync.error.quota.step1" = "打开「设置」> 点击顶部 Apple ID > iCloud > 管理账户储存空间";
+"sync.error.quota.step2" = "删除不需要的 iCloud 备份、照片或其他应用数据";
+"sync.error.quota.step3" = "或升级到 iCloud+ 获取更多存储空间（50GB 仅需 ¥6/月）";
+"sync.error.quota.step4" = "清理后重新打开本应用，同步将自动恢复";
+"sync.error.auth.step1" = "打开「设置」应用";
+"sync.error.auth.step2" = "点击顶部的 Apple ID";
+"sync.error.auth.step3" = "登录您的 iCloud 账户";
+"sync.error.network.step1" = "检查设备的网络连接";
+"sync.error.network.step2" = "确保已连接到互联网";
+"sync.error.network.step3" = "尝试切换网络或重启路由器";
+"sync.error.permission.step1" = "打开「设置」> 隐私与安全性";
+"sync.error.permission.step2" = "确保应用有 iCloud 访问权限";
+"sync.error.permission.step3" = "重新授权应用";
+"sync.error.default.step1" = "稍后重试";
+"sync.error.default.step2" = "如问题持续，请联系技术支持";
+
+/* Sync Settings Diagnostics */
+"sync.cloudkit_diagnostics" = "CloudKit 诊断";
+"sync.debug_title" = "同步调试";
+"sync.diagnostics_section" = "诊断工具";
+"sync.diagnostics_footer" = "使用诊断工具检查 CloudKit 配置和同步问题";

@@ -216,13 +216,14 @@ struct SettingsView: View {
             NavigationLink {
                 AboutView(type: .disclaimer)
             } label: {
-                Text(String(localized: "profile.disclaimer"))
+                Label(String(localized: "profile.disclaimer"), systemImage: "exclamationmark.shield")
             }
 
             NavigationLink {
                 MedicalReferencesView()
             } label: {
-                Text(String(localized: "profile.references"))
+                Label(String(localized: "profile.references"), systemImage: "book.closed.fill")
+                    .foregroundStyle(.blue)
             }
 
             Button(action: requestReview) {

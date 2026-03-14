@@ -311,16 +311,16 @@ struct SyncSettingsView: View {
     private var diagnosticsSection: some View {
         Section {
             NavigationLink(destination: CloudKitDiagnosticsView()) {
-                Label("CloudKit 诊断", systemImage: "stethoscope")
+                Label(String(localized: "sync.cloudkit_diagnostics"), systemImage: "stethoscope")
             }
             
             NavigationLink(destination: SyncDebugView()) {
-                Label("同步调试", systemImage: "wrench.and.screwdriver")
+                Label(String(localized: "sync.debug_title"), systemImage: "wrench.and.screwdriver")
             }
         } header: {
-            Text("诊断工具")
+            Text("sync.diagnostics_section", tableName: "Localizable")
         } footer: {
-            Text("使用诊断工具检查 CloudKit 配置和同步问题")
+            Text("sync.diagnostics_footer", tableName: "Localizable")
         }
     }
     #endif

@@ -40,8 +40,8 @@ struct TrendView: View {
                     if allRecords.isEmpty {
                         EmptyStateView(
                             icon: "chart.line.uptrend.xyaxis",
-                            title: "暂无趋势数据",
-                            subtitle: "开始记录血糖后，这里将展示您的趋势图表"
+                            title: String(localized: "chart.no_trend_data"),
+                            subtitle: String(localized: "trend.empty.hint")
                         )
                         .padding(.top, 60)
                     } else {
@@ -65,7 +65,7 @@ struct TrendView: View {
                 }
                 .padding(.vertical, AppConstants.Spacing.lg)
             }
-            .navigationTitle("趋势")
+            .navigationTitle(String(localized: "trend.title"))
         }
     }
 
@@ -73,7 +73,7 @@ struct TrendView: View {
 
     private var timeRangePicker: some View {
         VStack(spacing: AppConstants.Spacing.sm) {
-            Picker("时间范围", selection: $chartViewModel.selectedRange) {
+            Picker(String(localized: "statistics.time_range"), selection: $chartViewModel.selectedRange) {
                 ForEach(TimeRange.allCases) { range in
                     Text(range.rawValue).tag(range)
                 }
@@ -101,7 +101,7 @@ struct TrendView: View {
                     Button {
                         showCustomDatePicker = true
                     } label: {
-                        Text("修改")
+                        Text("record.modify", tableName: "Localizable")
                             .font(.caption.weight(.medium))
                             .foregroundStyle(Color.brandPrimary)
                     }
@@ -129,7 +129,7 @@ struct TrendView: View {
             HStack(spacing: AppConstants.Spacing.md) {
                 // 平均血糖 (eAG)
                 StatCardView(
-                    title: "平均血糖",
+                    title: String(localized: "statistics.average"),
                     value: averageGlucose,
                     subtitle: unit.rawValue,
                     tintColor: averageColor
@@ -137,9 +137,9 @@ struct TrendView: View {
 
                 // TIR 达标率
                 StatCardView(
-                    title: "达标率",
+                    title: String(localized: "statistics.tir"),
                     value: tirValue,
-                    subtitle: "目标 > 70%",
+                    subtitle: String(localized: "trend.tir.target"),
                     tintColor: tirColor
                 )
             }
@@ -147,17 +147,17 @@ struct TrendView: View {
             HStack(spacing: AppConstants.Spacing.md) {
                 // 波动系数
                 StatCardView(
-                    title: "波动系数",
+                    title: String(localized: "statistics.cv.label"),
                     value: cvValue,
-                    subtitle: "目标 < 36%",
+                    subtitle: String(localized: "trend.cv.target"),
                     tintColor: cvColor
                 )
 
                 // 记录次数
                 StatCardView(
-                    title: "记录次数",
+                    title: String(localized: "statistics.records"),
                     value: "\(rangeRecords.count)",
-                    subtitle: "近\(chartViewModel.selectedRange.rawValue)"
+                    subtitle: String(format: String(localized: "statistics.records_near"), chartViewModel.selectedRange.rawValue)
                 )
             }
         }

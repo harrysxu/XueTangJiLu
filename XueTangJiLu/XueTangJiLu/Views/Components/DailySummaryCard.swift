@@ -114,7 +114,7 @@ struct DailySummaryCard: View {
                     Text("\(todayRecords.count)")
                         .font(.system(size: 36, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
-                    Text("已记录")
+                    Text("daily.recorded", tableName: "Localizable")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -179,6 +179,11 @@ struct DailySummaryCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.red.opacity(0.08))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            
+            HStack {
+                Spacer()
+                ReferenceSourceLink()
             }
         }
     }

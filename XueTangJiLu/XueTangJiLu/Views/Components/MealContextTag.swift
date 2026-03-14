@@ -45,8 +45,8 @@ struct MealContextTag: View {
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(label)，\(isSelected ? "已选中" : "未选中")")
-        .accessibilityHint("双击切换选中状态")
+        .accessibilityLabel("\(label)，\(isSelected ? String(localized: "common.selected") : String(localized: "common.not_selected"))")
+        .accessibilityHint(String(localized: "common.double_tap_toggle"))
     }
 }
 
